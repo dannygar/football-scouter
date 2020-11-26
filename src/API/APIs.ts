@@ -1,66 +1,119 @@
+import { v4 as uuid } from 'uuid'
 import axios, { AxiosResponse } from 'axios'
-import { ISignificance, SignificanceDataType } from '../Models/SignificanceModel'
+import { IEvent, EventDataType, EventType } from '../Models/EventModel'
+import { convertToEventType } from '../Utils/TypeConversion'
 
 const baseUrl: string = 'http://localhost:4000'
 
-export const getSignificances = async (): Promise<AxiosResponse<SignificanceDataType>> => {
+export const getEvents = async (): Promise<AxiosResponse<EventDataType>> => {
   try {
-    const significances: AxiosResponse<SignificanceDataType> = await axios.get(
-      baseUrl + '/significances'
-    )
-    return significances
-  } catch (error) {
-    throw new Error(error)
-  }
-}
-
-export const addSignificance = async (
-  formData: ISignificance
-): Promise<AxiosResponse<SignificanceDataType>> => {
-  try {
-    const significance: Omit<ISignificance, 'id'> = {
-        time: formData.time,
-        advTeam: formData.advTeam,
-        sigType: formData.sigType,
-        position: formData.position,
-        significance: formData.significance,
-        status: false,
+    const events: AxiosResponse<EventDataType> = {
+      data: {
+        events: [
+          {
+            id: uuid(),
+            time: "05.23",
+            advTeam: "Chelsea",
+            eventType: EventType.Penetration,
+            position: 14,
+            significance: 40,
+            status: true,
+            comments: "Successful dribbling with the 3rd defensive line penetration "
+          },
+          {
+            id: uuid(),
+            time: "06.45",
+            advTeam: "Chelsea",
+            eventType: EventType.Disruption,
+            position: 8,
+            significance: 56,
+            status: true
+          },
+        ],
+        message: "",
+        status: "",
+        event: {
+          id: uuid(),
+          time: "05.23",
+          advTeam: "Chelsea",
+          eventType: EventType.Penetration,
+          position: 14,
+          significance: 40,
+          status: true
+        },
+      },
+      status: 200,
+      statusText: "OK",
+      headers: "application/json",
+      config: {}
     }
-    const saveSignificance: AxiosResponse<SignificanceDataType> = await axios.post(
-      baseUrl + '/add-significance',
-      significance
-    )
-    return saveSignificance
+    // const events: AxiosResponse<EventDataType> = await axios.get(
+    //   baseUrl + '/events'
+    // )
+    return events
   } catch (error) {
     throw new Error(error)
   }
 }
 
-export const updateSignificance = async (
-  significance: ISignificance
-): Promise<AxiosResponse<SignificanceDataType>> => {
+export const addEvent = async (
+  formData: IEvent
+): Promise<AxiosResponse<EventDataType>> => {
+    try {
+    // const event: Omit<IEvent, 'id'> = {
+    //     time: formData.time,
+    //     advTeam: formData.advTeam,
+    //     eventType: formData.eventType,
+    //     position: formData.position,
+    //     significance: formData.significance,
+    //     status: false,
+    // }
+    // const saveEvent: AxiosResponse<EventDataType> = await axios.post(
+    //   baseUrl + '/add-event',
+    //   event
+    // )
+    const event: IEvent = {
+      id: uuid(),
+      time: formData.time,
+      advTeam: formData.advTeam,
+      eventType: parseInt(formData.eventType.toString()),
+      position: parseInt(formData.position.toString()),
+      significance: parseInt(formData.significance.toString()),
+      status: false,
+    }
+    const events = await getEvents()
+    events.data.events.push(event)
+    return events
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+export const updateEvent = async (
+  event: IEvent
+): Promise<AxiosResponse<EventDataType>> => {
   try {
-    const significanceUpdate: Pick<ISignificance, 'status'> = {
+    const eventUpdate: Pick<IEvent, 'status'> = {
       status: true,
     }
-    const updatedSignificance: AxiosResponse<SignificanceDataType> = await axios.put(
-      `${baseUrl}/edit-significance/${significance.id}`,
-      significanceUpdate
+    const updatedEvent: AxiosResponse<EventDataType> = await axios.put(
+      `${baseUrl}/edit-event/${event.id}`,
+      eventUpdate
     )
-    return updatedSignificance
+    return updatedEvent
   } catch (error) {
     throw new Error(error)
   }
 }
 
-export const deleteSignificance = async (
+export const deleteEvent = async (
   _id: string
-): Promise<AxiosResponse<SignificanceDataType>> => {
+): Promise<AxiosResponse<EventDataType>> => {
   try {
-    const deletedSignificance: AxiosResponse<SignificanceDataType> = await axios.delete(
-      `${baseUrl}/delete-significance/${_id}`
+    const deletedEvent: AxiosResponse<EventDataType> = await axios.delete(
+      `${baseUrl}/delete-event/${_id}`
     )
-    return deletedSignificance
+    return deletedEvent
   } catch (error) {
     throw new Error(error)
   }

@@ -1,29 +1,29 @@
 import React from 'react'
-import { SignificanceType } from '../Models/SignificanceModel';
+import { EventType } from '../Models/EventModel';
 import '../Styles/App.css';
 
 const getTypes: any = () => {
     return [
         {
             label: "Penetration",
-            value: SignificanceType.Penetration
+            value: EventType.Penetration
         },
         {
             label: "Possession",
-            value: SignificanceType.Possession
+            value: EventType.Possession
         },
         {
             label: "Disruption",
-            value: SignificanceType.Disruption
+            value: EventType.Disruption
         },
         {
             label: "Error",
-            value: SignificanceType.Error
+            value: EventType.Error
         },
     ];
 };
 
-const SignificanceTypeDropDown: React.FC<any> = () => {
+const EventTypeDropDown: React.FC<any> = () => {
     const [loading, setLoading] = React.useState(false)
     const [items, setItems] = React.useState([])
     const [value, setValue] = React.useState("Loading...");
@@ -48,4 +48,4 @@ const SignificanceTypeDropDown: React.FC<any> = () => {
 }
 
 
-export default SignificanceTypeDropDown
+export default EventTypeDropDown
