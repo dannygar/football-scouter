@@ -62,7 +62,7 @@ body {
 
 .App {
   display: block;
-  max-width: 1480px;
+  max-width: 1280px;
   margin: 1rem auto;
 }
 
@@ -76,7 +76,7 @@ body {
   justify-content: space-between;
   align-items: center;
   text-align: center;
-  margin: 2vh 0;
+  margin: 2vh 0vh;
   background: #444;
 }
 
@@ -85,6 +85,7 @@ body {
   align-items: center;
   background: #444;
   margin-bottom: 1rem;
+  margin-left: 0vh;
   border-bottom: 1px solid #333333;
   color: #fff;
 }
@@ -140,21 +141,34 @@ body {
 }
 
 .Form #time {
-  width: 120px;
+  min-width: 90px;
+  max-width: 100px;
 }
 
 .Form #advTeam {
-  width: 150px;
+  min-width: 90px;
+  max-width: 100px;
 }
 
 .Form #position {
-  width: 100px;
+  min-width: 90px;
+  max-width: 100px;
 }
 
 .Form #significance {
-  width: 120px;
+  min-width: 90px;
+  max-width: 100px;
 }
 
+.Form #credit {
+  min-width: 90px;
+  max-width: 100px;
+}
+
+.Form #blame {
+  min-width: 90px;
+  max-width: 100px;
+}
 
 .line-through {
     text-decoration: line-through;

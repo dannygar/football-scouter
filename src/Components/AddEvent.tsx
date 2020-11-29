@@ -27,7 +27,7 @@ const AddEvent: React.FC<Props> = ({ saveEvent }) => {
               <input onChange={handleForm} type='text' id='time' />
             </div>
             <div>
-              <label htmlFor='advTeam'>Advantaged Team</label>
+              <label htmlFor='advTeam'>Adv Team</label>
               <input onChange={handleForm} type='text' id='advTeam' />
             </div>
             <div>
