@@ -1,19 +1,28 @@
 import React, { useEffect, useState } from 'react'
+import { Text } from '@fluentui/react'
 import './Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
-import AddEvent from './Components/AddEvent'
+import { authProvider } from './Auth/AuthProvider'
 import { getEvents, addEvent, updateEvent, deleteEvent } from './API/APIs'
 import { IEvent } from './Models/EventModel'
+import AddEvent from './Components/AddEvent'
 import Navigation from './Components/Navigation'
 import EventTable  from './Components/EventTable'
+import { AccessTokenResponse } from 'react-aad-msal';
 
 
 const App: React.FC = () => {
   const [events, setEvents] = useState<IEvent[]>([])
 
+  const [token, setToken] = useState<string>('')
+
+
   useEffect(() => {
     fetchEvents()
-  }, [])
+    authProvider.getAccessToken().then ((value: AccessTokenResponse) => {
+      setToken(value.accessToken)
+    })
+  }, [token])
 
   const fetchEvents = (): void => {
     getEvents()
@@ -64,7 +73,7 @@ const App: React.FC = () => {
             <Navigation />
           </div>
           <div className="main-element ms-Grid-col ms-sm11 ms-xl11">
-            <h1 className="App">Chelsea vs Barcelona, February, 21, 2021</h1>
+            <Text block className="Title" variant='xxLarge'>Chelsea vs Barcelona, February, 21, 2021</Text>
             <div className="ms-Grid-row">
               <main className='App'>
                 <AddEvent saveEvent={handleSaveEvent} />
@@ -81,7 +90,11 @@ const App: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>      
+        <footer>
+          <h2>Environment: {process.env.NODE_ENV}</h2>
+          <h2>Token: {token}</h2>
+        </footer>
+    </div>      
   )
 }
 

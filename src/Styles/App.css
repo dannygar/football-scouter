@@ -10,7 +10,11 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #fff;
-    background: #333;
+    /* background: #333; */
+    background-image: url('https://wallpapercave.com/wp/wc1689557.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-blend-mode: multiply;
 }
 
 #root {
@@ -18,7 +22,19 @@ body {
 }
 
 .ms-Nav {
-  background-color: white;
+  font-family: 'Nunito', sans-serif;
+  background-color: #ff9900;
+  color: #fff;
+}
+
+.ms-Button {
+  font-weight: 400;
+  font-size: large;
+  color: darkblue;
+}
+
+.ms-Button--Action {
+  color: rgb(73, 15, 15);
 }
 
 .ms-Grid-col {
@@ -29,6 +45,17 @@ body {
 .ms-Grid-row {
   padding-bottom: 0;
   margin-bottom: 0;
+}
+
+.Title {
+  display: block;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  margin: 1rem auto;
+  color: black;
+  font-weight: 800;
+  font-size: xx-large;
 }
 
 
@@ -49,6 +76,7 @@ body {
   align-items: center;
   text-align: center;
   margin: 2vh 0;
+  background: #444;
 }
 
 .Table {
