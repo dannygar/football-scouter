@@ -21,6 +21,22 @@ namespace ScouterApi
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureLogging(logging =>
+                {
+                    // clear default logging providers
+                    logging.ClearProviders();
+
+                    // add built-in providers manually, as needed
+                    logging.AddConsole();
+                    logging.AddDebug();
+                    logging.AddEventLog();
+                    logging.AddEventSourceLogger();
+                })
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config
+                        .AddEnvironmentVariables();
                 });
     }
 }

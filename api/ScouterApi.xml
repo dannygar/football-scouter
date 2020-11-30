@@ -1,0 +1,208 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ScouterApi</name>
+    </assembly>
+    <members>
+        <member name="T:ScouterApi.Configuration.AppSettings">
+            <summary>
+            Class AppSettings.
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Configuration.AppSettings.Logging">
+            <summary>
+            Gets or sets the logging.
+            </summary>
+            <value>The logging.</value>
+        </member>
+        <member name="P:ScouterApi.Configuration.AppSettings.ApplicationInsights">
+            <summary>
+            Gets or sets the application insights.
+            </summary>
+            <value>The application insights.</value>
+        </member>
+        <member name="P:ScouterApi.Configuration.AppSettings.CosmosDb">
+            <summary>
+            Gets or sets the cosmos database.
+            </summary>
+            <value>The cosmos database.</value>
+        </member>
+        <member name="P:ScouterApi.Configuration.AppSettings.AzureAD">
+            <summary>
+            Gets or sets the Azure AD app details.
+            </summary>
+            <value>The Azure AD settings for the application.</value>
+        </member>
+        <member name="M:ScouterApi.Configuration.AppSettings.GetConfiguration(System.String)">
+            <summary>
+            Gets the configuration.
+            </summary>
+            <param name="dir">The dir.</param>
+            <returns>IConfigurationRoot.</returns>
+        </member>
+        <member name="M:ScouterApi.Configuration.AppSettings.GetConfiguration(System.String,System.String)">
+            <summary>
+            Gets the configuration.
+            </summary>
+            <param name="dir">The dir.</param>
+            <param name="environmentName">Name of the environment.</param>
+            <returns>IConfigurationRoot.</returns>
+        </member>
+        <member name="M:ScouterApi.Configuration.AppSettings.GetSettings(System.String)">
+            <summary>
+            Gets the settings.
+            </summary>
+            <param name="dir">The dir.</param>
+            <returns>AppSettings.</returns>
+        </member>
+        <member name="M:ScouterApi.Configuration.AppSettings.GetSettings(System.String,System.String)">
+            <summary>
+            Gets the settings.
+            </summary>
+            <param name="dir">The dir.</param>
+            <param name="environmentName">Name of the environment.</param>
+            <returns>AppSettings.</returns>
+        </member>
+        <member name="M:ScouterApi.Configuration.AppSettings.GetSettings(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Gets the settings.
+            </summary>
+            <param name="config">The configuration.</param>
+            <returns>AppSettings.</returns>
+        </member>
+        <member name="T:ScouterApi.Configuration.AppSettings.LoggingSettings">
+            <summary>
+            Class LoggingSettings.
+            </summary>
+        </member>
+        <member name="T:ScouterApi.Configuration.AppSettings.LoggingSettings.LogLevelSettings">
+            <summary>
+            Class LogLevelSettings.
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Configuration.AppSettings.LoggingSettings.LogLevelSettings.Default">
+            <summary>
+            Gets or sets the default.
+            </summary>
+            <value>The default.</value>
+        </member>
+        <member name="P:ScouterApi.Configuration.AppSettings.LoggingSettings.LogLevelSettings.Microsoft">
+            <summary>
+            Gets or sets the microsoft logs.
+            </summary>
+            <value>The microsoft.</value>
+        </member>
+        <member name="P:ScouterApi.Configuration.AppSettings.LoggingSettings.LogLevelSettings.System">
+            <summary>
+            Gets or sets the System logs.
+            </summary>
+            <value>The microsoft.</value>
+        </member>
+        <member name="T:ScouterApi.Configuration.AppSettings.ApplicationInsightsSettings">
+            <summary>
+            Class ApplicationInsightsSettings.
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Configuration.AppSettings.ApplicationInsightsSettings.InstrumentationKey">
+            <summary>
+            Gets or sets the instrumentation key.
+            </summary>
+            <value>The instrumentation key.</value>
+        </member>
+        <member name="P:ScouterApi.Configuration.AppSettings.ApplicationInsightsSettings.LogLevel">
+            <summary>
+            Gets or sets the log level.
+            </summary>
+            <value>The log level.</value>
+        </member>
+        <member name="T:ScouterApi.Configuration.AppSettings.CosmosDbSettings">
+            <summary>
+            Class CosmosDbSettings.
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Configuration.AppSettings.CosmosDbSettings.ConnectionString">
+            <summary>
+            Gets or sets the Cosmos DB Connection string.
+            </summary>
+            <value>The endpoint URL.</value>
+        </member>
+        <member name="P:ScouterApi.Configuration.AppSettings.CosmosDbSettings.DatabaseName">
+            <summary>
+            Gets or sets the name of the database.
+            </summary>
+            <value>The name of the database.</value>
+        </member>
+        <member name="T:ScouterApi.Configuration.AppSettings.AzureADSettings">
+            <summary>
+            Class AzureAD Settings.
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Configuration.AppSettings.AzureADSettings.TenantId">
+            <summary>
+            Gets or sets the Tenant ID for the Azure AD app registration.
+            </summary>
+            <value>The tenant id.</value>
+        </member>
+        <member name="P:ScouterApi.Configuration.AppSettings.AzureADSettings.AppId">
+            <summary>
+            Gets or sets the App ID for the Azure AD app registration.
+            </summary>
+            <value>The app id.</value>
+        </member>
+        <member name="P:ScouterApi.Configuration.AppSettings.AzureADSettings.AppPassword">
+            <summary>
+            Gets or sets the App AppSecret/Secret for the Azure AD app registration.
+            </summary>
+            <value>The app password.</value>
+        </member>
+        <member name="P:ScouterApi.Configuration.AppSettings.AzureADSettings.HostDomain">
+            <summary>
+            Gets or sets the Host Domain for the Azure AD app registration that is also the permission scope prefix.
+            </summary>
+            <value>The name of the host domain.</value>
+        </member>
+        <member name="P:ScouterApi.Configuration.AppSettings.AzureADSettings.Scope">
+            <summary>
+            Gets or sets the Scope Name for the Azure AD app registration.
+            </summary>
+            <value>The name of the scope.</value>
+        </member>
+        <member name="T:ScouterApi.Constants.HttpRouteConstants">
+            <summary>
+            HTTP route constants for routing requests to CallController methods.
+            </summary>
+        </member>
+        <member name="F:ScouterApi.Constants.HttpRouteConstants.ScouterRoutePrefix">
+            <summary>
+            Route prefix for all incoming requests.
+            </summary>
+        </member>
+        <member name="F:ScouterApi.Constants.HttpRouteConstants.OnAddEventRequestRoute">
+            <summary>
+            Route for incoming call requests.
+            </summary>
+        </member>
+        <member name="T:ScouterApi.Controllers.Controllers.HomeController">
+            <summary>
+            Controller for home/default views
+            </summary>
+        </member>
+        <member name="M:ScouterApi.Controllers.Controllers.HomeController.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ScouterApi.Controllers.Controllers.HomeController"/> class.
+            </summary>
+        </member>
+        <member name="M:ScouterApi.Controllers.Controllers.HomeController.Index">
+            <summary>
+            The default index view for the Home controller
+            </summary>
+            <returns>the view to render</returns>
+        </member>
+        <member name="M:ScouterApi.Controllers.Controllers.HomeController.Get">
+            <summary>
+            Get the default content of home page.
+            </summary>
+            <returns>Default content.</returns>
+        </member>
+    </members>
+</doc>
