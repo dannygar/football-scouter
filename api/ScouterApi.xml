@@ -204,5 +204,215 @@
             </summary>
             <returns>Default content.</returns>
         </member>
+        <member name="T:ScouterApi.Services.ICosmosDbService`1">
+            <summary>
+            Interface ICosmosDbService.
+            </summary>
+            <typeparam name="T"> A model type.</typeparam>
+        </member>
+        <member name="M:ScouterApi.Services.ICosmosDbService`1.GetItemsAsync(System.String)">
+            <summary>
+            Gets the items asynchronous.
+            </summary>
+            <param name="queryString">The query string.</param>
+            <returns>Task&lt;IEnumerable&lt;T&gt;&gt;.</returns>
+        </member>
+        <member name="M:ScouterApi.Services.ICosmosDbService`1.GetItemAsync(System.String,System.String)">
+            <summary>
+            Gets the item asynchronous.
+            </summary>
+            <param name="id">The identifier.</param>
+            <param name="partitionKey">The partition key.</param>
+            <returns>Task&lt;T&gt;.</returns>
+        </member>
+        <member name="M:ScouterApi.Services.ICosmosDbService`1.AddItemAsync(`0,System.String)">
+            <summary>
+            Adds the item asynchronous.
+            </summary>
+            <param name="item">The item.</param>
+            <param name="partitionKey">The partition key.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:ScouterApi.Services.ICosmosDbService`1.UpsertItemAsync(`0,System.String)">
+            <summary>
+            Upserts the item asynchronous.
+            </summary>
+            <param name="item">The item.</param>
+            <param name="partitionKey">The partition key.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:ScouterApi.Services.ICosmosDbService`1.DeleteItemAsync(System.String,System.String)">
+            <summary>
+            Deletes the item asynchronous.
+            </summary>
+            <param name="id">The identifier.</param>
+            <param name="partitionKey">The partition key.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="T:ScouterApi.Utils.CosmosUtil`1">
+            <summary>
+            Class CosmosUtil.
+            Implements the <see cref="T:ScouterApi.Services.ICosmosDbService`1" />.
+            </summary>
+            <typeparam name="T">A model type.</typeparam>
+            <seealso cref="T:ScouterApi.Services.ICosmosDbService`1" />
+        </member>
+        <member name="F:ScouterApi.Utils.CosmosUtil`1.DefaultPartitionKey">
+            <summary>
+            The default partition key.
+            </summary>
+        </member>
+        <member name="F:ScouterApi.Utils.CosmosUtil`1.client">
+            <summary>
+            The client.
+            </summary>
+        </member>
+        <member name="F:ScouterApi.Utils.CosmosUtil`1.database">
+            <summary>
+            The database.
+            </summary>
+        </member>
+        <member name="F:ScouterApi.Utils.CosmosUtil`1.container">
+            <summary>
+            The container.
+            </summary>
+        </member>
+        <member name="M:ScouterApi.Utils.CosmosUtil`1.#ctor(System.String,System.String,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ScouterApi.Utils.CosmosUtil`1" /> class.
+            </summary>
+            <param name="containerName">Name of the container.</param>
+            <param name="partitionKey">The partition key.</param>
+            <param name="throughput">The throughput.</param>
+        </member>
+        <member name="M:ScouterApi.Utils.CosmosUtil`1.#ctor(System.String,ScouterApi.Configuration.AppSettings,System.String,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ScouterApi.Utils.CosmosUtil`1" /> class.
+            </summary>
+            <param name="containerName">Name of the container.</param>
+            <param name="appSettings">The application settings.</param>
+            <param name="partitionKey">The partition key.</param>
+            <param name="throughput">The throughput.</param>
+        </member>
+        <member name="M:ScouterApi.Utils.CosmosUtil`1.GetItemsAsync(System.String)">
+            <summary>
+            get items as an asynchronous operation.
+            </summary>
+            <param name="queryString">The query string.</param>
+            <returns>IEnumerable&lt;T&gt;.</returns>
+        </member>
+        <member name="M:ScouterApi.Utils.CosmosUtil`1.GetItemAsync(System.String,System.String)">
+            <summary>
+            get item as an asynchronous operation.
+            </summary>
+            <param name="id">The identifier.</param>
+            <param name="partitionKey">The partition key.</param>
+            <returns>T.</returns>
+        </member>
+        <member name="M:ScouterApi.Utils.CosmosUtil`1.AddItemAsync(`0,System.String)">
+            <summary>
+            add item as an asynchronous operation.
+            </summary>
+            <param name="item">The item.</param>
+            <param name="partitionKey">The partition key.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:ScouterApi.Utils.CosmosUtil`1.UpsertItemAsync(`0,System.String)">
+            <summary>
+            upsert item as an asynchronous operation.
+            </summary>
+            <param name="item">The item.</param>
+            <param name="partitionKey">The partition key.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:ScouterApi.Utils.CosmosUtil`1.DeleteItemAsync(System.String,System.String)">
+            <summary>
+            delete item as an asynchronous operation.
+            </summary>
+            <param name="id">The identifier.</param>
+            <param name="partitionKey">The partition key.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:ScouterApi.Utils.CosmosUtil`1.DeleteContainerAsync(System.String)">
+            <summary>
+            delete container as an asynchronous operation.
+            </summary>
+            <param name="containerName">Name of the container.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> representing the work of deleting the container.</returns>
+        </member>
+        <member name="M:ScouterApi.Utils.CosmosUtil`1.DeleteDatabaseAsync">
+            <summary>
+            delete database as an asynchronous operation.
+            </summary>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> representing the work of deleting the database.</returns>
+        </member>
+        <member name="M:ScouterApi.Utils.CosmosUtil`1.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:ScouterApi.Utils.CosmosUtil`1.UpdateConnectionStrForCosmosEmulator(System.String,System.String)">
+            <summary>
+            Updates a cosmosdb connectionstr with a new endpoint address" /> class.
+            </summary>
+            <param name="appSettingsConnectionString">The connection str read from app settings.</param>
+            <param name="cosmosEndPoint">The new cosmos db endpoint to update the connection str with.</param>
+            <returns>string.</returns>
+        </member>
+        <member name="M:ScouterApi.Utils.CosmosUtil`1.CreateDatabase(System.String,ScouterApi.Configuration.AppSettings,System.String,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ScouterApi.Utils.CosmosUtil`1" /> class.
+            </summary>
+            <param name="containerName">Name of the container.</param>
+            <param name="appSettings">The application settings.</param>
+            <param name="partitionKey">The partition key.</param>
+            <param name="throughput">The throughput.</param>
+            <returns>System.Threading.Tasks.Task.</returns>
+        </member>
+        <member name="T:ScouterApi.Utils.LogUtil">
+            <summary>
+            Log class to publish logs/traces into application Insights.
+            </summary>
+        </member>
+        <member name="M:ScouterApi.Utils.LogUtil.LogError(Microsoft.Extensions.Logging.ILogger,System.String,System.String)">
+            <summary>
+            Method to handle error messages.
+            </summary>
+            <param name="logger">logger.</param>
+            <param name="messages">message.</param>
+            <param name="module">module.</param>
+        </member>
+        <member name="M:ScouterApi.Utils.LogUtil.LogWarning(Microsoft.Extensions.Logging.ILogger,System.String,System.String)">
+            <summary>
+            Method to handle warning messages.
+            </summary>
+            <param name="logger">logger.</param>
+            <param name="messages">message.</param>
+            <param name="module">module.</param>
+        </member>
+        <member name="M:ScouterApi.Utils.LogUtil.LogInformation(Microsoft.Extensions.Logging.ILogger,System.String,System.String)">
+            <summary>
+            Method to handle information messages.
+            </summary>
+            <param name="logger">logger.</param>
+            <param name="messages">message.</param>
+            <param name="module">module.</param>
+        </member>
+        <member name="M:ScouterApi.Utils.LogUtil.LogCritical(Microsoft.Extensions.Logging.ILogger,System.String,System.String)">
+            <summary>
+            Method to handle critical messages.
+            </summary>
+            <param name="logger">logger.</param>
+            <param name="messages">message.</param>
+            <param name="module">module.</param>
+        </member>
+        <member name="M:ScouterApi.Utils.LogUtil.ArgumentValidation(Microsoft.Extensions.Logging.ILogger,System.String,System.String)">
+            <summary>
+            Method to validate arguments for nullvalue.
+            </summary>
+            <param name="logger">logger.</param>
+            <param name="messages">message.</param>
+            <param name="module">module.</param>
+        </member>
     </members>
 </doc>

@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Assembly         : Microsoft.Teams.App.TeamsRoom
+// Assembly         : ScouterApi
 // Author           : dannygar
 // Created          : 09-01-2020
 //

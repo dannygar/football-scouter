@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using ScouterApi.Configuration;
+using ScouterApi.Processors;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -39,6 +40,10 @@ namespace ScouterApi
 
             // Getting the AppSettings object here
             var settings = AppSettings.GetSettings(this.Configuration);
+
+            // Add transient services
+            services.AddTransient<AgentProcessor>();
+
 
             // Enable CORS
             services.AddCors(options =>

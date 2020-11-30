@@ -1,5 +1,11 @@
-import React from 'react'
-import { Nav, initializeIcons } from '@fluentui/react'
+import React, { useContext, useEffect, useState } from 'react'
+import { Nav, initializeIcons, INavLink } from '@fluentui/react'
+import GameManager from './GameManager'
+import { IEvent } from '../Models/EventModel'
+
+// Global NavBar context
+import { NavBarContext, navBarContext } from '../NavBar/NavBar.Context'
+import { useMenu } from '../NavBar/NavBar.Hook'
 
 const navigationStyles = {
     root: {
@@ -17,9 +23,9 @@ const links = [
         {
             name: 'Dashboard',
             key:'dash',
-            url: '/',
+            url: '/dashboard',
             iconProps: {
-                iconName: 'Soccer',
+                iconName: 'News',
                 styles: {
                     root: {
                         fontSize: 20,
@@ -70,19 +76,57 @@ const links = [
                 }
             }
         },
+        {
+            name: 'Games',
+            key: 'games',
+            url: '/games',
+            iconProps: {
+                iconName: 'Soccer',
+                styles: {
+                    root: {
+                        fontSize: 20,
+                        color: '#106ebe',
+                    },
+                }
+            }
+        },
     ],
     },
-  ]
+]
+
+type NavProps = {
+    selectedKey: string
+}
   
-  const Navigation = () => {
+const Navigation: React.FC<NavProps> = (props) => {
+    // Set selected Menu
+    const { setMenuKey } = useContext(navBarContext)
+    const [menuKey, setCurrentMenuKey] = useState<string>(useMenu().selectedMenu)
+
     initializeIcons();
+
+    const onLinkClick = (ev?: React.MouseEvent<HTMLElement>, item?: INavLink) => {
+        if (item && item.key) {
+            setMenuKey(item.key)
+            setCurrentMenuKey(item.Key)
+            console.log(`menu key=${item.key}`)
+        }
+    }
+
+    // useEffect(() => {
+    //     setCurrentMenuKey(props.selectedKey)
+    // },[])
+
+
     return (
-      <Nav
-        groups={links}
-        selectedKey='dash'
-        styles={navigationStyles}
-      />
+        <Nav
+            onLinkClick={onLinkClick}
+            groups={links}
+            selectedKey={props.selectedKey}
+            styles={navigationStyles}
+        />
     )
-  }
+}
+
   
-  export default Navigation
+export default Navigation
