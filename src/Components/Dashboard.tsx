@@ -3,18 +3,19 @@ import { Text } from '@fluentui/react'
 import '../Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
 import { authProvider } from '../Auth/AuthProvider'
-import { getEvents, addEvent, updateEvent, deleteEvent } from '../API/APIs'
+import { AccessTokenResponse } from 'react-aad-msal';
+
+import { getEvents, addEvent, saveEvents, updateEvent, deleteEvent } from '../API/APIs'
 import { IEvent } from '../Models/EventModel'
 import AddEvent from '../Components/AddEvent'
 import Navigation from '../Components/Navigation'
 import EventTable  from '../Components/EventTable'
-import { AccessTokenResponse } from 'react-aad-msal';
 
 // Global context
 import { navBarContext } from '../NavBar/NavBar.Context'
 import { useMenu } from '../NavBar/NavBar.Hook'
 
-const App: React.FC = () => {
+const Dashboard: React.FC = () => {
   const [events, setEvents] = useState<IEvent[]>([])
   
   const [token, setToken] = useState<string>('')
@@ -36,15 +37,26 @@ const App: React.FC = () => {
     .catch((err: Error) => console.log(err))
   }
 
+  const handleAddEvent = async (e: React.FormEvent, formData: IEvent): Promise<void> => {
+    e.preventDefault()
+    const _form: any = e.currentTarget
+    formData = {...formData, eventType: _form.elements[2].value}
+    await addEvent(formData, events)
+    .then(({ data }) => {
+      setEvents(data.events)
+    })
+    .catch((err) => console.log(err))
+  }
+
   const handleSaveEvent = async (e: React.FormEvent, formData: IEvent): Promise<void> => {
     e.preventDefault()
     const _form: any = e.currentTarget
     formData = {...formData, eventType: _form.elements[2].value}
-    await addEvent(formData)
+    await saveEvents(formData)
     .then(({ status, data }) => {
-      // if (status !== 201) {
-      //   throw new Error('Error! Event not saved')
-      // }
+      if (status !== 201) {
+        throw new Error('Error! Event not saved')
+      }
       setEvents(data.events)
     })
     .catch((err) => console.log(err))
@@ -82,7 +94,7 @@ const App: React.FC = () => {
             <Text block className="Title" variant='xxLarge'>Chelsea vs Barcelona, February, 21, 2021</Text>
             <div className="ms-Grid-row">
               <main className='App'>
-                <AddEvent saveEvent={handleSaveEvent} />
+                <AddEvent saveEvent={handleAddEvent} />
               </main>
             </div>
             <div className="ms-Grid-row">
@@ -107,4 +119,4 @@ const App: React.FC = () => {
   )
 }
 
-export default App
+export default Dashboard

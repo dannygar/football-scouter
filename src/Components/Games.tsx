@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import '../Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
 import { authProvider } from '../Auth/AuthProvider'
-import { getEvents, addEvent, updateEvent, deleteEvent } from '../API/APIs'
+import { getEvents, saveEvents, updateEvent, deleteEvent } from '../API/APIs'
 import { IEvent } from '../Models/EventModel'
 import AddEvent from './AddEvent'
 import Navigation from './Navigation'
@@ -34,7 +34,7 @@ const App: React.FC = () => {
     e.preventDefault()
     const _form: any = e.currentTarget
     formData = {...formData, eventType: _form.elements[2].value}
-    await addEvent(formData)
+    await saveEvents(formData)
     .then(({ status, data }) => {
       // if (status !== 201) {
       //   throw new Error('Error! Event not saved')

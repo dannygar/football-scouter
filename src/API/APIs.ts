@@ -57,6 +57,42 @@ export const getEvents = async (): Promise<AxiosResponse<EventDataType>> => {
 }
 
 export const addEvent = async (
+  formData: IEvent,
+  events: IEvent[],
+): Promise<AxiosResponse<EventDataType>> => {
+    try {
+    const event: IEvent = {
+      id: uuid(),
+      time: formData.time,
+      advTeam: formData.advTeam,
+      eventType: parseInt(formData.eventType.toString()),
+      position: parseInt(formData.position.toString()),
+      significance: parseInt(formData.significance.toString()),
+      status: false,
+    }
+    events.push(event)
+
+    const syncEvents: AxiosResponse<EventDataType> = {
+      data: {
+        events: events,
+        message: "",
+        status: "",
+        event: event,
+      },
+      status: 200,
+      statusText: "OK",
+      headers: "application/json",
+      config: {}
+    }
+
+    return syncEvents
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+
+export const saveEvents = async (
   formData: IEvent
 ): Promise<AxiosResponse<EventDataType>> => {
     try {
