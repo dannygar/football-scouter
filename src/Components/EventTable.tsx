@@ -178,6 +178,7 @@ const EventTable: React.FC<EventItemProps> = (props) => {
 
     useEffect(() => {
         setItems(props.events)
+        console.log(items)
     }, [props.events, items])
 
     const getKey = (item: IEvent, index?: number): string => {

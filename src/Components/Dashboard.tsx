@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { Text } from '@fluentui/react'
 import '../Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
@@ -14,9 +14,14 @@ import EventTable  from '../Components/EventTable'
 // Global context
 import { navBarContext } from '../NavBar/NavBar.Context'
 import { useMenu } from '../NavBar/NavBar.Hook'
+import { NIL } from 'uuid';
 
 const Dashboard: React.FC = () => {
   const [events, setEvents] = useState<IEvent[]>([])
+  const [newEvent, setNewEvent] = useState<IEvent | null>(null)
+  const [eventCount, addEventCount] = useState(0);
+  const [toggled, setToggled] = useState(false);
+
   
   const [token, setToken] = useState<string>('')
 
@@ -29,25 +34,54 @@ const Dashboard: React.FC = () => {
   })
 
   useEffect(() => {
-    fetchEvents()
-  }, [])
+    fetchEvents().then((totalEvents: number) => {
+      addEventCount(totalEvents)  
+    })
+  },[eventCount])
 
-  const fetchEvents = (): void => {
-    getEvents()
-    .then(({ data: { events } }: IEvent[] | any) => setEvents(events))
-    .catch((err: Error) => console.log(err))
+
+  useEffect(() => {
+    const addEventHandler = async (formData: IEvent): Promise<void> => {
+      await addEvent(formData, events)
+      .then(({ data }) => {
+        setEvents(data.events)
+        console.log(`added total of ${events.length} events`)
+      })
+      .catch((err) => console.log(err))
+    }  
+    if (toggled && newEvent !== null) {
+      addEventHandler(newEvent)
+      setToggled(false)
+    }
+  }, [events, newEvent, toggled])
+
+  const fetchEvents = async (): Promise<number> => {
+    const retrievedEvents = await getEvents()
+    setEvents(retrievedEvents.data.events)
+    return events.length
   }
 
-  const handleAddEvent = async (e: React.FormEvent, formData: IEvent): Promise<void> => {
+  const handleAddEvent = (e: React.FormEvent, formData: IEvent): void => {
     e.preventDefault()
     const _form: any = e.currentTarget
     formData = {...formData, eventType: _form.elements[2].value}
-    await addEvent(formData, events)
-    .then(({ data }) => {
-      setEvents(data.events)
-    })
-    .catch((err) => console.log(err))
+    console.log("adding new event")
+    setNewEvent(formData)
+    setToggled(true)
   }
+
+  // const handleAddEvent = async (e: React.FormEvent, formData: IEvent): Promise<void> => {
+  //   e.preventDefault()
+  //   const _form: any = e.currentTarget
+  //   formData = {...formData, eventType: _form.elements[2].value}
+  //   await addEvent(formData, events)
+  //   .then(({ data }) => {
+  //     setEvents(data.events)
+  //     console.log(`added total of ${events.length} events`)
+  //     addEventCount(data.events.length)
+  //   })
+  //   .catch((err) => console.log(err))
+  // }
 
   const handleSaveEvent = async (e: React.FormEvent, formData: IEvent): Promise<void> => {
     e.preventDefault()
@@ -99,19 +133,19 @@ const Dashboard: React.FC = () => {
               </main>
             </div>
             <div className="ms-Grid-row">
-              <main className='App'>
-                <EventTable 
-                  events={events} 
-                  updateEvent={handleUpdateEvent}
-                  deleteEvent={handleDeleteEvent}
+              {!toggled && <main className='App'>
+                  <EventTable 
+                    events={events} 
+                    updateEvent={handleUpdateEvent}
+                    deleteEvent={handleDeleteEvent}
                   />                  
-              </main>
+              </main>}
             </div>
           </div>
         </div>
         <footer>
           <h2>Environment: {process.env.NODE_ENV}</h2>
-          <h2>Token: {token}</h2>
+          <h2>Events Total: {events.length}</h2>
           <h2>AccountId: {accountId}</h2>
           <h2>UserName: {userName}</h2>
           <h2>Display Name: {name}</h2>

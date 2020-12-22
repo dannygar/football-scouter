@@ -37,7 +37,7 @@ const links = [
         {
             name: 'Stats',
             key: 'stats',
-            url: '/',
+            url: '/stats',
             iconProps: {
                 iconName: 'PowerBILogo',
                 styles: {
@@ -51,7 +51,7 @@ const links = [
         {
             name: 'Standing',
             key: 'stand',
-            url: '/',
+            url: '/standing',
             iconProps: {
                 iconName: 'PeopleAlert',
                 styles: {
@@ -65,7 +65,7 @@ const links = [
         {
             name: 'Rules',
             key: 'rules',
-            url: '/',
+            url: '/rules',
             iconProps: {
                 iconName: 'Settings',
                 styles: {

@@ -9,6 +9,7 @@ import { navBarContext } from './NavBar/NavBar.Context'
 import { useMenu } from './NavBar/NavBar.Hook'
 import Dashboard from './Components/Dashboard';
 import Games from './Components/Games';
+import Card from './Components/Card';
 
 const App: React.FC = () => {
   const currentMenu = useMenu();
@@ -19,6 +20,7 @@ const App: React.FC = () => {
         <Router>
             <Switch>
               <Route path="/dashboard" component={Dashboard} />
+              <Route path="/stats" children={<Card title="something" body="very very interesting" />} />
               <Route path="/games" component={Games} />
               <Redirect from="*" to="/dashboard" />
             </Switch>
