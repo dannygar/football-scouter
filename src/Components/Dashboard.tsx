@@ -24,12 +24,13 @@ const Dashboard: React.FC = () => {
   const name = authProvider.getAccountInfo()?.account.name
   const accountId = authProvider.getAccountInfo()?.account.accountIdentifier
 
+  authProvider.getAccessToken().then ((value: AccessTokenResponse) => {
+    setToken(value.accessToken)
+  })
+
   useEffect(() => {
     fetchEvents()
-    authProvider.getAccessToken().then ((value: AccessTokenResponse) => {
-      setToken(value.accessToken)
-    })
-  }, [token])
+  }, [])
 
   const fetchEvents = (): void => {
     getEvents()
