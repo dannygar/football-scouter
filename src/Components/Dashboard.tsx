@@ -116,15 +116,9 @@ const Dashboard: React.FC = () => {
     .catch((err) => console.log(err))
   }
 
-  const handleDeleteEvent = (_id: string): void => {
-    deleteEvent(_id)
-    .then(({ status, data }) => {
-      if (status !== 200) {
-        throw new Error('Error! Event not deleted')
-      }
-      setEvents(data.events)
-    })
-    .catch((err) => console.log(err))
+  const handleDeleteEvent = (deletedItems: IEvent[]): void => {
+    const updatedItemsList = events.filter((item, index) => !deletedItems.includes(item))
+    setEvents(updatedItemsList)
   }
 
   const onGameChanged = (event: React.FormEvent<HTMLDivElement>, item?: IDropdownOption, index?: number): void => {
@@ -170,7 +164,7 @@ const Dashboard: React.FC = () => {
                 <EventTable 
                   events={events} 
                   updateEvent={handleUpdateEvent}
-                  deleteEvent={handleDeleteEvent}
+                  deleteItemsEvent={handleDeleteEvent}
                 />                  
               </main>}
             </Stack.Item>
