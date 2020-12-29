@@ -10,6 +10,7 @@ import { IEvent } from '../Models/EventModel'
 import AddEvent from '../Components/AddEvent'
 import Navigation from '../Components/Navigation'
 import EventTable  from '../Components/EventTable'
+import { Game } from '../Models/Game';
 
 // Global context
 import { navBarContext } from '../NavBar/NavBar.Context'
@@ -32,7 +33,7 @@ const nonShrinkingStackItemStyles: IStackItemStyles = {
 initializeIcons();
 
 const Dashboard: React.FC = () => {
-  const [selectedGame, setSelectedGame] = useState<IDropdownOption>()
+  const [selectedGame, setSelectedGame] = useState<Game>()
   const [events, setEvents] = useState<IEvent[]>([])
   const [newEvent, setNewEvent] = useState<IEvent | null>(null)
   const [eventCount, addEventCount] = useState(0)
@@ -59,7 +60,7 @@ const Dashboard: React.FC = () => {
       addEventCount(totalEvents)  
     })
     onSetFocus()
-  },[eventCount])
+  },[eventCount, selectedGame])
 
 
   useEffect(() => {
@@ -86,7 +87,7 @@ const Dashboard: React.FC = () => {
   const handleAddEvent = (e: React.FormEvent, formData: IEvent): void => {
     e.preventDefault()
     const _form: any = e.currentTarget
-    formData = {...formData, eventType: _form.elements[2].value, position: formData.position ?? 0, significance: formData.significance ?? 0}
+    formData = {...formData, advTeam: _form.elements[1].value, eventType: _form.elements[2].value, position: formData.position ?? 0, significance: formData.significance ?? 0}
     setNewEvent(formData)
     setToggled(true)
   }
@@ -102,7 +103,9 @@ const Dashboard: React.FC = () => {
   }
 
   const onGameChanged = (event: React.FormEvent<HTMLDivElement>, item?: IDropdownOption, index?: number): void => {
-    setSelectedGame(item)
+    if (item && item.data) {
+      setSelectedGame(item.data)
+    }
     console.log(`Selected: ${item?.text}`)
   }
 
@@ -120,10 +123,10 @@ const Dashboard: React.FC = () => {
                   placeholder="Select a game"
                   label="Select a game for which you want to edit significant events"
                   options={[
-                    { key: 'CHEBAR', text: 'Chelsea vs Barcelona' },
-                    { key: 'ATLSEV', text: 'Athletico vs Sevilia' },
-                    { key: 'LIVMC', text: 'Liverpool vs Manchester City' },
-                    { key: 'MANARC', text: 'Manchester United vs Arsenal' },
+                    { key: 'CHEATL022321', text: 'Chelsea vs Atletico Madrid', 
+                      data: {id: 'CHEATL022321', homeTeam: 'Chelsea', awayTeam: 'Atletico Madrid', playedOn: '02/23/2021', fullGame: false, leagueName: 'Champions'} },
+                    { key: 'REALPSG031321', text: 'Real Madrid vs PSG',
+                      data: {id: 'REALPSG031321', homeTeam: 'Real Madrid', awayTeam: 'PSG', playedOn: '02/23/2021', fullGame: false, leagueName: 'Champions'} },
                   ]}
                   required
                   styles={dropdownStyles}
@@ -132,11 +135,11 @@ const Dashboard: React.FC = () => {
               </Stack>
             </Stack.Item>
             <Stack.Item align="auto">
-              <Text block className="Title" variant='xxLarge'>{selectedGame?.text}</Text>
+              <Text block className="Title" variant='xxLarge'>{selectedGame?.homeTeam} vs {selectedGame?.awayTeam}</Text>
             </Stack.Item>
             <Stack.Item align="auto">
               <main className='App'>
-                <AddEvent saveEvent={handleAddEvent} />
+                <AddEvent saveEvent={handleAddEvent} game={selectedGame as Game} />
               </main>
             </Stack.Item>
             <Stack.Item align="stretch">

@@ -2,14 +2,18 @@ import { EventType } from "../Models/EventModel";
 
 export const getEventType = (type: EventType) => {
     switch (type) {
-        case EventType.Penetration:
-            return "Penetration"
-        case EventType.Possession:
+        case EventType.PEP:
+            return "Pass"
+        case EventType.PED:
+            return "Dribble"
+        case EventType.POS:
             return "Possession"
-        case EventType.Disruption:
+        case EventType.DIS:
             return "Disruption"
-        case EventType.Error:
+        case EventType.ERR:
             return "Error"
+        case EventType.RUN:
+            return "Run"
         default:
             return "Unknown"                                
     }

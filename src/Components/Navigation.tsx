@@ -1,10 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Nav, initializeIcons, INavLink } from '@fluentui/react'
-import GameManager from './GameManager'
-import { IEvent } from '../Models/EventModel'
 
 // Global NavBar context
-import { NavBarContext, navBarContext } from '../NavBar/NavBar.Context'
+import { navBarContext } from '../NavBar/NavBar.Context'
 import { useMenu } from '../NavBar/NavBar.Hook'
 
 const navigationStyles = {

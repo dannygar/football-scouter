@@ -1,15 +1,32 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import '../Styles/App.css';
-import { EventType, IEvent } from '../Models/EventModel'
+import { IEvent, getEventTypes } from '../Models/EventModel'
 import EventTypeDropDown from './EventTypeDropDown'
+import { Game } from '../Models/Game';
 
   
 type Props = { 
   saveEvent: (e: React.FormEvent, formData: IEvent | any) => void 
+  game: Game
 }
 
-const AddEvent: React.FC<Props> = ({ saveEvent }) => {
+const initTeams = (props: Game): any[] => {
+  return [
+      {
+          label: props?.homeTeam ?? 'Home Team',
+          value: props?.homeTeam ?? '0'
+      },
+      {
+          label: props?.awayTeam ?? 'Away Team',
+          value: props?.awayTeam ?? '1'
+      },
+  ] 
+}
+
+
+const AddEvent: React.FC<Props> = ({ saveEvent, game }) => {
   const [formData, setFormData] = useState<IEvent | {}>()
+  const [teams, setTeams] = useState<any[]>(initTeams(game))
 
   const handleForm = (e: React.FormEvent<HTMLInputElement>): void => {
     setFormData({
@@ -17,6 +34,13 @@ const AddEvent: React.FC<Props> = ({ saveEvent }) => {
       [e.currentTarget.id]: e.currentTarget.value,
     })
   }
+
+
+  useEffect(() => {
+    if (game && (teams[0].value !== game.homeTeam || teams[1].value !== game.awayTeam)) {
+      setTeams(initTeams(game))
+    }
+  }, [game, teams])
 
   return (
     <div className="container">
@@ -28,11 +52,11 @@ const AddEvent: React.FC<Props> = ({ saveEvent }) => {
             </div>
             <div>
               <label htmlFor='advTeam'>Adv Team</label>
-              <input onChange={handleForm} type='text' id='advTeam' />
+              <EventTypeDropDown onChange={handleForm} type='text' id='advTeam' items={teams} />
             </div>
             <div>
               <label htmlFor='eventType'>Event Type</label>
-              <EventTypeDropDown onChange={handleForm} type='number' id='eventType' />
+              <EventTypeDropDown onChange={handleForm} type='number' id='eventType' items={getEventTypes()} />
             </div>
             <div>
               <label htmlFor='position'>Position</label>

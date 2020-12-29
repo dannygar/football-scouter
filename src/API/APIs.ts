@@ -14,7 +14,7 @@ export const getEvents = async (): Promise<AxiosResponse<EventDataType>> => {
             id: uuid(),
             time: "05.23",
             advTeam: "Chelsea",
-            eventType: EventType.Penetration,
+            eventType: EventType.PEP,
             position: 14,
             significance: 40,
             status: true,
@@ -24,7 +24,7 @@ export const getEvents = async (): Promise<AxiosResponse<EventDataType>> => {
             id: uuid(),
             time: "06.45",
             advTeam: "Chelsea",
-            eventType: EventType.Disruption,
+            eventType: EventType.DIS,
             position: 8,
             significance: 56,
             status: true
@@ -36,7 +36,7 @@ export const getEvents = async (): Promise<AxiosResponse<EventDataType>> => {
           id: uuid(),
           time: "05.23",
           advTeam: "Chelsea",
-          eventType: EventType.Penetration,
+          eventType: EventType.RUN,
           position: 14,
           significance: 40,
           status: true

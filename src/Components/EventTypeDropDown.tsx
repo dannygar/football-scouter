@@ -1,36 +1,22 @@
 import React from 'react'
-import { EventType } from '../Models/EventModel';
 import '../Styles/App.css';
 
-const getTypes: any = () => {
-    return [
-        {
-            label: "Penetration",
-            value: EventType.Penetration
-        },
-        {
-            label: "Possession",
-            value: EventType.Possession
-        },
-        {
-            label: "Disruption",
-            value: EventType.Disruption
-        },
-        {
-            label: "Error",
-            value: EventType.Error
-        },
-    ];
-};
 
-const EventTypeDropDown: React.FC<any> = () => {
+type DropDownProps = { 
+    items: any[]
+    onChange: (e: React.FormEvent<HTMLInputElement>) => void
+    type: string
+    id: string
+}
+
+const EventTypeDropDown: React.FC<DropDownProps> = (props: DropDownProps) => {
     const [loading, setLoading] = React.useState(false)
-    const [items, setItems] = React.useState([])
+    const [items, setItems ] = React.useState(props.items)
     const [value, setValue] = React.useState("Loading...");
     React.useEffect(() => {
-        setItems(getTypes)
+        setItems(props.items)
         setLoading(false)
-    }, [])
+    }, [props.items, items])
   
     return (
         <select className=".Form input"
@@ -39,9 +25,9 @@ const EventTypeDropDown: React.FC<any> = () => {
             onChange={(e) => setValue(e.currentTarget.value)}
         >
             {items.map(({ label, value }) => (
-            <option key={value} value={value}>
-                {label}
-            </option>
+                <option key={value} value={value}>
+                    {label}
+                </option>
             ))}
         </select>
     );
