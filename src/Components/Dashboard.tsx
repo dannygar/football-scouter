@@ -91,29 +91,9 @@ const Dashboard: React.FC = () => {
     setToggled(true)
   }
 
-  const handleSaveEvent = async (e: React.FormEvent, formData: IEvent): Promise<void> => {
-    e.preventDefault()
-    const _form: any = e.currentTarget
-    formData = {...formData, eventType: _form.elements[2].value}
-    await saveEvents(formData)
-    .then(({ status, data }) => {
-      if (status !== 201) {
-        throw new Error('Error! Event not saved')
-      }
-      setEvents(data.events)
-    })
-    .catch((err) => console.log(err))
-  }
 
-  const handleUpdateEvent = (event: IEvent): void => {
-    updateEvent(event)
-    .then(({ status, data }) => {
-      if (status !== 200) {
-        throw new Error('Error! Event not updated')
-      }
-      setEvents(data.events)
-    })
-    .catch((err) => console.log(err))
+  const handleSaveEvent = async (events: IEvent[]):  Promise<void>  => {
+    await saveEvents(events)
   }
 
   const handleDeleteEvent = (deletedItems: IEvent[]): void => {
@@ -163,7 +143,7 @@ const Dashboard: React.FC = () => {
               {!toggled && <main className='App'>
                 <EventTable 
                   events={events} 
-                  updateEvent={handleUpdateEvent}
+                  saveEvents={handleSaveEvent}
                   deleteItemsEvent={handleDeleteEvent}
                 />                  
               </main>}

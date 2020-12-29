@@ -93,8 +93,8 @@ export const addEvent = async (
 
 
 export const saveEvents = async (
-  formData: IEvent
-): Promise<AxiosResponse<EventDataType>> => {
+  events: IEvent[]
+): Promise<IEvent[]> => {
     try {
     // const event: Omit<IEvent, 'id'> = {
     //     time: formData.time,
@@ -108,17 +108,6 @@ export const saveEvents = async (
     //   baseUrl + '/add-event',
     //   event
     // )
-    const event: IEvent = {
-      id: uuid(),
-      time: formData.time,
-      advTeam: formData.advTeam,
-      eventType: parseInt(formData.eventType.toString()),
-      position: parseInt(formData.position.toString()),
-      significance: parseInt(formData.significance.toString()),
-      status: false,
-    }
-    const events = await getEvents()
-    events.data.events.push(event)
     return events
   } catch (error) {
     throw new Error(error)

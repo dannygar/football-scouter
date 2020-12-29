@@ -22,7 +22,7 @@ import { IEvent } from '../Models/EventModel'
 import { getEventType } from '../Utils/TypeConversion';
 
 type EventItemProps = {
-    updateEvent: (event: IEvent) => void
+    saveEvents: (events: IEvent[]) => void
     deleteItemsEvent: (deletedItems: IEvent[]) => void
     events: IEvent[]
 }
@@ -180,6 +180,7 @@ const EventTable: React.FC<EventItemProps> = (props) => {
     const [items, setItems] = useState<IEvent[]>(props.events)
     const [selectedItems, setSelectedItems] = useState<IEvent[]>([])
     const [toggleDelete, setToggleDelete] = useState(false)
+    const [stateMessage, setStateMessage] = useState<string>('')
 
     const onItemsSelectionChanged  = () => {
       const selectedItems = selection.getSelection()
@@ -247,7 +248,7 @@ const EventTable: React.FC<EventItemProps> = (props) => {
           key: 'saveRow',
           text: 'Save Results',
           iconProps: { iconName: 'Save' },
-          onClick: onDeleteRow,
+          onClick: onSaveEvents,
         },
       ]
     }
@@ -255,11 +256,17 @@ const EventTable: React.FC<EventItemProps> = (props) => {
     const onDeleteRow = (): void => {
       if (selection.getSelectedCount() > 0) {
         setToggleDelete(true)
+        setStateMessage(`${selection.getSelectedCount()} item(s) were successfully deleted`)
       } else {
         alert('Please select at least one row to be deleted.')
       }
     }
   
+    const onSaveEvents = (): void => {
+      props.saveEvents(items)
+      setStateMessage('Saved')
+    }
+    
 
     return (
       <div data-is-scrollable={true}>
@@ -267,6 +274,7 @@ const EventTable: React.FC<EventItemProps> = (props) => {
           <CommandBar
             styles={commandBarStyles}
             items={getCommandItems()}
+            farItems={[{ key: 'state', text: `${stateMessage}` }]}
           />
 
           <DetailsList
