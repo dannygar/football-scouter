@@ -54,11 +54,21 @@ body {
   align-items: center;
   text-align: center;
   margin: 1rem auto;
-  color: black;
+  color: white;
   font-weight: 800;
   font-size: xx-large;
 }
 
+.Header {
+  display: flex;
+  justify-content: space-between;
+  align-items: left;
+  text-align: left;
+  margin: 10px 0 0 0;
+  color: white;
+  font-weight: 600;
+  font-size: x-large;
+}
 
 .App {
   display: block;
@@ -168,6 +178,16 @@ body {
 .Form #blame {
   min-width: 90px;
   max-width: 100px;
+}
+
+.button {
+  background: #ff9900;
+  color: #fff;
+  padding: 0.5rem 2rem;
+  border-radius: 20px;
+  margin-top: 1.5rem;
+  cursor: pointer;
+  border: none;
 }
 
 .line-through {
