@@ -5,12 +5,12 @@ import 'office-ui-fabric-react/dist/css/fabric.css';
 import { authProvider } from '../Auth/AuthProvider'
 import { AccessTokenResponse } from 'react-aad-msal';
 
-import { getEvents, addEvent, saveEvents, updateEvent, deleteEvent } from '../API/APIs'
+import { getEvents, addEvent, saveEvents, updateEvent, deleteEvent } from '../API/EventAPI'
 import { IEvent } from '../Models/EventModel'
 import AddEvent from '../Components/AddEvent'
 import Navigation from '../Components/Navigation'
 import EventTable  from '../Components/EventTable'
-import { Game } from '../Models/Game';
+import { IGame } from '../Models/GameModel';
 
 // Global context
 import { navBarContext } from '../NavBar/NavBar.Context'
@@ -33,7 +33,7 @@ const nonShrinkingStackItemStyles: IStackItemStyles = {
 initializeIcons();
 
 const Dashboard: React.FC = () => {
-  const [selectedGame, setSelectedGame] = useState<Game>()
+  const [selectedGame, setSelectedGame] = useState<IGame>()
   const [events, setEvents] = useState<IEvent[]>([])
   const [newEvent, setNewEvent] = useState<IEvent | null>(null)
   const [eventCount, addEventCount] = useState(0)
@@ -139,7 +139,7 @@ const Dashboard: React.FC = () => {
             </Stack.Item>
             <Stack.Item align="auto">
               <main className='App'>
-                <AddEvent saveEvent={handleAddEvent} game={selectedGame as Game} />
+                <AddEvent saveEvent={handleAddEvent} game={selectedGame as IGame} />
               </main>
             </Stack.Item>
             <Stack.Item align="stretch">

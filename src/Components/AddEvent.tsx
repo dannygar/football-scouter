@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react'
 import '../Styles/App.css';
 import { IEvent, getEventTypes } from '../Models/EventModel'
 import EventTypeDropDown from './EventTypeDropDown'
-import { Game } from '../Models/Game';
+import { IGame } from '../Models/GameModel';
 
   
 type Props = { 
   saveEvent: (e: React.FormEvent, formData: IEvent | any) => void 
-  game: Game
+  game: IGame
 }
 
-const initTeams = (props: Game): any[] => {
+const initTeams = (props: IGame): any[] => {
   return [
       {
           label: props?.homeTeam ?? 'Home Team',

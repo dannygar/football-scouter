@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace ScouterApi.Models
 {
     /// <summary>
-    ///  Game model
+    ///  IGame model
     /// </summary>
-    public class Game: BaseModel
+    public class IGame: BaseModel
     {
         [DataMember(Name = "homeTeam")]
         public string HomeTeam { get; set; }

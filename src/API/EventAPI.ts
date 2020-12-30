@@ -1,7 +1,6 @@
 import { v4 as uuid } from 'uuid'
 import axios, { AxiosResponse } from 'axios'
 import { IEvent, EventDataType, EventType } from '../Models/EventModel'
-import { convertToEventType } from '../Utils/TypeConversion'
 
 const baseUrl: string = 'http://localhost:4000'
 

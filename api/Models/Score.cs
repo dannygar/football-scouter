@@ -21,10 +21,10 @@ namespace ScouterApi.Models
         public Agent Agent { get; set; }
 
         /// <summary>
-        /// Gets or sets Game.
+        /// Gets or sets IGame.
         /// </summary>
         [DataMember(Name = "game")]
-        public Game Game { get; set; }
+        public IGame IGame { get; set; }
 
         /// <summary>
         ///  Gets or sets the Events.
