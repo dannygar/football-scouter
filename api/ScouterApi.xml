@@ -4,6 +4,17 @@
         <name>ScouterApi</name>
     </assembly>
     <members>
+        <member name="T:ScouterApi.Attributes.ValidateModelStateAttribute">
+            <summary>
+            Model state validation attribute
+            </summary>
+        </member>
+        <member name="M:ScouterApi.Attributes.ValidateModelStateAttribute.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
+            <summary>
+            Called before the action method is invoked
+            </summary>
+            <param name="context">context</param>
+        </member>
         <member name="T:ScouterApi.Configuration.AppSettings">
             <summary>
             Class AppSettings.
@@ -172,15 +183,31 @@
             HTTP route constants for routing requests to CallController methods.
             </summary>
         </member>
-        <member name="F:ScouterApi.Constants.HttpRouteConstants.ScouterRoutePrefix">
+        <member name="F:ScouterApi.Constants.HttpRouteConstants.ScoresRoutePrefix">
             <summary>
             Route prefix for all incoming requests.
             </summary>
         </member>
-        <member name="F:ScouterApi.Constants.HttpRouteConstants.OnAddEventRequestRoute">
+        <member name="F:ScouterApi.Constants.HttpRouteConstants.AgentRoutePrefix">
             <summary>
-            Route for incoming call requests.
+            Route agent
             </summary>
+        </member>
+        <member name="F:ScouterApi.Constants.HttpRouteConstants.GameRoutePrefix">
+            <summary>
+            Route agent
+            </summary>
+        </member>
+        <member name="T:ScouterApi.Controllers.GamesController">
+             <summary>
+             Scouter Controller
+             </summary>
+            [Authorize]
+        </member>
+        <member name="M:ScouterApi.Controllers.GamesController.PostAsync(System.Collections.Generic.IEnumerable{ScouterApi.Models.IGame})">
+            <summary>Posts the specified event.</summary>
+            <param name="games">The games collection.</param>
+            <returns>Task&lt;System.Boolean&gt;.</returns>
         </member>
         <member name="T:ScouterApi.Controllers.Controllers.HomeController">
             <summary>
@@ -203,6 +230,158 @@
             Get the default content of home page.
             </summary>
             <returns>Default content.</returns>
+        </member>
+        <member name="T:ScouterApi.Controllers.ScoresController">
+             <summary>
+             Scouter Controller
+             </summary>
+            [Authorize]
+        </member>
+        <member name="M:ScouterApi.Controllers.ScoresController.PostAsync(ScouterApi.Models.Score)">
+            <summary>Posts the specified event.</summary>
+            <param name="score">The score data.</param>
+            <returns>Task&lt;System.Boolean&gt;.</returns>
+        </member>
+        <member name="T:ScouterApi.Models.BaseModel">
+            <summary>
+            Base model class.
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Models.BaseModel.Id">
+            <summary>
+            Gets or sets the identifier in Cosmos Db.
+            </summary>
+            <value>The identifier.</value>
+        </member>
+        <member name="P:ScouterApi.Models.BaseModel.UpdatedOn">
+            <summary>
+             Gets or sets the UpdatedOn
+            </summary>
+        </member>
+        <member name="M:ScouterApi.Models.BaseModel.op_Equality(ScouterApi.Models.BaseModel,ScouterApi.Models.BaseModel)">
+            <summary>
+            Implements the == operator.
+            </summary>
+            <param name="obj1">The obj1.</param>
+            <param name="obj2">The obj2.</param>
+            <returns>The result of the operator.</returns>
+        </member>
+        <member name="M:ScouterApi.Models.BaseModel.op_Inequality(ScouterApi.Models.BaseModel,ScouterApi.Models.BaseModel)">
+            <summary>
+            Implements the != operator.
+            </summary>
+            <param name="obj1">The obj1.</param>
+            <param name="obj2">The obj2.</param>
+            <returns>The result of the operator.</returns>
+        </member>
+        <member name="M:ScouterApi.Models.BaseModel.Equals(ScouterApi.Models.BaseModel)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <param name="other">An object to compare with this object.</param>
+            <returns>true if the current object is equal to the <paramref name="other">other</paramref> parameter; otherwise, false.</returns>
+        </member>
+        <member name="M:ScouterApi.Models.BaseModel.Equals(System.Object)">
+            <summary>
+            Determines whether the specified <see cref="T:System.Object" /> is equal to this instance.
+            </summary>
+            <param name="obj">The object to compare with the current object.</param>
+            <returns><c>true</c> if the specified <see cref="T:System.Object" /> is equal to this instance; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:ScouterApi.Models.BaseModel.GetHashCode">
+            <summary>
+            Returns a hash code for this instance.
+            </summary>
+            <returns>A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.</returns>
+        </member>
+        <member name="T:ScouterApi.Models.IGame">
+            <summary>
+             IGame model
+            </summary>
+        </member>
+        <member name="T:ScouterApi.Models.Score">
+            <summary>
+            Model that describes the Significant Event.
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Models.Score.Agent">
+            <summary>
+            Gets or sets Agent.
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Models.Score.IGame">
+            <summary>
+            Gets or sets IGame.
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Models.Score.Events">
+            <summary>
+             Gets or sets the Events.
+            </summary>
+        </member>
+        <member name="T:ScouterApi.Models.SignificantEvent">
+            <summary>
+            Model that describes the Significant Event.
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Models.SignificantEvent.EventTime">
+            <summary>
+            Gets or sets EventTime
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Models.SignificantEvent.AdvTeam">
+            <summary>
+            Gets or sets AdvTeam
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Models.SignificantEvent.EventType">
+            <summary>
+            Gets or sets Event Type
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Models.SignificantEvent.Position">
+            <summary>
+            Gets or sets Position
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Models.SignificantEvent.Significance">
+            <summary>
+            Gets or sets Significance
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Models.SignificantEvent.Credit">
+            <summary>
+            Gets or sets Credit
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Models.SignificantEvent.Blame">
+            <summary>
+            Gets or sets Blame
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Models.SignificantEvent.Comments">
+            <summary>
+            Gets or sets Credit
+            </summary>
+        </member>
+        <member name="T:ScouterApi.Processors.AgentProcessor">
+            <summary>
+            Agent Processor
+            </summary>
+        </member>
+        <member name="M:ScouterApi.Processors.AgentProcessor.AddAgentAsync(ScouterApi.Models.Agent)">
+            <summary>
+            AddAgentAsync
+            </summary>
+            <param name="agent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ScouterApi.Processors.AgentProcessor.GetAgent(System.Guid)">
+            <summary>
+            GetAgent
+            </summary>
+            <param name="agentId"></param>
+            <returns></returns>
         </member>
         <member name="T:ScouterApi.Services.ICosmosDbService`1">
             <summary>
@@ -324,6 +503,14 @@
             <param name="item">The item.</param>
             <param name="partitionKey">The partition key.</param>
             <returns>Task.</returns>
+        </member>
+        <member name="M:ScouterApi.Utils.CosmosUtil`1.UpsertArrayAsync(System.Collections.Generic.IList{`0},System.String)">
+            <summary>
+            Bulk Upsert Task execution
+            </summary>
+            <param name="items"></param>
+            <param name="partitionKey"></param>
+            <returns></returns>
         </member>
         <member name="M:ScouterApi.Utils.CosmosUtil`1.DeleteItemAsync(System.String,System.String)">
             <summary>

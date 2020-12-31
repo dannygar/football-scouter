@@ -19,28 +19,14 @@ namespace ScouterApi.Constants
         public const string ScoresRoutePrefix = "api/scores";
 
         /// <summary>
-        /// Route for incoming call requests.
-        /// </summary>
-        public const string OnAddScoresRequestRoute = ScoresRoutePrefix + "/addScores";
-
-        /// <summary>
         /// Route agent
         /// </summary>
         public const string AgentRoutePrefix = "api/agent";
 
         /// <summary>
-        /// Route for incoming call requests.
-        /// </summary>
-        public const string OnAddAgentRequestRoute = AgentRoutePrefix + "/addAgent";
-
-        /// <summary>
         /// Route agent
         /// </summary>
-        public const string GameRoutePrefix = "api/game";
+        public const string GameRoutePrefix = "api/games";
 
-        /// <summary>
-        /// Route for incoming call requests.
-        /// </summary>
-        public const string OnAddGameRequestRoute = GameRoutePrefix + "/addGame";
     }
 }

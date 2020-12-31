@@ -22,12 +22,6 @@ namespace ScouterApi.Models
         public Guid Id { get; set; }
 
         /// <summary>
-        ///  Gets or sets the CreatedOn
-        /// </summary>
-        [DataMember(Name = "createdOn")]
-        public DateTimeOffset CreatedOn { get; set; }
-
-        /// <summary>
         ///  Gets or sets the UpdatedOn
         /// </summary>
         [DataMember(Name = "updatedOn")]

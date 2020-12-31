@@ -27,7 +27,7 @@ namespace ScouterApi.Processors
                         return theAgent;
 
                     // Otherwise, add a new agent
-                    agent.CreatedOn = DateTime.UtcNow;
+                    agent.UpdatedOn = DateTime.UtcNow;
 
                     //Create or replace the Scores document
                     await db.UpsertItemAsync(agent);

@@ -21,7 +21,7 @@ import {
 import { IGame } from '../Models/GameModel'
 
 type GameItemProps = {
-    saveGames: (games: IGame[]) => void
+    saveGames: (games: IGame[]) => Promise<string>
     deleteItemsEvent: (deletedItems: IGame[]) => void
     games: IGame[]
     readOnly: boolean
@@ -145,7 +145,7 @@ const GameTable: React.FC<GameItemProps> = (props) => {
     const [items, setItems] = useState<IGame[]>(props.games)
     const [selectedItems, setSelectedItems] = useState<IGame[]>([])
     const [toggleDelete, setToggleDelete] = useState(false)
-    const [stateMessage, setStateMessage] = useState<string>('')
+    const [stateMessage, setStateMessage] = useState<string | undefined>()
 
     const onItemsSelectionChanged  = () => {
       const selectedItems = selection.getSelection()
@@ -227,9 +227,9 @@ const GameTable: React.FC<GameItemProps> = (props) => {
       }
     }
   
-    const onSaveGames = (): void => {
-      props.saveGames(items)
-      setStateMessage('Saved')
+    const onSaveGames = async (): Promise<void> => {
+      const response = await props.saveGames(items)
+      setStateMessage(response)
     }
     
 
@@ -240,7 +240,7 @@ const GameTable: React.FC<GameItemProps> = (props) => {
             <CommandBar
               styles={commandBarStyles}
               items={getCommandItems()}
-              farItems={[{ key: 'state', text: `${stateMessage}` }]}
+              farItems={[{ key: 'state', text: `${stateMessage ?? ''}` }]}
             />
           ) : (
             <br/>

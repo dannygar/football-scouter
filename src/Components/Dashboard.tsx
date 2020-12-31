@@ -32,7 +32,8 @@ const Dashboard: React.FC = () => {
   const [toggled, setToggled] = useState(false)
   const [signedIn, setSignedStatus] = useState(false)
   const [token, setToken] = useState<string>('')
-  const [userName, setUserName] = useState<string>('')
+  const [userName, setUserName] = useState<string | undefined>()
+  const [displayName, setDisplayName] = useState<string | undefined>()
 
 
   
@@ -47,8 +48,8 @@ const Dashboard: React.FC = () => {
   const authenticate = (): void => {
     authProvider.getAccessToken().then ((value: AccessTokenResponse) => {
       setToken(value.accessToken)
-      const userName = authProvider.getAccountInfo()?.account.userName ?? ''
-      setUserName(userName)
+      setUserName(authProvider.getAccountInfo()?.account.userName)
+      setDisplayName(authProvider.getAccountInfo()?.account.name)
       setSignedStatus((userName && userName.length > 0) ? true : false)
     })
   }
@@ -126,7 +127,7 @@ const Dashboard: React.FC = () => {
           </div>
           <Stack tokens={stackTokens} verticalAlign="end">
             <Stack.Item align="end">
-              <Text className="Header">{authProvider.getAccountInfo()?.account.name}</Text>
+              <Text className="Header">{displayName ?? 'Anonymous'}</Text>
               <ActionButton className="button" text={signedIn ? 'Sign Out' : 'Sign In'} iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={onSignInOutClicked} />
             </Stack.Item>
             <Stack.Item align="auto">

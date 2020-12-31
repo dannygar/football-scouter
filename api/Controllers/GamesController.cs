@@ -19,14 +19,14 @@ namespace ScouterApi.Controllers
     /// Scouter Controller
     /// </summary>
     ///[Authorize]
-    [Route(HttpRouteConstants.ScoresRoutePrefix)]
+    [Route(HttpRouteConstants.GameRoutePrefix)]
     [ApiController]
-    public class ScoresController : ControllerBase
+    public class GamesController : ControllerBase
     {
         private readonly ILogger _logger;
         private readonly AgentProcessor _agentProcessor;
 
-        public ScoresController(
+        public GamesController(
             ILogger<ScoresController> logger,
             AgentProcessor agentProcessor)
         {
@@ -35,33 +35,29 @@ namespace ScouterApi.Controllers
         }
 
         /// <summary>Posts the specified event.</summary>
-        /// <param name="score">The score data.</param>
+        /// <param name="games">The games collection.</param>
         /// <returns>Task&lt;System.Boolean&gt;.</returns>
         [HttpPost("save")]
         [ValidateModelState]
-        [SwaggerOperation("scores")]
+        [SwaggerOperation("games")]
         [SwaggerResponse(statusCode: 200, type: typeof(bool), description: "true - if the new scores were created, otherwise - false")]
-        public async Task<bool> PostAsync([FromBody] Score score)
+        public async Task<bool> PostAsync([FromBody] IEnumerable<IGame> games)
         {
+            const string partitionKey = "/id";
             try
             {
-                using (var db = new CosmosUtil<Score>("scores", partitionKey: "agent/id"))
+                using (var db = new CosmosUtil<IGame>("games", partitionKey: partitionKey))
                 {
-                    var theScore = await db.GetItemAsync(
-                        score.Id.ToString(),
-                        score.Agent.Id.ToString());
-
-                    if (theScore == null) // The scores doesn't exist
+                    // Update the create/update date
+                    foreach (var game in games)
                     {
-                        // Find if the agent already has been added to the Db, and if not, add him or her to the Db
-                        var theAgent = await this._agentProcessor.AddAgentAsync(score.Agent);
+                        game.UpdatedOn = DateTime.UtcNow;
                     }
-                    theScore.UpdatedOn = DateTime.UtcNow;
 
-                    //Create or replace the Scores document
-                    await db.UpsertItemAsync(theScore, partitionKey: "/agent/id");
+                    //Create or replace the Games documents
+                    var response = await db.UpsertArrayAsync(games.ToList(), partitionKey);
 
-                    return true;
+                    return response.SuccessfulDocuments == games.Count();
                 }
             }
             catch (Exception e)

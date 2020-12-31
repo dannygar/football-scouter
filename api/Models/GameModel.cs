@@ -18,13 +18,13 @@ namespace ScouterApi.Models
         public string AwayTeam { get; set; }
 
         [DataMember(Name = "playedOn")]
-        public DateTimeOffset PlayedOn { get; set; }
+        public string PlayedOn { get; set; }
 
         [DataMember(Name = "fullGame")]
         public bool FullGame { get; set; }
 
-        [DataMember(Name = "leagueName")]
-        public string LeagueName { get; set; }
+        [DataMember(Name = "league")]
+        public string League { get; set; }
 
     }
 }

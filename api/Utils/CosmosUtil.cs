@@ -23,6 +23,7 @@ namespace ScouterApi.Utils
     using Microsoft.Azure.Cosmos;
     using ScouterApi.Configuration;
     using ScouterApi.Services;
+    using ScouterApi.Utils.Bulk;
 
     /// <summary>
     /// Class CosmosUtil.
@@ -150,6 +151,35 @@ namespace ScouterApi.Utils
             }
         }
 
+
+        /// <summary>
+        /// Bulk Upsert Task execution
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="partitionKey"></param>
+        /// <returns></returns>
+        public async Task<BulkOperationResponse<T>> UpsertArrayAsync(IList<T> items, string partitionKey = DefaultPartitionKey)
+        {
+            BulkOperations<T> bulkOperations = new BulkOperations<T>(items.Count);
+            if (partitionKey == DefaultPartitionKey)
+            {
+                foreach (T document in items)
+                {
+                    bulkOperations.Tasks.Add(container.UpsertItemAsync(document).CaptureOperationResponse(document));
+                }
+            }
+            else
+            {
+                foreach (T document in items)
+                {
+                    bulkOperations.Tasks.Add(container.UpsertItemAsync<T>(document, new PartitionKey(partitionKey)).CaptureOperationResponse(document));
+                }
+            }
+
+            // Execute all tasks
+            return await bulkOperations.ExecuteAsync();
+        }
+
         /// <summary>
         /// delete item as an asynchronous operation.
         /// </summary>
@@ -225,7 +255,7 @@ namespace ScouterApi.Utils
             }
 
             // Initialize Cosmos Client
-            this.client = new CosmosClient(connectionString);
+            this.client = new CosmosClient(connectionString, new CosmosClientOptions() { AllowBulkExecution = true });
 
             // Create a new Database if not exists
             var databaseResponse = await this.client.CreateDatabaseIfNotExistsAsync(databaseName);

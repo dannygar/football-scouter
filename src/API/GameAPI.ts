@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid'
 import axios, { AxiosResponse } from 'axios'
 import { IGame } from '../Models/GameModel'
 
-const baseUrl: string = 'http://localhost:4000'
+const baseUrl: string = `${process.env.REACT_APP_API_URL}/api/games`
 
 export const getGames = async (): Promise<AxiosResponse<IGame[]>> => {
   try {
@@ -60,23 +60,16 @@ export const addGame = async (formData: IGame, games: IGame[]): Promise<AxiosRes
 }
 
 
-export const saveGames = async (games: IGame[]): Promise<IGame[]> => {
-    try {
-    // const event: Omit<IEvent, 'id'> = {
-    //     time: formData.time,
-    //     advTeam: formData.advTeam,
-    //     eventType: formData.eventType,
-    //     position: formData.position,
-    //     significance: formData.significance,
-    //     status: false,
-    // }
-    // const saveEvent: AxiosResponse<EventDataType> = await axios.post(
-    //   baseUrl + '/add-event',
-    //   event
-    // )
-    return games
+export const saveGames = async (games: IGame[]): Promise<string> => {
+  try {
+    const apiUrl = `${baseUrl}/save`
+    const response: AxiosResponse<boolean> = await axios.post(
+      apiUrl,
+      games
+    )
+    return response ? 'Saved' : 'Failed'
   } catch (error) {
-    throw new Error(error)
+    return error
   }
 }
 
