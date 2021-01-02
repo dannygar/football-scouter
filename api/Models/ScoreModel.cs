@@ -12,19 +12,19 @@ namespace ScouterApi.Models
     /// <summary>
     /// Model that describes the Significant Event.
     /// </summary>
-    public class Score : BaseModel
+    public class EventModel : BaseModel
     {
         /// <summary>
-        /// Gets or sets Agent.
+        /// Gets or sets User.
         /// </summary>
-        [DataMember(Name = "agent")]
-        public Agent Agent { get; set; }
+        [DataMember(Name = "user")]
+        public string User { get; set; }
 
         /// <summary>
-        /// Gets or sets IGame.
+        /// Gets or sets Game Id.
         /// </summary>
-        [DataMember(Name = "game")]
-        public IGame IGame { get; set; }
+        [DataMember(Name = "gameId")]
+        public Guid GameId { get; set; }
 
         /// <summary>
         ///  Gets or sets the Events.

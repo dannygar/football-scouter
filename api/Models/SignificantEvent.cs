@@ -5,6 +5,7 @@
 
 namespace ScouterApi.Models
 {
+    using System;
     using System.Runtime.Serialization;
 
     /// <summary>
@@ -12,6 +13,12 @@ namespace ScouterApi.Models
     /// </summary>
     public class SignificantEvent
     {
+        /// <summary>
+        /// Gets or sets Event Id.
+        /// </summary>
+        [DataMember(Name = "id")]
+        public Guid Id { get; set; }
+
         /// <summary>
         /// Gets or sets EventTime
         /// </summary>

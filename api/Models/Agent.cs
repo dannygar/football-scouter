@@ -8,7 +8,6 @@ namespace ScouterApi.Models
 {
     public class Agent : BaseModel
     {
-
         [DataMember(Name = "userName")]
         public string UserName { get; set; }
 

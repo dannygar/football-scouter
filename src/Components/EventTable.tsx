@@ -22,9 +22,9 @@ import { IEvent } from '../Models/EventModel'
 import { getEventType } from '../Utils/TypeConversion';
 
 type EventItemProps = {
-    saveEvents: (events: IEvent[]) => void
-    deleteItemsEvent: (deletedItems: IEvent[]) => void
-    events: IEvent[]
+  saveEvents: (games: IEvent[]) => Promise<string>
+  deleteItemsEvent: (deletedItems: IEvent[]) => void
+  events: IEvent[]
 }
 
 const theme = getTheme();
@@ -262,11 +262,11 @@ const EventTable: React.FC<EventItemProps> = (props) => {
       }
     }
   
-    const onSaveEvents = (): void => {
-      props.saveEvents(items)
-      setStateMessage('Saved')
+    const onSaveEvents = async (): Promise<void> => {
+      const response = await props.saveEvents(items)
+      setStateMessage(response)
     }
-    
+
 
     return (
       <div data-is-scrollable={true}>
@@ -274,7 +274,7 @@ const EventTable: React.FC<EventItemProps> = (props) => {
           <CommandBar
             styles={commandBarStyles}
             items={getCommandItems()}
-            farItems={[{ key: 'state', text: `${stateMessage}` }]}
+            farItems={[{ key: 'state', text: `${stateMessage ?? ''}` }]}
           />
 
           <DetailsList

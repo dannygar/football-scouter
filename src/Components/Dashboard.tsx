@@ -16,6 +16,7 @@ import { IGame } from '../Models/GameModel';
 import { navBarContext } from '../NavBar/NavBar.Context'
 import { useMenu } from '../NavBar/NavBar.Hook'
 import { NIL } from 'uuid';
+import { getGames } from '../API/GameAPI';
 
 const dropdownStyles = { dropdown: { width: 500 }, label: { color: 'White' } };
 
@@ -26,6 +27,8 @@ initializeIcons();
 
 const Dashboard: React.FC = () => {
   const [selectedGame, setSelectedGame] = useState<IGame>()
+  const [games, setGames] = useState<IGame[]>([])
+  const [gamesList, setGamesList] = useState<IDropdownOption[]>([])
   const [events, setEvents] = useState<IEvent[]>([])
   const [newEvent, setNewEvent] = useState<IEvent | null>(null)
   const [eventCount, addEventCount] = useState(0)
@@ -40,9 +43,6 @@ const Dashboard: React.FC = () => {
   // const name = authProvider.getAccountInfo()?.account.name
   // const accountId = authProvider.getAccountInfo()?.account.accountIdentifier
   
-  const dropdownRef = React.createRef<IDropdown>();
-  const onSetFocus = () => dropdownRef.current!.focus(true);
-
   const stackTokens: IStackTokens = { childrenGap: 20 };
 
   const authenticate = (): void => {
@@ -54,6 +54,23 @@ const Dashboard: React.FC = () => {
     })
   }
   authenticate()
+
+  const dropdownRef = React.createRef<IDropdown>();
+  const onSetFocus = () => dropdownRef.current!.focus(true);
+
+  const fetchGames = async (): Promise<number> => {
+    const retrievedGames = await getGames()
+    setGames(retrievedGames)
+    const gameOptions: IDropdownOption[] = []
+    retrievedGames.forEach(game => {
+      gameOptions.push({ key: game.id, text: `${game.homeTeam} vs ${game.awayTeam}`,
+        data: game })
+    })
+    setGamesList(gameOptions)
+    return games.length
+  }
+  fetchGames()
+
 
   useEffect(() => {
     fetchEvents().then((totalEvents: number) => {
@@ -78,6 +95,7 @@ const Dashboard: React.FC = () => {
     }
   }, [events, newEvent, toggled])
 
+
   const fetchEvents = async (): Promise<number> => {
     const retrievedEvents = await getEvents()
     setEvents(retrievedEvents.data.events)
@@ -93,8 +111,9 @@ const Dashboard: React.FC = () => {
   }
 
 
-  const handleSaveEvent = async (events: IEvent[]):  Promise<void>  => {
-    await saveEvents(events)
+  const handleSaveEvent = async (events: IEvent[]):  Promise<string>  => {
+    const result = await saveEvents(events)
+    return result
   }
 
   const handleDeleteEvent = (deletedItems: IEvent[]): void => {
@@ -136,12 +155,7 @@ const Dashboard: React.FC = () => {
                   componentRef={dropdownRef}
                   placeholder="Select a game"
                   label="Select a game for which you want to edit significant events"
-                  options={[
-                    { key: 'CHEATL022321', text: 'Chelsea vs Atletico Madrid', 
-                      data: {id: 'CHEATL022321', homeTeam: 'Chelsea', awayTeam: 'Atletico Madrid', playedOn: '02/23/2021', fullGame: false, leagueName: 'Champions'} },
-                    { key: 'REALPSG031321', text: 'Real Madrid vs PSG',
-                      data: {id: 'REALPSG031321', homeTeam: 'Real Madrid', awayTeam: 'PSG', playedOn: '02/23/2021', fullGame: false, leagueName: 'Champions'} },
-                  ]}
+                  options={gamesList}
                   required
                   styles={dropdownStyles}
                   onChange={onGameChanged}

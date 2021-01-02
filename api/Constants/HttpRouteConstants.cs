@@ -16,7 +16,7 @@ namespace ScouterApi.Constants
         /// <summary>
         /// Route prefix for all incoming requests.
         /// </summary>
-        public const string ScoresRoutePrefix = "api/scores";
+        public const string EventsRoutePrefix = "api/events";
 
         /// <summary>
         /// Route agent

@@ -27,7 +27,7 @@ namespace ScouterApi.Controllers
         private readonly AgentProcessor _agentProcessor;
 
         public GamesController(
-            ILogger<ScoresController> logger,
+            ILogger<EventsController> logger,
             AgentProcessor agentProcessor)
         {
             this._logger = logger;

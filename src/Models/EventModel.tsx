@@ -38,6 +38,14 @@ export const getEventTypes: any = () => {
     ]
 }
 
+export interface ScoreModel {
+    id: string
+    updatedOn: string
+    user: string
+    gameId: string
+    events: IEvent[]
+}
+
 export interface IEvent {
     id: string
     time: string
@@ -48,7 +56,6 @@ export interface IEvent {
     credit?: string
     blame?: string
     comments?: string
-    status: boolean
 }
 
 export interface EventProps {

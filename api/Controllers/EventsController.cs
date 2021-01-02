@@ -19,15 +19,15 @@ namespace ScouterApi.Controllers
     /// Scouter Controller
     /// </summary>
     ///[Authorize]
-    [Route(HttpRouteConstants.ScoresRoutePrefix)]
+    [Route(HttpRouteConstants.EventsRoutePrefix)]
     [ApiController]
-    public class ScoresController : ControllerBase
+    public class EventsController : ControllerBase
     {
         private readonly ILogger _logger;
         private readonly AgentProcessor _agentProcessor;
 
-        public ScoresController(
-            ILogger<ScoresController> logger,
+        public EventsController(
+            ILogger<EventsController> logger,
             AgentProcessor agentProcessor)
         {
             this._logger = logger;
@@ -39,27 +39,20 @@ namespace ScouterApi.Controllers
         /// <returns>Task&lt;System.Boolean&gt;.</returns>
         [HttpPost("save")]
         [ValidateModelState]
-        [SwaggerOperation("scores")]
-        [SwaggerResponse(statusCode: 200, type: typeof(bool), description: "true - if the new scores were created, otherwise - false")]
-        public async Task<bool> PostAsync([FromBody] Score score)
+        [SwaggerOperation("events")]
+        [SwaggerResponse(statusCode: 200, type: typeof(bool), description: "true - if the new events were created, otherwise - false")]
+        public async Task<bool> PostAsync([FromBody] ScoreModel score)
         {
+            const string partitionKey = "/user";
+
             try
             {
-                using (var db = new CosmosUtil<Score>("scores", partitionKey: "agent/id"))
+                using (var db = new CosmosUtil<ScoreModel>("scores", partitionKey: partitionKey))
                 {
-                    var theScore = await db.GetItemAsync(
-                        score.Id.ToString(),
-                        score.Agent.Id.ToString());
-
-                    if (theScore == null) // The scores doesn't exist
-                    {
-                        // Find if the agent already has been added to the Db, and if not, add him or her to the Db
-                        var theAgent = await this._agentProcessor.AddAgentAsync(score.Agent);
-                    }
-                    theScore.UpdatedOn = DateTime.UtcNow;
+                    score.UpdatedOn = DateTime.UtcNow;
 
                     //Create or replace the Scores document
-                    await db.UpsertItemAsync(theScore, partitionKey: "/agent/id");
+                    await db.UpsertItemAsync(score, partitionKey: partitionKey);
 
                     return true;
                 }

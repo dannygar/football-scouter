@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid'
 import axios, { AxiosResponse } from 'axios'
 import { IEvent, EventDataType, EventType } from '../Models/EventModel'
 
-const baseUrl: string = 'http://localhost:4000'
+const baseUrl: string = `${process.env.REACT_APP_API_URL}/api/events`
 
 export const getEvents = async (): Promise<AxiosResponse<EventDataType>> => {
   try {
@@ -16,7 +16,6 @@ export const getEvents = async (): Promise<AxiosResponse<EventDataType>> => {
             eventType: EventType.PEP,
             position: 14,
             significance: 40,
-            status: true,
             comments: "Successful dribbling with the 3rd defensive line penetration "
           },
           {
@@ -26,7 +25,6 @@ export const getEvents = async (): Promise<AxiosResponse<EventDataType>> => {
             eventType: EventType.DIS,
             position: 8,
             significance: 56,
-            status: true
           },
         ],
         message: "",
@@ -38,7 +36,6 @@ export const getEvents = async (): Promise<AxiosResponse<EventDataType>> => {
           eventType: EventType.RUN,
           position: 14,
           significance: 40,
-          status: true
         },
       },
       status: 200,
@@ -67,7 +64,6 @@ export const addEvent = async (
       eventType: parseInt(formData.eventType.toString()),
       position: parseInt(formData.position.toString()),
       significance: parseInt(formData.significance.toString()),
-      status: false,
     }
     events.push(event)
 
@@ -93,42 +89,19 @@ export const addEvent = async (
 
 export const saveEvents = async (
   events: IEvent[]
-): Promise<IEvent[]> => {
-    try {
-    // const event: Omit<IEvent, 'id'> = {
-    //     time: formData.time,
-    //     advTeam: formData.advTeam,
-    //     eventType: formData.eventType,
-    //     position: formData.position,
-    //     significance: formData.significance,
-    //     status: false,
-    // }
-    // const saveEvent: AxiosResponse<EventDataType> = await axios.post(
-    //   baseUrl + '/add-event',
-    //   event
-    // )
-    return events
+): Promise<string> => {
+  try {
+    const apiUrl = `${baseUrl}/save`
+    const response: AxiosResponse<boolean> = await axios.post(
+      apiUrl,
+      events
+    )
+    return response ? 'Saved' : 'Failed'
   } catch (error) {
-    throw new Error(error)
-  }
+    return error
+  }  
 }
 
-export const updateEvent = async (
-  event: IEvent
-): Promise<AxiosResponse<EventDataType>> => {
-  try {
-    const eventUpdate: Pick<IEvent, 'status'> = {
-      status: true,
-    }
-    const updatedEvent: AxiosResponse<EventDataType> = await axios.put(
-      `${baseUrl}/edit-event/${event.id}`,
-      eventUpdate
-    )
-    return updatedEvent
-  } catch (error) {
-    throw new Error(error)
-  }
-}
 
 export const deleteEvent = async (
   _id: string
