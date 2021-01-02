@@ -34,6 +34,30 @@ namespace ScouterApi.Controllers
             this._agentProcessor = agentProcessor;
         }
 
+        [HttpGet("")]
+        [ValidateModelState]
+        [SwaggerOperation("games")]
+        [SwaggerResponse(statusCode: 200, type: typeof(IEnumerable<IGame>), description: "The list of IGame objects")]
+        public async Task<IEnumerable<IGame>> GetAsync()
+        {
+            const string partitionKey = "/id";
+            try
+            {
+                using (var db = new CosmosUtil<IGame>("games", partitionKey: partitionKey))
+                {
+                    // Return all games
+                    return await db.GetItemsAsync("SELECT * FROM c");
+                }
+            }
+            catch (Exception e)
+            {
+                LogUtil.LogError(this._logger, e.Message, nameof(this.PostAsync));
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+
         /// <summary>Posts the specified event.</summary>
         /// <param name="games">The games collection.</param>
         /// <returns>Task&lt;System.Boolean&gt;.</returns>

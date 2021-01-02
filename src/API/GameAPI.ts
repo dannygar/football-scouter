@@ -4,37 +4,11 @@ import { IGame } from '../Models/GameModel'
 
 const baseUrl: string = `${process.env.REACT_APP_API_URL}/api/games`
 
-export const getGames = async (): Promise<AxiosResponse<IGame[]>> => {
+export const getGames = async (): Promise<IGame[]> => {
   try {
-    const games: AxiosResponse<IGame[]> = {
-      data: 
-        [
-          {
-            id: uuid(),
-            homeTeam: "Atletico Madrid",
-            awayTeam: "Chelsea",
-            playedOn: "02/23/2021",
-            fullGame: false,
-            league: "Champions League"
-          },
-          {
-            id: uuid(),
-            homeTeam: "Real Madrid",
-            awayTeam: "PSG",
-            playedOn: "02/23/2021",
-            fullGame: false,
-            league: "Champions League"
-          },
-        ],
-      status: 200,
-      statusText: "OK",
-      headers: "application/json",
-      config: {}
-    }
-    // const events: AxiosResponse<IGame[]> = await axios.get(
-    //   baseUrl + '/games'
-    // )
-    return games
+    const apiUrl = baseUrl
+    const response: AxiosResponse<IGame[]> = await axios.get(apiUrl)
+    return (response.status === 200)? response.data : []
   } catch (error) {
     throw new Error(error)
   }

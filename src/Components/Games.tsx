@@ -73,7 +73,7 @@ const Games: React.FC<GameProps> = (props) => {
 
   const fetchGames = async (): Promise<number> => {
     const retrievedGames = await getGames()
-    setGames(retrievedGames.data)
+    setGames(retrievedGames)
     return games.length
   }
 
