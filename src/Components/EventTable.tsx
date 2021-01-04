@@ -277,21 +277,26 @@ const EventTable: React.FC<EventItemProps> = (props) => {
             farItems={[{ key: 'state', text: `${stateMessage ?? ''}` }]}
           />
 
-          <DetailsList
-              items={items}
-              compact={false}
-              columns={columns}
-              selectionMode={SelectionMode.multiple}
-              selection={selection}
-              getKey={getKey}
-              setKey="none"
-              layoutMode={DetailsListLayoutMode.justified}
-              checkboxVisibility={CheckboxVisibility.onHover}
-              isHeaderVisible={true}
-              enterModalSelectionOnTouch={true}
-              onItemInvoked={onItemInvoked}
-              onRenderRow={onRenderRow}
-          />
+          {items?.length > 0 ? (
+            <DetailsList
+                items={items}
+                compact={false}
+                columns={columns}
+                selectionMode={SelectionMode.multiple}
+                selection={selection}
+                getKey={getKey}
+                setKey="none"
+                layoutMode={DetailsListLayoutMode.justified}
+                checkboxVisibility={CheckboxVisibility.onHover}
+                isHeaderVisible={true}
+                enterModalSelectionOnTouch={true}
+                onItemInvoked={onItemInvoked}
+                onRenderRow={onRenderRow}
+            />
+          ) : (
+            <br/>
+          )}
+
         </Fabric>
       </div>
     );

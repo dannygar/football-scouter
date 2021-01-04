@@ -1,56 +1,19 @@
 import { v4 as uuid } from 'uuid'
 import axios, { AxiosResponse } from 'axios'
-import { IEvent, EventDataType, EventType } from '../Models/EventModel'
+import { IEvent, EventDataType } from '../Models/EventModel'
 
 const baseUrl: string = `${process.env.REACT_APP_API_URL}/api/events`
 
-export const getEvents = async (): Promise<AxiosResponse<EventDataType>> => {
+export const getEvents = async (gameId: string, userId: string | undefined): Promise<IEvent[]> => {
   try {
-    const events: AxiosResponse<EventDataType> = {
-      data: {
-        events: [
-          {
-            id: uuid(),
-            time: "05.23",
-            advTeam: "Chelsea",
-            eventType: EventType.PEP,
-            position: 14,
-            significance: 40,
-            comments: "Successful dribbling with the 3rd defensive line penetration "
-          },
-          {
-            id: uuid(),
-            time: "06.45",
-            advTeam: "Chelsea",
-            eventType: EventType.DIS,
-            position: 8,
-            significance: 56,
-          },
-        ],
-        message: "",
-        status: "",
-        event: {
-          id: uuid(),
-          time: "05.23",
-          advTeam: "Chelsea",
-          eventType: EventType.RUN,
-          position: 14,
-          significance: 40,
-        },
-      },
-      status: 200,
-      statusText: "OK",
-      headers: "application/json",
-      config: {}
-    }
-    // const events: AxiosResponse<EventDataType> = await axios.get(
-    //   baseUrl + '/events'
-    // )
-    return events
+    const apiUrl = `${baseUrl}/game?Id=${gameId}&account=${userId}`
+    const response: AxiosResponse<IEvent[]> = await axios.get(apiUrl)
+    return (response.status === 200)? response.data : []
   } catch (error) {
-    throw new Error(error)
+    throw error
   }
 }
+
 
 export const addEvent = async (
   formData: IEvent,

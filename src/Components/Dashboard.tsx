@@ -31,7 +31,6 @@ const Dashboard: React.FC = () => {
   const [gamesList, setGamesList] = useState<IDropdownOption[]>([])
   const [events, setEvents] = useState<IEvent[]>([])
   const [newEvent, setNewEvent] = useState<IEvent | null>(null)
-  const [eventCount, addEventCount] = useState(0)
   const [toggled, setToggled] = useState(false)
   const [signedIn, setSignedStatus] = useState(false)
   const [token, setToken] = useState<string>('')
@@ -41,9 +40,10 @@ const Dashboard: React.FC = () => {
 
   
   // const name = authProvider.getAccountInfo()?.account.name
-  // const accountId = authProvider.getAccountInfo()?.account.accountIdentifier
+  const accountId = authProvider.getAccountInfo()?.account.accountIdentifier
   
   const stackTokens: IStackTokens = { childrenGap: 20 };
+
 
   const authenticate = (): void => {
     authProvider.getAccessToken().then ((value: AccessTokenResponse) => {
@@ -56,28 +56,25 @@ const Dashboard: React.FC = () => {
   authenticate()
 
   const dropdownRef = React.createRef<IDropdown>();
-  const onSetFocus = () => dropdownRef.current!.focus(true);
-
-  const fetchGames = async (): Promise<number> => {
-    const retrievedGames = await getGames()
-    setGames(retrievedGames)
-    const gameOptions: IDropdownOption[] = []
-    retrievedGames.forEach(game => {
-      gameOptions.push({ key: game.id, text: `${game.homeTeam} vs ${game.awayTeam}`,
-        data: game })
-    })
-    setGamesList(gameOptions)
-    return games.length
-  }
-  fetchGames()
-
 
   useEffect(() => {
-    fetchEvents().then((totalEvents: number) => {
-      addEventCount(totalEvents)  
-    })
-    onSetFocus()
-  },[eventCount, selectedGame])
+    const fetchGames = async (): Promise<number> => {
+      const retrievedGames = await getGames()
+      const gameOptions: IDropdownOption[] = []
+      retrievedGames.forEach(game => {
+        gameOptions.push({ key: game.id, text: `${game.homeTeam} vs ${game.awayTeam}`,
+          data: game })
+      })
+      setGamesList(gameOptions)
+      setGames(retrievedGames)
+      if(dropdownRef.current !== null) {
+        const onSetFocus = () => dropdownRef.current!.focus(true);
+        onSetFocus()
+      }
+      return games.length
+    }
+    fetchGames()
+  },[])
 
 
   useEffect(() => {
@@ -96,10 +93,14 @@ const Dashboard: React.FC = () => {
   }, [events, newEvent, toggled])
 
 
-  const fetchEvents = async (): Promise<number> => {
-    const retrievedEvents = await getEvents()
-    setEvents(retrievedEvents.data.events)
-    return events.length
+  const fetchEvents = async (gameId: string): Promise<void> => {
+    try {
+      const retrievedEvents = await getEvents(gameId, accountId)
+      setEvents(retrievedEvents)
+    } catch (error) {
+      if (error.response.status !== 404)
+        alert(`Failed to fetch all significances for this game. Please try again later. Error details: ${error.message}`)      
+    }
   }
 
   const handleAddEvent = (e: React.FormEvent, formData: IEvent): void => {
@@ -124,6 +125,7 @@ const Dashboard: React.FC = () => {
   const onGameChanged = (event: React.FormEvent<HTMLDivElement>, item?: IDropdownOption, index?: number): void => {
     if (item && item.data) {
       setSelectedGame(item.data)
+      fetchEvents(item.data?.id)
     }
     console.log(`Selected: ${item?.text}`)
   }
@@ -149,22 +151,28 @@ const Dashboard: React.FC = () => {
               <Text className="Header">{displayName ?? 'Anonymous'}</Text>
               <ActionButton className="button" text={signedIn ? 'Sign Out' : 'Sign In'} iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={onSignInOutClicked} />
             </Stack.Item>
-            <Stack.Item align="auto">
-              <Stack horizontalAlign="center">
+            <Stack horizontalAlign="center">
+              <Stack.Item align="auto">
                 <Dropdown
                   componentRef={dropdownRef}
-                  placeholder="Select a game"
+                  placeholder={games?.length === 0 ? "please, wait..." : "Select a game"}
                   label="Select a game for which you want to edit significant events"
                   options={gamesList}
                   required
                   styles={dropdownStyles}
                   onChange={onGameChanged}
                 />
-              </Stack>
-            </Stack.Item>
-            <Stack.Item align="auto">
-              <Text block className="Title" variant='xxLarge'>{selectedGame?.homeTeam} vs {selectedGame?.awayTeam}</Text>
-            </Stack.Item>
+                {games?.length > 0 ? (
+                <Stack.Item align="auto">
+                  <Text block className="Title" variant='xxLarge'>{selectedGame?.homeTeam} vs {selectedGame?.awayTeam}</Text>
+                </Stack.Item>
+                ) : (
+                  <Stack.Item align="auto">
+                    <Text block className="Title" variant='xxLarge'>Loading...</Text>
+                  </Stack.Item>
+                ) }
+              </Stack.Item>
+            </Stack>
             <Stack.Item align="auto">
               <main className='App'>
                 <AddEvent saveEvent={handleAddEvent} game={selectedGame as IGame} />

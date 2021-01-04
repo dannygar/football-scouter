@@ -12,7 +12,7 @@ namespace ScouterApi.Models
     /// <summary>
     /// Model that describes the Significant Event.
     /// </summary>
-    public class EventModel : BaseModel
+    public class ScoreModel : BaseModel
     {
         /// <summary>
         /// Gets or sets User.

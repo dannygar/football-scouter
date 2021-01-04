@@ -22,8 +22,8 @@ namespace ScouterApi.Models
         /// <summary>
         /// Gets or sets EventTime
         /// </summary>
-        [DataMember(Name = "eventTime")]
-        public float EventTime { get; set; }
+        [DataMember(Name = "time")]
+        public string EventTime { get; set; }
 
         /// <summary>
         /// Gets or sets AdvTeam
@@ -35,7 +35,7 @@ namespace ScouterApi.Models
         /// Gets or sets Event Type
         /// </summary>
         [DataMember(Name = "eventType")]
-        public EventTypeEnum EventType { get; set; }
+        public uint EventType { get; set; }
 
         /// <summary>
         /// Gets or sets Position

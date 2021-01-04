@@ -5,6 +5,7 @@
 
 namespace ScouterApi.Controllers.Controllers
 {
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
 
     /// <summary>
@@ -25,7 +26,7 @@ namespace ScouterApi.Controllers.Controllers
         /// <returns>the view to render</returns>
         public IActionResult Index()
         {
-            return this.View();
+            return BadRequest();
         }
 
         /// <summary>

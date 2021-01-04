@@ -183,7 +183,7 @@
             HTTP route constants for routing requests to CallController methods.
             </summary>
         </member>
-        <member name="F:ScouterApi.Constants.HttpRouteConstants.ScoresRoutePrefix">
+        <member name="F:ScouterApi.Constants.HttpRouteConstants.EventsRoutePrefix">
             <summary>
             Route prefix for all incoming requests.
             </summary>
@@ -197,6 +197,17 @@
             <summary>
             Route agent
             </summary>
+        </member>
+        <member name="T:ScouterApi.Controllers.EventsController">
+             <summary>
+             Scouter Controller
+             </summary>
+            [Authorize]
+        </member>
+        <member name="M:ScouterApi.Controllers.EventsController.PostAsync(ScouterApi.Models.ScoreModel)">
+            <summary>Posts the specified event.</summary>
+            <param name="score">The score data.</param>
+            <returns>Task&lt;System.Boolean&gt;.</returns>
         </member>
         <member name="T:ScouterApi.Controllers.GamesController">
              <summary>
@@ -230,17 +241,6 @@
             Get the default content of home page.
             </summary>
             <returns>Default content.</returns>
-        </member>
-        <member name="T:ScouterApi.Controllers.ScoresController">
-             <summary>
-             Scouter Controller
-             </summary>
-            [Authorize]
-        </member>
-        <member name="M:ScouterApi.Controllers.ScoresController.PostAsync(ScouterApi.Models.Score)">
-            <summary>Posts the specified event.</summary>
-            <param name="score">The score data.</param>
-            <returns>Task&lt;System.Boolean&gt;.</returns>
         </member>
         <member name="T:ScouterApi.Models.BaseModel">
             <summary>
@@ -299,22 +299,22 @@
              IGame model
             </summary>
         </member>
-        <member name="T:ScouterApi.Models.Score">
+        <member name="T:ScouterApi.Models.ScoreModel">
             <summary>
             Model that describes the Significant Event.
             </summary>
         </member>
-        <member name="P:ScouterApi.Models.Score.Agent">
+        <member name="P:ScouterApi.Models.ScoreModel.User">
             <summary>
-            Gets or sets Agent.
+            Gets or sets User.
             </summary>
         </member>
-        <member name="P:ScouterApi.Models.Score.IGame">
+        <member name="P:ScouterApi.Models.ScoreModel.GameId">
             <summary>
-            Gets or sets IGame.
+            Gets or sets Game Id.
             </summary>
         </member>
-        <member name="P:ScouterApi.Models.Score.Events">
+        <member name="P:ScouterApi.Models.ScoreModel.Events">
             <summary>
              Gets or sets the Events.
             </summary>
@@ -322,6 +322,11 @@
         <member name="T:ScouterApi.Models.SignificantEvent">
             <summary>
             Model that describes the Significant Event.
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Models.SignificantEvent.Id">
+            <summary>
+            Gets or sets Event Id.
             </summary>
         </member>
         <member name="P:ScouterApi.Models.SignificantEvent.EventTime">
