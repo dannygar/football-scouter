@@ -489,6 +489,14 @@
             <param name="partitionKey">The partition key.</param>
             <param name="throughput">The throughput.</param>
         </member>
+        <member name="M:ScouterApi.Utils.CosmosUtil`1.GetItemsAsync(Microsoft.Azure.Cosmos.QueryDefinition,System.String)">
+            <summary>
+            get items as an asynchronous operation.
+            </summary>
+            <param name="queryDefinition">The query definition.</param>
+            <param name="partitionKey"></param>
+            <returns>IEnumerable&lt;T&gt;.</returns>
+        </member>
         <member name="M:ScouterApi.Utils.CosmosUtil`1.GetItemsAsync(System.String)">
             <summary>
             get items as an asynchronous operation.

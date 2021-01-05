@@ -77,6 +77,31 @@ namespace ScouterApi.Utils
             this.CreateDatabase(containerName, appSettings, partitionKey, throughput).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
+
+        /// <summary>
+        /// get items as an asynchronous operation.
+        /// </summary>
+        /// <param name="queryDefinition">The query definition.</param>
+        /// <param name="partitionKey"></param>
+        /// <returns>IEnumerable&lt;T&gt;.</returns>
+        public async Task<IEnumerable<T>> GetItemsAsync(QueryDefinition queryDefinition, string partitionKey)
+        {
+            var results = new List<T>();
+            using (FeedIterator<T> feedIterator = this.container.GetItemQueryIterator<T>(
+                queryDefinition,
+                null,
+                new QueryRequestOptions() { PartitionKey = new PartitionKey(partitionKey) }))
+            {
+                while (feedIterator.HasMoreResults)
+                {
+                    FeedResponse<T> response = await feedIterator.ReadNextAsync();
+                    results.AddRange(response.ToList());
+                }
+            }
+
+            return results;
+        }
+
         /// <summary>
         /// get items as an asynchronous operation.
         /// </summary>
@@ -114,6 +139,9 @@ namespace ScouterApi.Utils
                 return default(T);
             }
         }
+
+
+
 
         /// <summary>
         /// add item as an asynchronous operation.
