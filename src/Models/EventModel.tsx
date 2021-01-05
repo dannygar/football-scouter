@@ -41,14 +41,15 @@ export const getEventTypes: any = () => {
 export interface ScoreModel {
     id: string
     updatedOn: string
-    user: string
+    account: string
+    email: string
     gameId: string
     events: IEvent[]
 }
 
 export interface IEvent {
     id: string
-    time: string
+    eventTime: number
     advTeam: string
     eventType: number
     position: number

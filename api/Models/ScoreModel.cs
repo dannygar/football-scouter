@@ -15,10 +15,16 @@ namespace ScouterApi.Models
     public class ScoreModel : BaseModel
     {
         /// <summary>
-        /// Gets or sets User.
+        /// Gets or sets User's account.
         /// </summary>
-        [DataMember(Name = "user")]
-        public string User { get; set; }
+        [DataMember(Name = "account")]
+        public string Account { get; set; }
+
+        /// <summary>
+        /// Gets or sets User's email.
+        /// </summary>
+        [DataMember(Name = "email")]
+        public string Email { get; set; }
 
         /// <summary>
         /// Gets or sets Game Id.

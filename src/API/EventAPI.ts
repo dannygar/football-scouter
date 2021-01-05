@@ -1,14 +1,14 @@
 import { v4 as uuid } from 'uuid'
 import axios, { AxiosResponse } from 'axios'
-import { IEvent, EventDataType } from '../Models/EventModel'
+import { IEvent, EventDataType, ScoreModel } from '../Models/EventModel'
 
 const baseUrl: string = `${process.env.REACT_APP_API_URL}/api/events`
 
-export const getEvents = async (gameId: string, userId: string | undefined): Promise<IEvent[]> => {
+export const getEvents = async (gameId: string, userId: string | undefined): Promise<ScoreModel | null> => {
   try {
-    const apiUrl = `${baseUrl}/game?Id=${gameId}&account=${userId}`
-    const response: AxiosResponse<IEvent[]> = await axios.get(apiUrl)
-    return (response.status === 200)? response.data : []
+    const apiUrl = `${baseUrl}?id=${gameId}&account=${userId}`
+    const response: AxiosResponse<ScoreModel> = await axios.get(apiUrl)
+    return (response.status === 200)? response.data : null
   } catch (error) {
     throw error
   }
@@ -22,7 +22,7 @@ export const addEvent = async (
     try {
     const event: IEvent = {
       id: uuid(),
-      time: formData.time,
+      eventTime: formData.eventTime,
       advTeam: formData.advTeam,
       eventType: parseInt(formData.eventType.toString()),
       position: parseInt(formData.position.toString()),
@@ -51,13 +51,35 @@ export const addEvent = async (
 
 
 export const saveEvents = async (
-  events: IEvent[]
+  events: IEvent[], account: string, email: string, gameId: string
 ): Promise<string> => {
   try {
     const apiUrl = `${baseUrl}/save`
+    // const significances: IEvent[] = []
+    // events.forEach(event => {
+    //   significances.push({ 
+    //     id: event.id, 
+    //     eventTime: event.eventTime,
+    //     eventType: event.eventType,
+    //     advTeam: event.advTeam,
+    //     position: event.position,
+    //     significance: event.significance,
+    //     credit: event.credit ?? '',
+    //     blame: event.blame ?? '',
+    //     comments: event.comments ?? ''
+    //   })
+    // })
+    const scores: ScoreModel = {
+      id: uuid(),
+      account: account,
+      email: email,
+      gameId: gameId,
+      updatedOn: '',
+      events: events
+    }
     const response: AxiosResponse<boolean> = await axios.post(
       apiUrl,
-      events
+      scores
     )
     return response ? 'Saved' : 'Failed'
   } catch (error) {

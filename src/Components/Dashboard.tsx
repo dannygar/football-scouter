@@ -6,7 +6,7 @@ import { authProvider } from '../Auth/AuthProvider'
 import { AccessTokenResponse } from 'react-aad-msal';
 
 import { getEvents, addEvent, saveEvents } from '../API/EventAPI'
-import { IEvent } from '../Models/EventModel'
+import { IEvent, ScoreModel } from '../Models/EventModel'
 import AddEvent from '../Components/AddEvent'
 import Navigation from '../Components/Navigation'
 import EventTable  from '../Components/EventTable'
@@ -32,6 +32,7 @@ const Dashboard: React.FC = () => {
   const [events, setEvents] = useState<IEvent[]>([])
   const [newEvent, setNewEvent] = useState<IEvent | null>(null)
   const [toggled, setToggled] = useState(false)
+  const [eventsLoaded, setEventsLoaded] = useState(false)
   const [signedIn, setSignedStatus] = useState(false)
   const [token, setToken] = useState<string>('')
   const [userName, setUserName] = useState<string | undefined>()
@@ -74,7 +75,7 @@ const Dashboard: React.FC = () => {
       return games.length
     }
     fetchGames()
-  },[])
+  },[dropdownRef, games.length])
 
 
   useEffect(() => {
@@ -86,22 +87,13 @@ const Dashboard: React.FC = () => {
       })
       .catch((err) => console.log(err))
     }  
+
     if (toggled && newEvent !== null) {
       addEventHandler(newEvent)
       setToggled(false)
     }
-  }, [events, newEvent, toggled])
+  }, [events, newEvent, toggled, accountId, selectedGame])
 
-
-  const fetchEvents = async (gameId: string): Promise<void> => {
-    try {
-      const retrievedEvents = await getEvents(gameId, accountId)
-      setEvents(retrievedEvents)
-    } catch (error) {
-      if (error.response.status !== 404)
-        alert(`Failed to fetch all significances for this game. Please try again later. Error details: ${error.message}`)      
-    }
-  }
 
   const handleAddEvent = (e: React.FormEvent, formData: IEvent): void => {
     e.preventDefault()
@@ -113,8 +105,7 @@ const Dashboard: React.FC = () => {
 
 
   const handleSaveEvent = async (events: IEvent[]):  Promise<string>  => {
-    const result = await saveEvents(events)
-    return result
+    return await saveEvents(events, accountId as string, userName as string, (selectedGame as IGame).id)
   }
 
   const handleDeleteEvent = (deletedItems: IEvent[]): void => {
@@ -125,6 +116,22 @@ const Dashboard: React.FC = () => {
   const onGameChanged = (event: React.FormEvent<HTMLDivElement>, item?: IDropdownOption, index?: number): void => {
     if (item && item.data) {
       setSelectedGame(item.data)
+      const fetchEvents = async (gameId: string): Promise<void> => {
+        try {
+          const retrievedEvents = await getEvents(gameId, accountId)
+          if (retrievedEvents) {
+            setEvents(retrievedEvents.events)
+          } else {
+            setEvents([])
+          }
+          setEventsLoaded(true)
+          console.log("events have been updated")
+      } catch (error) {
+          if (error.response?.status !== 404)
+            alert(`Failed to fetch all significances for this game. Please try again later. Error details: ${error.message}`)      
+        }
+      }
+
       fetchEvents(item.data?.id)
     }
     console.log(`Selected: ${item?.text}`)
@@ -180,11 +187,13 @@ const Dashboard: React.FC = () => {
             </Stack.Item>
             <Stack.Item align="stretch">
               {!toggled && <main className='App'>
-                <EventTable 
-                  events={events} 
-                  saveEvents={handleSaveEvent}
-                  deleteItemsEvent={handleDeleteEvent}
-                />                  
+                {eventsLoaded && 
+                  <EventTable 
+                    events={events} 
+                    saveEvents={handleSaveEvent}
+                    deleteItemsEvent={handleDeleteEvent}
+                  />                  
+                }
               </main>}
             </Stack.Item>
           </Stack>

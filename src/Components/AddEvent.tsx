@@ -32,6 +32,7 @@ const AddEvent: React.FC<Props> = ({ saveEvent, game }) => {
     setFormData({
       ...formData,
       [e.currentTarget.id]: e.currentTarget.value,
+      eventTime: e.currentTarget.id === 'eventTime' ? Number.parseFloat(e.currentTarget.value) : 0.00
     })
   }
 
@@ -47,8 +48,8 @@ const AddEvent: React.FC<Props> = ({ saveEvent, game }) => {
         <form className='Form' onSubmit={(e) => saveEvent(e, formData)}>
         <div>
             <div>
-              <label htmlFor='time'>Event Time</label>
-              <input onChange={handleForm} type='text' id='time' />
+              <label htmlFor='eventTime'>Event Time</label>
+              <input onChange={handleForm} type='string' id='eventTime' />
             </div>
             <div>
               <label htmlFor='advTeam'>Adv Team</label>

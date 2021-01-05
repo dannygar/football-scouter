@@ -22,8 +22,8 @@ namespace ScouterApi.Models
         /// <summary>
         /// Gets or sets EventTime
         /// </summary>
-        [DataMember(Name = "time")]
-        public string EventTime { get; set; }
+        [DataMember(Name = "eventTime")]
+        public decimal EventTime { get; set; }
 
         /// <summary>
         /// Gets or sets AdvTeam
@@ -53,18 +53,18 @@ namespace ScouterApi.Models
         /// Gets or sets Credit
         /// </summary>
         [DataMember(Name = "credit")]
-        public string Credit { get; set; }
+        public string? Credit { get; set; }
 
         /// <summary>
         /// Gets or sets Blame
         /// </summary>
         [DataMember(Name = "blame")]
-        public string Blame { get; set; }
+        public string? Blame { get; set; }
 
         /// <summary>
         /// Gets or sets Credit
         /// </summary>
         [DataMember(Name = "comments")]
-        public string Comments { get; set; }
+        public string? Comments { get; set; }
     }
 }

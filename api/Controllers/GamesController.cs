@@ -75,11 +75,11 @@ namespace ScouterApi.Controllers
                     // Update the create/update date
                     foreach (var game in games)
                     {
-                        game.UpdatedOn = DateTime.UtcNow;
+                        game.UpdatedOn = DateTime.UtcNow.ToString();
                     }
 
                     //Create or replace the Games documents
-                    var response = await db.UpsertArrayAsync(games.ToList(), partitionKey);
+                    var response = await db.UpsertArrayAsync(games.ToList());
 
                     return response.SuccessfulDocuments == games.Count();
                 }

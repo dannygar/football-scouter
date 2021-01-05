@@ -66,121 +66,160 @@ const classNames = mergeStyleSets({
   },
 });
 
-const columns: IColumn[] = [
-  {
-    key: 'column1',
-    name: 'Row Type',
-    className: classNames.iconCell,
-    iconClassName: classNames.iconHeader,
-    ariaLabel: '',
-    iconName: 'Soccer',
-    isIconOnly: true,
-    fieldName: 'icon',
-    minWidth: 16,
-    maxWidth: 16,
-    onRender: (item: IEvent) => {
-        return <FontIcon iconName="Soccer" className={classNames.iconImg} />
-    },
-  },
-  {
-    key: 'column2',
-    name: 'Event Time',
-    fieldName: 'time',
-    minWidth: 70,
-    maxWidth: 90,
-    isRowHeader: true,
-    isResizable: true,
-    isSorted: false,
-    isSortedDescending: false,
-    data: 'string',
-    isPadded: true,
-  },
-  {
-    key: 'column3',
-    name: 'Advantaged Team',
-    fieldName: 'advTeam',
-    minWidth: 100,
-    maxWidth: 120,
-    isResizable: true,
-    data: 'string',
-    onRender: (item: IEvent) => {
-        return <span>{item.advTeam}</span>;
-    },
-    isPadded: true,
-  },
-  {
-    key: 'column4',
-    name: 'Event Type',
-    fieldName: 'eventType',
-    minWidth: 70,
-    maxWidth: 90,
-    isResizable: true,
-    isCollapsible: true,
-    data: 'string',
-    onRender: (item: IEvent) => {
-        return <span>{getEventType(item.eventType)}</span>;
-    },
-    isPadded: true,
-  },
-  {
-    key: 'column5',
-    name: 'Position',
-    fieldName: 'position',
-    minWidth: 70,
-    maxWidth: 90,
-    isResizable: true,
-    isCollapsible: true,
-    data: 'number',
-  },
-  {
-    key: 'column6',
-    name: 'Significance',
-    fieldName: 'significance',
-    minWidth: 90,
-    maxWidth: 120,
-    isResizable: true,
-    isCollapsible: true,
-    data: 'number',
-  },
-  {
-    key: 'column7',
-    name: 'Credit',
-    fieldName: 'credit',
-    minWidth: 90,
-    maxWidth: 120,
-    isResizable: true,
-    isCollapsible: true,
-    data: 'string',
-  },
-  {
-    key: 'column8',
-    name: 'Blame',
-    fieldName: 'blame',
-    minWidth: 120,
-    maxWidth: 150,
-    isResizable: true,
-    isCollapsible: true,
-    data: 'string',
-  },
-  {
-    key: 'column9',
-    name: 'Comments',
-    fieldName: 'comments',
-    minWidth: 250,
-    maxWidth: 350,
-    isResizable: true,
-    isCollapsible: true,
-    data: 'string',
-  },
-];
 
 const commandBarStyles: Partial<ICommandBarStyles> = { root: { marginBottom: '40px' } };
 
 const EventTable: React.FC<EventItemProps> = (props) => {
-    const [items, setItems] = useState<IEvent[]>(props.events)
+    const [columns, setColumns] = useState<IColumn[]>([])
+    const [items, setItems] = useState<IEvent[]>([])
     const [selectedItems, setSelectedItems] = useState<IEvent[]>([])
     const [toggleDelete, setToggleDelete] = useState(false)
     const [stateMessage, setStateMessage] = useState<string>('')
+
+    function _copyAndSort<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
+      const key = columnKey as keyof T;
+      return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1));
+    }
+
+    useEffect(() => {
+      if ((props.events && props.events.length > 0) || props.events.length !== items.length) {
+        setItems(props.events)
+     }
+    },[props.events, items.length])
+
+    useEffect(() => {
+      const onTimeColumnClick = (ev: React.MouseEvent<HTMLElement>, column: IColumn): void => {
+        if (columns.length > 0) {
+          const newColumns: IColumn[] = columns.slice()
+          const currColumn: IColumn = newColumns.filter(currCol => column.key === currCol.key)[0]
+          newColumns.forEach((newCol: IColumn) => {
+            if (newCol === currColumn) {
+              currColumn.isSorted = true
+            } else {
+              newCol.isSorted = false
+              newCol.isSortedDescending = true
+            }
+          })
+          const newItems = _copyAndSort(items, currColumn.fieldName!, false)
+          
+          setItems(newItems)
+        }
+      }
+    
+      const columns = [
+        {
+          key: 'column1',
+          name: 'Row Type',
+          className: classNames.iconCell,
+          iconClassName: classNames.iconHeader,
+          ariaLabel: '',
+          iconName: 'Soccer',
+          isIconOnly: true,
+          fieldName: 'icon',
+          minWidth: 16,
+          maxWidth: 16,
+          onRender: (item: IEvent) => {
+              return <FontIcon iconName="Soccer" className={classNames.iconImg} />
+          },
+        },
+        {
+          key: 'column2',
+          name: 'Event Time',
+          fieldName: 'eventTime',
+          minWidth: 70,
+          maxWidth: 90,
+          isRowHeader: true,
+          isResizable: true,
+          isSorted: true,
+          isSortedDescending: true,
+          sortAscendingAriaLabel: 'Sorted Small to Large',
+          sortDescendingAriaLabel: 'Sorted Large to Small',
+          onColumnClick: onTimeColumnClick,
+          data: 'number',
+          isPadded: true
+        },
+        {
+          key: 'column3',
+          name: 'Advantaged Team',
+          fieldName: 'advTeam',
+          minWidth: 100,
+          maxWidth: 120,
+          isResizable: true,
+          data: 'string',
+          onRender: (item: IEvent) => {
+              return <span>{item.advTeam}</span>
+          },
+          isPadded: true,
+        },
+        {
+          key: 'column4',
+          name: 'Event Type',
+          fieldName: 'eventType',
+          minWidth: 70,
+          maxWidth: 90,
+          isResizable: true,
+          isCollapsible: true,
+          data: 'string',
+          onRender: (item: IEvent) => {
+              return <span>{getEventType(item.eventType)}</span>;
+          },
+          isPadded: true,
+        },
+        {
+          key: 'column5',
+          name: 'Position',
+          fieldName: 'position',
+          minWidth: 70,
+          maxWidth: 90,
+          isResizable: true,
+          isCollapsible: true,
+          data: 'number',
+        },
+        {
+          key: 'column6',
+          name: 'Significance',
+          fieldName: 'significance',
+          minWidth: 90,
+          maxWidth: 120,
+          isResizable: true,
+          isCollapsible: true,
+          data: 'number',
+        },
+        {
+          key: 'column7',
+          name: 'Credit',
+          fieldName: 'credit',
+          minWidth: 90,
+          maxWidth: 120,
+          isResizable: true,
+          isCollapsible: true,
+          data: 'string',
+        },
+        {
+          key: 'column8',
+          name: 'Blame',
+          fieldName: 'blame',
+          minWidth: 120,
+          maxWidth: 150,
+          isResizable: true,
+          isCollapsible: true,
+          data: 'string',
+        },
+        {
+          key: 'column9',
+          name: 'Comments',
+          fieldName: 'comments',
+          minWidth: 250,
+          maxWidth: 350,
+          isResizable: true,
+          isCollapsible: true,
+          data: 'string',
+        },
+      ]
+
+      setColumns(columns)
+
+    }, [items])
 
     const onItemsSelectionChanged  = () => {
       const selectedItems = selection.getSelection()
@@ -207,11 +246,7 @@ const EventTable: React.FC<EventItemProps> = (props) => {
         deleteRowEventHandler(updatedItemsList)
         setToggleDelete(false)
         resetSelection()
-      } else {
-        if (selectedItems.length === 0) {
-          setItems(props.events)
-        }
-      }
+      } 
     }, [props, props.events, items, selection, selectedItems, toggleDelete])
   
     const getKey = (item: IEvent, index?: number): string => {
@@ -223,6 +258,8 @@ const EventTable: React.FC<EventItemProps> = (props) => {
     }
 
     const onRenderRow = (props: IDetailsRowProps | undefined): JSX.Element => {
+      // sort all times
+      _copyAndSort(items, "eventTime", false)
       // Set each other row's background a bit lighter
       const customStyles: Partial<IDetailsRowStyles> = {}
       if (props) {
@@ -268,6 +305,8 @@ const EventTable: React.FC<EventItemProps> = (props) => {
     }
 
 
+  
+
     return (
       <div data-is-scrollable={true}>
         <Fabric className="Table">
@@ -277,26 +316,21 @@ const EventTable: React.FC<EventItemProps> = (props) => {
             farItems={[{ key: 'state', text: `${stateMessage ?? ''}` }]}
           />
 
-          {items?.length > 0 ? (
-            <DetailsList
-                items={items}
-                compact={false}
-                columns={columns}
-                selectionMode={SelectionMode.multiple}
-                selection={selection}
-                getKey={getKey}
-                setKey="none"
-                layoutMode={DetailsListLayoutMode.justified}
-                checkboxVisibility={CheckboxVisibility.onHover}
-                isHeaderVisible={true}
-                enterModalSelectionOnTouch={true}
-                onItemInvoked={onItemInvoked}
-                onRenderRow={onRenderRow}
-            />
-          ) : (
-            <br/>
-          )}
-
+          <DetailsList
+              items={items}
+              compact={false}
+              columns={columns}
+              selectionMode={SelectionMode.multiple}
+              selection={selection}
+              getKey={getKey}
+              setKey="none"
+              layoutMode={DetailsListLayoutMode.justified}
+              checkboxVisibility={CheckboxVisibility.onHover}
+              isHeaderVisible={true}
+              enterModalSelectionOnTouch={true}
+              onItemInvoked={onItemInvoked}
+              onRenderRow={onRenderRow}
+          />
         </Fabric>
       </div>
     );

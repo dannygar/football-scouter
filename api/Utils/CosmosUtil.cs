@@ -134,6 +134,25 @@ namespace ScouterApi.Utils
         }
 
         /// <summary>
+        /// Replace item as an asynchronous operation.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <param name="id"></param>
+        /// <param name="partitionKey">The partition key.</param>
+        /// <returns>Task.</returns>
+        public async Task ReplaceItemAsync(T item, string id, string partitionKey = DefaultPartitionKey)
+        {
+            if (partitionKey == DefaultPartitionKey)
+            {
+                await this.container.ReplaceItemAsync<T>(item, id);
+            }
+            else
+            {
+                await this.container.ReplaceItemAsync<T>(item, id, new PartitionKey(partitionKey));
+            }
+        }
+
+        /// <summary>
         /// upsert item as an asynchronous operation.
         /// </summary>
         /// <param name="item">The item.</param>

@@ -25,7 +25,7 @@ namespace ScouterApi.Models
         ///  Gets or sets the UpdatedOn
         /// </summary>
         [DataMember(Name = "updatedOn")]
-        public DateTimeOffset UpdatedOn { get; set; }
+        public string UpdatedOn { get; set; }
 
         /// <summary>
         /// Implements the == operator.

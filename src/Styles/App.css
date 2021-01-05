@@ -150,7 +150,7 @@ body {
     border: none;
 }
 
-.Form #time {
+.Form #eventTime {
   min-width: 90px;
   max-width: 100px;
 }
