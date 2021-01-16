@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
-
+﻿
 namespace ScouterApi.Models
 {
+    using Scouter.Common;
+    using System.Runtime.Serialization;
+
     /// <summary>
     ///  IGame model
     /// </summary>

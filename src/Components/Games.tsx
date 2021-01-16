@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react'
-import { initializeIcons, IStackTokens, Stack, Text, ActionButton, IIconProps } from '@fluentui/react'
+import { IStackTokens, Stack, Text, ActionButton, IIconProps } from '@fluentui/react'
 import { authProvider } from '../Auth/AuthProvider'
 import '../Styles/App.css'
 import 'office-ui-fabric-react/dist/css/fabric.css'
@@ -14,7 +15,7 @@ import GameTable from './GameTable';
 const signIcon: IIconProps = { iconName: 'SignIn' };
 
 // Initialize icons in case this page uses them
-initializeIcons();
+// initializeIcons();
 
 type GameProps = {
   userName: string
@@ -28,6 +29,7 @@ const Games: React.FC<GameProps> = (props) => {
   const [signedIn, setSignedStatus] = useState(false)
   const [userName, setUserName] = useState<string | undefined>()
   const [displayName, setDisplayName] = useState<string | undefined>()
+  const [statusMsg, setStatusMsg] = useState<string>('')
 
   const stackTokens: IStackTokens = { childrenGap: 20 };
 
@@ -51,12 +53,17 @@ const Games: React.FC<GameProps> = (props) => {
   }
 
   useEffect(() => {
-    fetchGames().then(() => {
-    })
-  },[])
+    console.log("Did mount")
+    try {
+      const fetchGames = async (): Promise<void> => {
+        const retrievedGames = await getGames()
+        setGames(retrievedGames)
+      }
+      fetchGames()
+    } catch (error) {
+      setStatusMsg("Failed to retrieve the list of games")
+    }
 
-
-  useEffect(() => {
     const addGameHandler = async (formData: IGame): Promise<void> => {
       await addGame(formData, games)
       .then(({ data }) => {
@@ -69,13 +76,26 @@ const Games: React.FC<GameProps> = (props) => {
       addGameHandler(newGame)
       setToggled(false)
     }
-  }, [games, newGame, toggled])
+  },[])
 
-  const fetchGames = async (): Promise<number> => {
-    const retrievedGames = await getGames()
-    setGames(retrievedGames)
-    return games.length
-  }
+  useEffect(() => {
+    console.log("Component is updated")
+    const addGameHandler = async (formData: IGame): Promise<void> => {
+      await addGame(formData, games)
+      .then(({ data }) => {
+        setGames(data)
+        console.log(`added total of ${games.length} games`)
+      })
+      .catch((err) => console.log(err))
+    }  
+    if (toggled && newGame !== null) {
+      console.log("Game is added")
+      addGameHandler(newGame)
+      setToggled(false)
+    }
+  })
+
+
 
   const handleAddGame = (e: React.FormEvent, formData: IGame): void => {
     e.preventDefault()
@@ -129,6 +149,9 @@ const Games: React.FC<GameProps> = (props) => {
             </Stack.Item>
           </Stack>
         </div>
+        <footer>
+          <h4>{statusMsg}</h4>
+        </footer>
     </div>      
   )
 }

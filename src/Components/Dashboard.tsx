@@ -1,21 +1,22 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import { Dropdown, Text, initializeIcons, IDropdown, IStackTokens, Stack, IDropdownOption, ActionButton, IIconProps } from '@fluentui/react'
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useState } from 'react'
+import { Dropdown, Text, IDropdown, IStackTokens, Stack, IDropdownOption, ActionButton, IIconProps } from '@fluentui/react'
 import '../Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
 import { authProvider } from '../Auth/AuthProvider'
 import { AccessTokenResponse } from 'react-aad-msal';
 
 import { getEvents, addEvent, saveEvents } from '../API/EventAPI'
-import { IEvent, ScoreModel } from '../Models/EventModel'
+import { IEvent } from '../Models/EventModel'
 import AddEvent from '../Components/AddEvent'
 import Navigation from '../Components/Navigation'
 import EventTable  from '../Components/EventTable'
 import { IGame } from '../Models/GameModel';
 
 // Global context
-import { navBarContext } from '../NavBar/NavBar.Context'
-import { useMenu } from '../NavBar/NavBar.Hook'
-import { NIL } from 'uuid';
+// import { navBarContext } from '../NavBar/NavBar.Context'
+// import { useMenu } from '../NavBar/NavBar.Hook'
+// import { NIL } from 'uuid';
 import { getGames } from '../API/GameAPI';
 
 const dropdownStyles = { dropdown: { width: 500 }, label: { color: 'White' } };
@@ -23,7 +24,7 @@ const dropdownStyles = { dropdown: { width: 500 }, label: { color: 'White' } };
 const signIcon: IIconProps = { iconName: 'SignIn' };
 
 // Initialize icons in case this page uses them
-initializeIcons();
+// initializeIcons();
 
 const Dashboard: React.FC = () => {
   const [selectedGame, setSelectedGame] = useState<IGame>()
@@ -34,9 +35,10 @@ const Dashboard: React.FC = () => {
   const [toggled, setToggled] = useState(false)
   const [eventsLoaded, setEventsLoaded] = useState(false)
   const [signedIn, setSignedStatus] = useState(false)
-  const [token, setToken] = useState<string>('')
+  // const [token, setToken] = useState<string>('')
   const [userName, setUserName] = useState<string | undefined>()
   const [displayName, setDisplayName] = useState<string | undefined>()
+  const [statusMsg, setStatusMsg] = useState<string>('')
 
 
   
@@ -48,7 +50,7 @@ const Dashboard: React.FC = () => {
 
   const authenticate = (): void => {
     authProvider.getAccessToken().then ((value: AccessTokenResponse) => {
-      setToken(value.accessToken)
+      // setToken(value.accessToken)
       setUserName(authProvider.getAccountInfo()?.account.userName)
       setDisplayName(authProvider.getAccountInfo()?.account.name)
       setSignedStatus((userName && userName.length > 0) ? true : false)
@@ -59,26 +61,35 @@ const Dashboard: React.FC = () => {
   const dropdownRef = React.createRef<IDropdown>();
 
   useEffect(() => {
-    const fetchGames = async (): Promise<number> => {
-      const retrievedGames = await getGames()
-      const gameOptions: IDropdownOption[] = []
-      retrievedGames.forEach(game => {
-        gameOptions.push({ key: game.id, text: `${game.homeTeam} vs ${game.awayTeam}`,
-          data: game })
-      })
-      setGamesList(gameOptions)
-      setGames(retrievedGames)
-      if(dropdownRef.current !== null) {
-        const onSetFocus = () => dropdownRef.current!.focus(true);
-        onSetFocus()
+    console.log("Component Did Mount")
+    try {
+      const fetchGames = async (): Promise<void> => {
+        const retrievedGames = await getGames()
+        if (retrievedGames.length === 0) {
+          setStatusMsg("Failed to retrieve the list of games")
+          return
+        }
+        const gameOptions: IDropdownOption[] = []
+        retrievedGames.forEach(game => {
+          gameOptions.push({ key: game.id, text: `${game.homeTeam} vs ${game.awayTeam}`,
+            data: game })
+        })
+        setGamesList(gameOptions)
+        setGames(retrievedGames)
+        setEventsLoaded(true)
+        if(dropdownRef.current !== null) {
+          const onSetFocus = () => dropdownRef.current!.focus(true);
+          onSetFocus()
+        }
       }
-      return games.length
+      fetchGames()
+    } catch (error) {
+      setStatusMsg("Failed to retrieve the list of games")
     }
-    fetchGames()
-  },[dropdownRef, games.length])
-
+  }, [])
 
   useEffect(() => {
+    console.log("Component is updated")
     const addEventHandler = async (formData: IEvent): Promise<void> => {
       await addEvent(formData, events)
       .then(({ data }) => {
@@ -92,7 +103,7 @@ const Dashboard: React.FC = () => {
       addEventHandler(newEvent)
       setToggled(false)
     }
-  }, [events, newEvent, toggled, accountId, selectedGame])
+  })
 
 
   const handleAddEvent = (e: React.FormEvent, formData: IEvent): void => {
@@ -162,17 +173,19 @@ const Dashboard: React.FC = () => {
               <Stack.Item align="auto">
                 <Dropdown
                   componentRef={dropdownRef}
-                  placeholder={games?.length === 0 ? "please, wait..." : "Select a game"}
+                  placeholder={eventsLoaded ? ( games.length > 0 ? "Select a game" : "No games found") : "please, wait..."}
                   label="Select a game for which you want to edit significant events"
                   options={gamesList}
                   required
                   styles={dropdownStyles}
                   onChange={onGameChanged}
                 />
-                {games?.length > 0 ? (
+                {eventsLoaded ? (games.length > 0 ? (
                 <Stack.Item align="auto">
                   <Text block className="Title" variant='xxLarge'>{selectedGame?.homeTeam} vs {selectedGame?.awayTeam}</Text>
-                </Stack.Item>
+                </Stack.Item> ) : (
+                  <br/>
+                )
                 ) : (
                   <Stack.Item align="auto">
                     <Text block className="Title" variant='xxLarge'>Loading...</Text>
@@ -200,6 +213,7 @@ const Dashboard: React.FC = () => {
         </div>
         <footer>
           <h2>Environment: {process.env.NODE_ENV}</h2>
+          <h4>{statusMsg}</h4>
         </footer>
     </div>      
   )

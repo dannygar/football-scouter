@@ -208,11 +208,11 @@
             <summary>Gets the user's Scores for the specific game.</summary>
             <param name="id"></param>
             <param name="account"></param>
-            <returns>score&lt;ScoreModel&gt;.</returns>
+            <returns>scoreEvent&lt;EventModel&gt;.</returns>
         </member>
-        <member name="M:ScouterApi.Controllers.EventsController.PostAsync(ScouterApi.Models.ScoreModel)">
+        <member name="M:ScouterApi.Controllers.EventsController.PostAsync(ScouterApi.Models.EventModel)">
             <summary>Posts the specified event.</summary>
-            <param name="score">The score data.</param>
+            <param name="scoreEvent">The scoreEvent data.</param>
             <returns>Task&lt;System.Boolean&gt;.</returns>
         </member>
         <member name="T:ScouterApi.Controllers.GamesController">
@@ -248,57 +248,40 @@
             </summary>
             <returns>Default content.</returns>
         </member>
-        <member name="T:ScouterApi.Models.BaseModel">
+        <member name="T:ScouterApi.Mappings.MappingProfile">
             <summary>
-            Base model class.
+            MappingProfile
             </summary>
         </member>
-        <member name="P:ScouterApi.Models.BaseModel.Id">
+        <member name="M:ScouterApi.Mappings.MappingProfile.#ctor">
             <summary>
-            Gets or sets the identifier in Cosmos Db.
-            </summary>
-            <value>The identifier.</value>
-        </member>
-        <member name="P:ScouterApi.Models.BaseModel.UpdatedOn">
-            <summary>
-             Gets or sets the UpdatedOn
+            Default Constructor
             </summary>
         </member>
-        <member name="M:ScouterApi.Models.BaseModel.op_Equality(ScouterApi.Models.BaseModel,ScouterApi.Models.BaseModel)">
+        <member name="T:ScouterApi.Models.EventModel">
             <summary>
-            Implements the == operator.
+            Model that describes the Significant Event.
             </summary>
-            <param name="obj1">The obj1.</param>
-            <param name="obj2">The obj2.</param>
-            <returns>The result of the operator.</returns>
         </member>
-        <member name="M:ScouterApi.Models.BaseModel.op_Inequality(ScouterApi.Models.BaseModel,ScouterApi.Models.BaseModel)">
+        <member name="P:ScouterApi.Models.EventModel.Account">
             <summary>
-            Implements the != operator.
+            Gets or sets User's account.
             </summary>
-            <param name="obj1">The obj1.</param>
-            <param name="obj2">The obj2.</param>
-            <returns>The result of the operator.</returns>
         </member>
-        <member name="M:ScouterApi.Models.BaseModel.Equals(ScouterApi.Models.BaseModel)">
+        <member name="P:ScouterApi.Models.EventModel.Email">
             <summary>
-            Indicates whether the current object is equal to another object of the same type.
+            Gets or sets User's email.
             </summary>
-            <param name="other">An object to compare with this object.</param>
-            <returns>true if the current object is equal to the <paramref name="other">other</paramref> parameter; otherwise, false.</returns>
         </member>
-        <member name="M:ScouterApi.Models.BaseModel.Equals(System.Object)">
+        <member name="P:ScouterApi.Models.EventModel.GameId">
             <summary>
-            Determines whether the specified <see cref="T:System.Object" /> is equal to this instance.
+            Gets or sets Game Id.
             </summary>
-            <param name="obj">The object to compare with the current object.</param>
-            <returns><c>true</c> if the specified <see cref="T:System.Object" /> is equal to this instance; otherwise, <c>false</c>.</returns>
         </member>
-        <member name="M:ScouterApi.Models.BaseModel.GetHashCode">
+        <member name="P:ScouterApi.Models.EventModel.Events">
             <summary>
-            Returns a hash code for this instance.
+             Gets or sets the Events.
             </summary>
-            <returns>A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.</returns>
         </member>
         <member name="T:ScouterApi.Models.IGame">
             <summary>
@@ -307,27 +290,7 @@
         </member>
         <member name="T:ScouterApi.Models.ScoreModel">
             <summary>
-            Model that describes the Significant Event.
-            </summary>
-        </member>
-        <member name="P:ScouterApi.Models.ScoreModel.Account">
-            <summary>
-            Gets or sets User's account.
-            </summary>
-        </member>
-        <member name="P:ScouterApi.Models.ScoreModel.Email">
-            <summary>
-            Gets or sets User's email.
-            </summary>
-        </member>
-        <member name="P:ScouterApi.Models.ScoreModel.GameId">
-            <summary>
-            Gets or sets Game Id.
-            </summary>
-        </member>
-        <member name="P:ScouterApi.Models.ScoreModel.Events">
-            <summary>
-             Gets or sets the Events.
+            Scores
             </summary>
         </member>
         <member name="T:ScouterApi.Models.SignificantEvent">
@@ -397,6 +360,33 @@
             GetAgent
             </summary>
             <param name="agentId"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ScouterApi.Processors.ScoresProcessor">
+            <summary>
+            Agent Processor
+            </summary>
+        </member>
+        <member name="M:ScouterApi.Processors.ScoresProcessor.ProcessScoresAsync(System.String,System.Collections.Generic.List{Scouter.Data.EventModel})">
+            <summary>
+            AddAgentAsync
+            </summary>
+            <param name="agent"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ScouterApi.Resolvers.ProcessedTimeResolver">
+            <summary>
+            ProcessedTimeResolver
+            </summary>
+        </member>
+        <member name="M:ScouterApi.Resolvers.ProcessedTimeResolver.Resolve(ScouterApi.Models.SignificantEvent,Scouter.Data.SignificantEvent,System.Decimal,AutoMapper.ResolutionContext)">
+            <summary>
+            Resolve
+            </summary>
+            <param name="source"></param>
+            <param name="destination"></param>
+            <param name="destMember"></param>
+            <param name="context"></param>
             <returns></returns>
         </member>
         <member name="T:ScouterApi.Services.ICosmosDbService`1">
@@ -633,6 +623,24 @@
             <param name="logger">logger.</param>
             <param name="messages">message.</param>
             <param name="module">module.</param>
+        </member>
+        <member name="T:Scouter.Common.Resolvers.IValueResolver`3">
+            <summary>
+            IValueResolver
+            </summary>
+            <typeparam name="TSource"></typeparam>
+            <typeparam name="TDestination"></typeparam>
+            <typeparam name="TDestMember"></typeparam>
+        </member>
+        <member name="M:Scouter.Common.Resolvers.IValueResolver`3.Resolve(`0,`1,`2,AutoMapper.ResolutionContext)">
+            <summary>
+            Resolve
+            </summary>
+            <param name="source"></param>
+            <param name="destination"></param>
+            <param name="destMember"></param>
+            <param name="context"></param>
+            <returns></returns>
         </member>
     </members>
 </doc>

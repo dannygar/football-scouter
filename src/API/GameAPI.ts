@@ -10,7 +10,7 @@ export const getGames = async (): Promise<IGame[]> => {
     const response: AxiosResponse<IGame[]> = await axios.get(apiUrl)
     return (response.status === 200)? response.data : []
   } catch (error) {
-    throw new Error(error)
+    return []
   }
 }
 

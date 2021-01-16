@@ -1,9 +1,9 @@
-import React, { useContext, useState } from 'react'
-import { Nav, initializeIcons, INavLink } from '@fluentui/react'
+import React, { useContext } from 'react'
+import { Nav, INavLink } from '@fluentui/react'
 
 // Global NavBar context
 import { navBarContext } from '../NavBar/NavBar.Context'
-import { useMenu } from '../NavBar/NavBar.Hook'
+// import { useMenu } from '../NavBar/NavBar.Hook'
 
 const navigationStyles = {
     root: {
@@ -99,14 +99,14 @@ type NavProps = {
 const Navigation: React.FC<NavProps> = (props) => {
     // Set selected Menu
     const { setMenuKey } = useContext(navBarContext)
-    const [menuKey, setCurrentMenuKey] = useState<string>(useMenu().selectedMenu)
+    // const [menuKey, setCurrentMenuKey] = useState<string>(useMenu().selectedMenu)
 
-    initializeIcons();
+    // initializeIcons();
 
     const onLinkClick = (ev?: React.MouseEvent<HTMLElement>, item?: INavLink) => {
         if (item && item.key) {
             setMenuKey(item.key)
-            setCurrentMenuKey(item.Key)
+            // setCurrentMenuKey(item.Key)
             console.log(`menu key=${item.key}`)
         }
     }

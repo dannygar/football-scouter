@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
+import { initializeIcons } from '@fluentui/react';
 import './Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
 import { authProvider } from './Auth/AuthProvider'
@@ -11,6 +12,9 @@ import { useMenu } from './NavBar/NavBar.Hook'
 import Dashboard from './Components/Dashboard';
 import Games from './Components/Games';
 import Card from './Components/Card';
+
+// Initialize icons in case this page uses them
+initializeIcons();
 
 const App: React.FC = () => {
   const currentMenu = useMenu()

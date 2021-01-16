@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { DatePicker, DayOfWeek, Checkbox, mergeStyleSets } from '@fluentui/react'
 
 import '../Styles/App.css';
-import { IEvent, getEventTypes } from '../Models/EventModel'
-import EventTypeDropDown from './EventTypeDropDown'
+// import { IEvent, getEventTypes } from '../Models/EventModel'
+// import EventTypeDropDown from './EventTypeDropDown'
 import { IGame } from '../Models/GameModel'
 import { DayPickerStrings, parseDateFromString } from '../Utils/DateTimeUtil'
 

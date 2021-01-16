@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE.TXT file in the project root for full license information.
 // </copyright>
 
-namespace ScouterApi.Models
+namespace Scouter.Common
 {
     using System;
     using System.Runtime.Serialization;

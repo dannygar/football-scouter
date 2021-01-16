@@ -3,7 +3,15 @@ import '../Styles/App.css';
 import { IEvent, getEventTypes } from '../Models/EventModel'
 import EventTypeDropDown from './EventTypeDropDown'
 import { IGame } from '../Models/GameModel';
+import { MaskedTextField, mergeStyleSets } from '@fluentui/react';
 
+const inputTextClass = mergeStyleSets({
+  control: {
+    margin: '5px 15px 0 0',
+    minWidth: '60px',
+    maxWidth: '90px',
+  },
+})
   
 type Props = { 
   saveEvent: (e: React.FormEvent, formData: IEvent | any) => void 
@@ -31,11 +39,16 @@ const AddEvent: React.FC<Props> = ({ saveEvent, game }) => {
   const handleForm = (e: React.FormEvent<HTMLInputElement>): void => {
     setFormData({
       ...formData,
-      [e.currentTarget.id]: e.currentTarget.value,
-      eventTime: e.currentTarget.id === 'eventTime' ? Number.parseFloat(e.currentTarget.value) : 0.00
+      [e.currentTarget.id]: e.currentTarget.value
     })
   }
 
+  const handleMaskedTextInput = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: any): void => {
+    setFormData({
+      ...formData,
+      eventTime: Number.parseFloat(newValue)
+    })
+  }
 
   useEffect(() => {
     if (game && (teams[0].value !== game.homeTeam || teams[1].value !== game.awayTeam)) {
@@ -49,7 +62,14 @@ const AddEvent: React.FC<Props> = ({ saveEvent, game }) => {
         <div>
             <div>
               <label htmlFor='eventTime'>Event Time</label>
-              <input onChange={handleForm} type='string' id='eventTime' />
+              <MaskedTextField 
+                className={inputTextClass.control} 
+                mask='99.99' 
+                required 
+                onChange={handleMaskedTextInput} 
+                id='eventTime' 
+                borderless={true}
+              />
             </div>
             <div>
               <label htmlFor='advTeam'>Adv Team</label>

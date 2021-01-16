@@ -8,11 +8,12 @@ namespace ScouterApi.Models
     using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
+    using Scouter.Common;
 
     /// <summary>
     /// Model that describes the Significant Event.
     /// </summary>
-    public class ScoreModel : BaseModel
+    public class EventModel : BaseModel
     {
         /// <summary>
         /// Gets or sets User's account.
