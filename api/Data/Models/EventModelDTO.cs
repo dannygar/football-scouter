@@ -13,7 +13,7 @@ namespace Scouter.Data
     /// <summary>
     /// Model that describes the Significant Event.
     /// </summary>
-    public class EventModel : BaseModel
+    public class EventModelDTO : BaseModel
     {
         /// <summary>
         /// Gets or sets User's account.
@@ -43,7 +43,7 @@ namespace Scouter.Data
         ///  Gets or sets the Events.
         /// </summary>
         [DataMember(Name = "events")]
-        public List<SignificantEvent> Events { get; set; }
+        public List<SignificantEventDTO> Events { get; set; }
 
     }
 }

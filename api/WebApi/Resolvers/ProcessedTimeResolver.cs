@@ -9,7 +9,7 @@ namespace ScouterApi.Resolvers
     /// <summary>
     /// ProcessedTimeResolver
     /// </summary>
-    public class ProcessedTimeResolver : IValueResolver<ScouterApi.Models.SignificantEvent, Scouter.Data.SignificantEvent, decimal>
+    public class ProcessedTimeResolver : IValueResolver<ScouterApi.Models.SignificantEvent, Scouter.Data.SignificantEventDTO, decimal>
     {
         private const decimal TIME2DEC_CONVERTOR = 0.6M;
         /// <summary>
@@ -22,7 +22,7 @@ namespace ScouterApi.Resolvers
         /// <returns></returns>
         public decimal Resolve(
             Models.SignificantEvent source,
-            Scouter.Data.SignificantEvent destination,
+            Scouter.Data.SignificantEventDTO destination,
             decimal destMember,
             ResolutionContext context)
         {

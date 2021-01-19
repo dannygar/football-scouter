@@ -1,4 +1,6 @@
 import { IColumn } from '@fluentui/react'
+import { BaseModel } from './BaseModel'
+
 
 export enum EventType {
     PEP = 1,
@@ -38,9 +40,7 @@ export const getEventTypes: any = () => {
     ]
 }
 
-export interface ScoreModel {
-    id: string
-    updatedOn: string
+export interface IEventModel extends BaseModel {
     account: string
     email: string
     gameId: string
@@ -57,10 +57,6 @@ export interface IEvent {
     credit?: string
     blame?: string
     comments?: string
-}
-
-export interface EventProps {
-    event: IEvent
 }
 
 export type EventDataType = {

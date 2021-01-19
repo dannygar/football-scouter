@@ -7,6 +7,7 @@ using ScouterApi.Processors;
 using ScouterApi.Utils;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -35,28 +36,61 @@ namespace ScouterApi.Controllers
         }
 
 
-        /// <summary>Gets the user's Scores for the specific game.</summary>
+        /// <summary>Gets the game's stats.</summary>
         /// <param name="id"></param>
-        /// <param name="account"></param>
         /// <returns>scoreEvent&lt;EventModel&gt;.</returns>
-        [HttpGet()]
+        [HttpGet("game/stats")]
         [ValidateModelState]
         [SwaggerOperation("events")]
         [SwaggerResponse(statusCode: 200, type: typeof(ScouterApi.Models.EventModel), description: "the Score object containing Events")]
-        public async Task<ScouterApi.Models.EventModel> GetAsync([FromQuery] string id, [FromQuery] string account)
+        public async Task<IEnumerable<ScouterApi.Models.ScoreModel>> GetGameStatsAsync([FromQuery] string id)
         {
             const string partitionKey = "/gameId";
 
             try
             {
-                using (var db = new CosmosUtil<Scouter.Data.EventModel>("events", partitionKey: partitionKey))
+                using (var db = new CosmosUtil<Scouter.Data.EventModelDTO>("events", partitionKey: partitionKey))
+                {
+                    //Check if the item is already exist, and then replace it
+                    var eventData = await db.GetItemsAsync(
+                        $"SELECT * FROM c WHERE c.gameId = '{id}'");
+                    if (eventData.Count() == 0) return null;
+
+                    var scoreStats = await ScoresProcessor.ProcessScoresAsync(eventData);
+                    return scoreStats;
+                }
+            }
+            catch (Exception e)
+            {
+                LogUtil.LogError(this._logger, e.Message, nameof(this.GetGameStatsAsync));
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+
+        /// <summary>Gets the user's Scores for the specific game.</summary>
+        /// <param name="id"></param>
+        /// <param name="account"></param>
+        /// <returns>scoreEvent&lt;EventModel&gt;.</returns>
+        [HttpGet("game/account")]
+        [ValidateModelState]
+        [SwaggerOperation("events")]
+        [SwaggerResponse(statusCode: 200, type: typeof(ScouterApi.Models.EventModel), description: "the Score object containing Events")]
+        public async Task<ScouterApi.Models.EventModel> GetEventsByAccountAsync([FromQuery] string id, [FromQuery] string account)
+        {
+            const string partitionKey = "/gameId";
+
+            try
+            {
+                using (var db = new CosmosUtil<Scouter.Data.EventModelDTO>("events", partitionKey: partitionKey))
                 {
                     //Check if the item is already exist, and then replace it
                     var events = await db.GetItemsAsync(
                         $"SELECT * FROM c WHERE c.gameId = '{id}' and c.account = '{account}'");
                     if (events.Count() > 0)
                     {
-                        var data = events.Last<Scouter.Data.EventModel>();
+                        var data = events.Last<Scouter.Data.EventModelDTO>();
                         var apiScores = _mapper.Map<ScouterApi.Models.EventModel>(data);
                         return apiScores;
                     }
@@ -65,7 +99,7 @@ namespace ScouterApi.Controllers
             }
             catch (Exception e)
             {
-                LogUtil.LogError(this._logger, e.Message, nameof(this.GetAsync));
+                LogUtil.LogError(this._logger, e.Message, nameof(this.GetEventsByAccountAsync));
                 Console.WriteLine(e);
                 throw;
             }
@@ -89,9 +123,9 @@ namespace ScouterApi.Controllers
             try
             {
                 // Map API data object to Data
-                var scoreDTO = _mapper.Map<Scouter.Data.EventModel>(scoreEvent);
+                var scoreDTO = _mapper.Map<Scouter.Data.EventModelDTO>(scoreEvent);
 
-                using (var db = new CosmosUtil<Scouter.Data.EventModel>("events", partitionKey: partitionKey))
+                using (var db = new CosmosUtil<Scouter.Data.EventModelDTO>("events", partitionKey: partitionKey))
                 {
                     //Check if the item is already exist, and then replace it
                     var oldScores = await db.GetItemsAsync(

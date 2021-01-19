@@ -11,7 +11,7 @@ namespace Scouter.Data
     /// <summary>
     /// Model that describes the Significant Event.
     /// </summary>
-    public class SignificantEvent
+    public class SignificantEventDTO
     {
         /// <summary>
         /// Gets or sets Event Id.

@@ -11,7 +11,7 @@ import { navBarContext } from './NavBar/NavBar.Context'
 import { useMenu } from './NavBar/NavBar.Hook'
 import Dashboard from './Components/Dashboard';
 import Games from './Components/Games';
-import Card from './Components/Card';
+import Stats from './Components/Stats';
 
 // Initialize icons in case this page uses them
 initializeIcons();
@@ -31,7 +31,7 @@ const App: React.FC = () => {
         <Router>
             <Switch>
               <Route path="/dashboard" component={Dashboard} />
-              <Route path="/stats" children={<Card title="something" body="very very interesting" />} />
+              <Route path="/stats" children={<Stats userName={userName as string} />} />
               <Route path="/games" children={<Games userName={userName as string} />} />
               <Redirect from="*" to="/dashboard" />
             </Switch>

@@ -15,11 +15,11 @@ namespace ScouterApi.Processors
         /// </summary>
         /// <param name="agent"></param>
         /// <returns></returns>
-        public async Task<Agent> AddAgentAsync(Agent agent)
+        public async Task<AgentModel> AddAgentAsync(AgentModel agent)
         {
             try
             {
-                using (var db = new CosmosUtil<Agent>("agents"))
+                using (var db = new CosmosUtil<AgentModel>("agents"))
                 {
                     var theAgent = await db.GetItemAsync(agent.Id.ToString(), agent.Id.ToString());
 
@@ -48,11 +48,11 @@ namespace ScouterApi.Processors
         /// </summary>
         /// <param name="agentId"></param>
         /// <returns></returns>
-        public async Task<Agent> GetAgent(Guid agentId)
+        public async Task<AgentModel> GetAgent(Guid agentId)
         {
             try
             {
-                using (var db = new CosmosUtil<Agent>("agents"))
+                using (var db = new CosmosUtil<AgentModel>("agents"))
                 {
                     return await db.GetItemAsync(
                         agentId.ToString(),

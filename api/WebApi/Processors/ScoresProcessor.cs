@@ -13,11 +13,11 @@ namespace ScouterApi.Processors
     public class ScoresProcessor
     {
         /// <summary>
-        /// AddAgentAsync
+        /// ProcessScoresAsync
         /// </summary>
-        /// <param name="agent"></param>
+        /// <param name="events"></param>
         /// <returns></returns>
-        public static async Task<IOrderedEnumerable<ScoreModel>> ProcessScoresAsync(string gameId, List<Scouter.Data.EventModel> events)
+        public static async Task<IOrderedEnumerable<ScoreModel>> ProcessScoresAsync(IEnumerable<Scouter.Data.EventModelDTO> events)
         {
             try
             {
@@ -31,7 +31,7 @@ namespace ScouterApi.Processors
                         || (sig.ProcessedTime) <= (score.Time + 0.005M)))).Count();
                 }
 
-                return scores.OrderByDescending<ScoreModel, int>(score => score.SummaryCount);
+                return scores.Where(score => score.SummaryCount > 0).OrderByDescending<ScoreModel, int>(score => score.SummaryCount);
             }
             catch (Exception e)
             {

@@ -1,13 +1,13 @@
 import { v4 as uuid } from 'uuid'
 import axios, { AxiosResponse } from 'axios'
-import { IEvent, EventDataType, ScoreModel } from '../Models/EventModel'
+import { IEventModel, IEvent, EventDataType } from '../Models/EventModel'
 
 const baseUrl: string = `${process.env.REACT_APP_API_URL}/api/events`
 
-export const getEvents = async (gameId: string, userId: string | undefined): Promise<ScoreModel | null> => {
+export const getEvents = async (gameId: string, userId: string | undefined): Promise<IEventModel | null> => {
   try {
-    const apiUrl = `${baseUrl}?id=${gameId}&account=${userId}`
-    const response: AxiosResponse<ScoreModel> = await axios.get(apiUrl)
+    const apiUrl = `${baseUrl}/game/account?id=${gameId}&account=${userId}`
+    const response: AxiosResponse<IEventModel> = await axios.get(apiUrl)
     return (response.status === 200)? response.data : null
   } catch (error) {
     throw error
@@ -69,7 +69,7 @@ export const saveEvents = async (
     //     comments: event.comments ?? ''
     //   })
     // })
-    const scores: ScoreModel = {
+    const scores: IEventModel = {
       id: uuid(),
       account: account,
       email: email,
