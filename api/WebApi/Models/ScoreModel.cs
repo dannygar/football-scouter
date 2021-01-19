@@ -25,7 +25,9 @@ namespace ScouterApi.Models
 
     public class Score
     {
+        [DataMember(Name = "account")]
         public string Account { get; set; }
+        [DataMember(Name = "count")]
         public bool Count { get; set; }
     }
 }
