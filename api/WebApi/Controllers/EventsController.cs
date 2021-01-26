@@ -43,7 +43,7 @@ namespace ScouterApi.Controllers
         [ValidateModelState]
         [SwaggerOperation("events")]
         [SwaggerResponse(statusCode: 200, type: typeof(ScouterApi.Models.EventModel), description: "the Score object containing Events")]
-        public async Task<IEnumerable<ScouterApi.Models.ScoreModel>> GetGameStatsAsync([FromQuery] string id)
+        public async Task<IEnumerable<ScouterApi.Models.ConsensusModel>> GetGameStatsAsync([FromQuery] string id)
         {
             const string partitionKey = "/gameId";
 

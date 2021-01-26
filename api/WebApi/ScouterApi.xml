@@ -263,6 +263,11 @@
             Default Constructor
             </summary>
         </member>
+        <member name="T:ScouterApi.Models.ConsensusModel">
+            <summary>
+            ConsensusModel
+            </summary>
+        </member>
         <member name="T:ScouterApi.Models.EventModel">
             <summary>
             Model that describes the Significant Event.
@@ -291,11 +296,6 @@
         <member name="T:ScouterApi.Models.IGame">
             <summary>
              IGame model
-            </summary>
-        </member>
-        <member name="T:ScouterApi.Models.ScoreModel">
-            <summary>
-            Scores
             </summary>
         </member>
         <member name="T:ScouterApi.Models.SignificantEvent">
@@ -376,7 +376,7 @@
             <summary>
             ProcessScoresAsync
             </summary>
-            <param name="events"></param>
+            <param name="agentScores"></param>
             <returns></returns>
         </member>
         <member name="T:ScouterApi.Resolvers.ProcessedTimeResolver">

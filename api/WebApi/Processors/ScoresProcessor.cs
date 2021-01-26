@@ -15,23 +15,27 @@ namespace ScouterApi.Processors
         /// <summary>
         /// ProcessScoresAsync
         /// </summary>
-        /// <param name="events"></param>
+        /// <param name="agentScores"></param>
         /// <returns></returns>
-        public static async Task<IOrderedEnumerable<ScoreModel>> ProcessScoresAsync(IEnumerable<Scouter.Data.EventModelDTO> events)
+        public static async Task<IOrderedEnumerable<ConsensusModel>> ProcessScoresAsync(IEnumerable<Scouter.Data.EventModelDTO> agentScores)
         {
             try
             {
                 // Calculate consensus times
-                var scores = GenerateGameTime();
-
-                foreach (var score in scores)
+                var scores = GenerateGameTime(agentScores.ToList());
+                foreach (var (score, eventScore) in scores.SelectMany(
+                    score => agentScores.Where(agentScore => agentScore.IsGoldenCircle)
+                    .SelectMany(agentScore => agentScore.Events.Where(
+                        eventScore => (eventScore.ProcessedTime >= (score.ProcessedTime - 0.005M))
+                        && (eventScore.ProcessedTime <= (score.ProcessedTime + 0.005M)))
+                    .Select(eventScore => (score, eventScore)
+                    ))))
                 {
-                    score.SummaryCount += (events.Where(scoreEvent =>
-                        scoreEvent.Events.Any(sig => (sig.ProcessedTime >= (score.Time - 0.005M))
-                        || (sig.ProcessedTime) <= (score.Time + 0.005M)))).Count();
+                    score.EventsCount++;
+                    score.Time = score.Time < eventScore.EventTime ? eventScore.EventTime : score.Time;
                 }
 
-                return scores.Where(score => score.SummaryCount > 0).OrderByDescending<ScoreModel, int>(score => score.SummaryCount);
+                return scores.Where(score => score.EventsCount > 0).OrderByDescending<ConsensusModel, int>(score => score.EventsCount);
             }
             catch (Exception e)
             {
@@ -40,18 +44,18 @@ namespace ScouterApi.Processors
             }
         }
 
-        private static List<ScoreModel> GenerateGameTime()
+        private static List<ConsensusModel> GenerateGameTime(List<Scouter.Data.EventModelDTO> agentScores)
         {
-            var scores = new List<ScoreModel>();
-            for (var i = 0.00M; i < 120.00M; i+=0.01M)
+            var minEvent = agentScores.Min(agentScores => agentScores.Events.Min(eventScore => eventScore.ProcessedTime));
+            var maxEvent = agentScores.Max(agentScores => agentScores.Events.Max(eventScore => eventScore.ProcessedTime));
+            var scores = new List<ConsensusModel>();
+            for (var i = minEvent; i < maxEvent; i += 0.01M)
             {
-                scores.Add(new ScoreModel
+                scores.Add(new ConsensusModel
                 {
-                    Id = Guid.NewGuid(),
-                    Time = i,
-                    SummaryCount = 0,
-                    UpdatedOn = DateTime.UtcNow.ToString(),
-                    Scores = new List<Score>(),
+                    Time = 0,
+                    ProcessedTime = i,
+                    EventsCount = 0,
                 });
             }
             return scores;
