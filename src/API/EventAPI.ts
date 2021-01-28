@@ -14,6 +14,15 @@ export const getEvents = async (gameId: string, userId: string | undefined): Pro
   }
 }
 
+export const getGameEvents = async (gameId: string): Promise<IEventModel[]> => {
+  try {
+    const apiUrl = `${baseUrl}/game/events?id=${gameId}`
+    const response: AxiosResponse<IEventModel[]> = await axios.get(apiUrl)
+    return (response.status === 200)? response.data : []
+  } catch (error) {
+    throw error
+  }
+}
 
 export const addEvent = async (
   formData: IEvent,

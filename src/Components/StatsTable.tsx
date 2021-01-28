@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { mergeStyleSets } from '@fluentui/react'
 import 'office-ui-fabric-react/dist/css/fabric.css'
 import { getTheme } from 'office-ui-fabric-react/lib/Styling';
 import {
@@ -11,218 +10,76 @@ import {
     IDetailsRowStyles,
     SelectionMode,
     IColumn,
-    FontIcon,
     CommandBar,
     IContextualMenuItem,
     ICommandBarStyles,
     Selection,
     Fabric,
   } from '@fluentui/react';
-import { IScoreModel } from '../Models/ScoreModel'
-import { getEventType } from '../Utils/TypeConversion';
+import { IEventModel } from '../Models/EventModel';
 
 type ScoreItemProps = {
-  saveStats: (scores: IScoreModel[]) => Promise<string>
-  gameStats: IScoreModel[]
+  saveStats: (scores: IEventModel[]) => Promise<string>
+  gameStats: IEventModel[]
 }
 
 const theme = getTheme();
-
-const classNames = mergeStyleSets({
-  iconHeader: {
-    padding: 0,
-    fontSize: '16px',
-  },
-  iconCell: {
-    textAlign: 'center',
-    selectors: {
-      '&:before': {
-        content: '.',
-        display: 'inline-block',
-        verticalAlign: 'middle',
-        height: '100%',
-        width: '0px',
-        visibility: 'hidden',
-      },
-    },
-  },
-  iconImg: {
-    verticalAlign: 'middle',
-    maxHeight: '16px',
-    maxWidth: '16px',
-  },
-  controlWrapper: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
-  exampleToggle: {
-    display: 'inline-block',
-    marginBottom: '10px',
-    marginRight: '30px',
-  },
-  selectionDetails: {
-    marginBottom: '20px',
-  },
-});
-
 
 const commandBarStyles: Partial<ICommandBarStyles> = { root: { marginBottom: '40px' } };
 
 const StatsTable: React.FC<ScoreItemProps> = (props) => {
     const [columns, setColumns] = useState<IColumn[]>([])
-    const [items, setItems] = useState<IScoreModel[]>([])
-    const [selectedItems, setSelectedItems] = useState<IScoreModel[]>([])
+    const [items, setItems] = useState<IEventModel[]>([])
+    const [selectedItems, setSelectedItems] = useState<IEventModel[]>([])
     const [toggleDelete, setToggleDelete] = useState(false)
     const [stateMessage, setStateMessage] = useState<string>('')
-
-    function _copyAndSort<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
-      const key = columnKey as keyof T;
-      return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1));
-    }
+    const [scouters, setScouters] = useState<string[]>([])
+    const [loaded, setLoaded] = useState(false)
 
     useEffect(() => {
       if ((props.gameStats && props.gameStats.length > 0) || props.gameStats.length !== items.length) {
         setItems(props.gameStats)
+        const scouters = items.map(i => i.email.split('@')[0])
+        setScouters(scouters)
+        setLoaded(true)
      }
     },[props.gameStats, items.length])
 
     useEffect(() => {
-      const onTimeColumnClick = (ev: React.MouseEvent<HTMLElement>, column: IColumn): void => {
-        if (columns.length > 0) {
-          const newColumns: IColumn[] = columns.slice()
-          const currColumn: IColumn = newColumns.filter(currCol => column.key === currCol.key)[0]
-          newColumns.forEach((newCol: IColumn) => {
-            if (newCol === currColumn) {
-              currColumn.isSorted = true
-            } else {
-              newCol.isSorted = false
-              newCol.isSortedDescending = true
-            }
+      if (loaded) {
+        const events = items.flatMap(i => i.events).sort((a,b) => a.eventTime - b.eventTime)
+        const uniqueEvents = [...new Set(events.map(e => e.eventTime))]
+        let columns: IColumn[] = []
+        columns.push({
+          key: 'name',
+          name: 'Name',
+          minWidth: 70,
+          maxWidth: 90,
+          isResizable: true,
+          data: 'string',
+          isPadded: true,
+        },)
+        uniqueEvents.forEach((event, i) => {
+          columns.push({
+            key: i.toString(),
+            name: event.toString(),
+            minWidth: 20,
+            maxWidth: 30,
+            isRowHeader: true,
+            isResizable: true,
+            data: 'number',
+            isPadded: true
           })
-          const newItems = _copyAndSort(items, currColumn.fieldName!, false)
-          
-          setItems(newItems)
-        }
+        });
+        setColumns(columns)
+        selection.setAllSelected(true)
       }
-    
-      const columns = [
-        {
-          key: 'column1',
-          name: 'Row Type',
-          className: classNames.iconCell,
-          iconClassName: classNames.iconHeader,
-          ariaLabel: '',
-          iconName: 'Soccer',
-          isIconOnly: true,
-          fieldName: 'icon',
-          minWidth: 16,
-          maxWidth: 16,
-          onRender: (item: IScoreModel) => {
-              return <FontIcon iconName="Soccer" className={classNames.iconImg} />
-          },
-        },
-        {
-          key: 'column2',
-          name: 'Event Time',
-          fieldName: 'eventTime',
-          minWidth: 70,
-          maxWidth: 90,
-          isRowHeader: true,
-          isResizable: true,
-          isSorted: true,
-          isSortedDescending: true,
-          sortAscendingAriaLabel: 'Sorted Small to Large',
-          sortDescendingAriaLabel: 'Sorted Large to Small',
-          onColumnClick: onTimeColumnClick,
-          data: 'number',
-          isPadded: true
-        },
-        {
-          key: 'column3',
-          name: 'Advantaged Team',
-          fieldName: 'advTeam',
-          minWidth: 100,
-          maxWidth: 120,
-          isResizable: true,
-          data: 'string',
-          onRender: (item: IScoreModel) => {
-              return <span>{item.advTeam}</span>
-          },
-          isPadded: true,
-        },
-        {
-          key: 'column4',
-          name: 'Event Type',
-          fieldName: 'eventType',
-          minWidth: 70,
-          maxWidth: 90,
-          isResizable: true,
-          isCollapsible: true,
-          data: 'string',
-          onRender: (item: IScoreModel) => {
-              return <span>{getEventType(item.eventType)}</span>;
-          },
-          isPadded: true,
-        },
-        {
-          key: 'column5',
-          name: 'Position',
-          fieldName: 'position',
-          minWidth: 70,
-          maxWidth: 90,
-          isResizable: true,
-          isCollapsible: true,
-          data: 'number',
-        },
-        {
-          key: 'column6',
-          name: 'Significance',
-          fieldName: 'significance',
-          minWidth: 90,
-          maxWidth: 120,
-          isResizable: true,
-          isCollapsible: true,
-          data: 'number',
-        },
-        {
-          key: 'column7',
-          name: 'Credit',
-          fieldName: 'credit',
-          minWidth: 90,
-          maxWidth: 120,
-          isResizable: true,
-          isCollapsible: true,
-          data: 'string',
-        },
-        {
-          key: 'column8',
-          name: 'Blame',
-          fieldName: 'blame',
-          minWidth: 120,
-          maxWidth: 150,
-          isResizable: true,
-          isCollapsible: true,
-          data: 'string',
-        },
-        {
-          key: 'column9',
-          name: 'Comments',
-          fieldName: 'comments',
-          minWidth: 250,
-          maxWidth: 350,
-          isResizable: true,
-          isCollapsible: true,
-          data: 'string',
-        },
-      ]
-
-      setColumns(columns)
 
     }, [items])
 
     const onItemsSelectionChanged  = () => {
       const selectedItems = selection.getSelection()
-      setSelectedItems(selectedItems as IScoreModel[])
+      setSelectedItems(selectedItems as IEventModel[])
     }
 
     const [selection, ] = useState<Selection>(new Selection({
@@ -242,17 +99,7 @@ const StatsTable: React.FC<ScoreItemProps> = (props) => {
       } 
     }, [props, props.gameStats, items, selection, selectedItems, toggleDelete])
   
-    const getKey = (item: IScoreModel, index?: number): string => {
-        return item.id;
-    }
-
-    const onItemInvoked = (item: IScoreModel): void => {
-        console.log(`Item invoked: ${item.id}`);
-    }
-
     const onRenderRow = (props: IDetailsRowProps | undefined): JSX.Element => {
-      // sort all times
-      _copyAndSort(items, "eventTime", false)
       // Set each other row's background a bit lighter
       const customStyles: Partial<IDetailsRowStyles> = {}
       if (props) {
@@ -265,25 +112,38 @@ const StatsTable: React.FC<ScoreItemProps> = (props) => {
       }
       return <div />
     }
+
+    const onRenderItemColumn = (item?: IEventModel | any, index?: number | undefined, column?: IColumn | undefined): JSX.Element => {
+      const tableColumn = column as IColumn
+      const gameEvent = item as IEventModel
+
+      switch (tableColumn.key) {
+        case 'name':
+          return <h2>{scouters[index as number]}</h2>
+        default:
+          const fieldContent = gameEvent.events.filter(e => e.eventTime === Number.parseFloat(tableColumn.name))
+          return <span>{fieldContent.length > 0 ? 'X' : ''}</span>
+      }    
+    }
     
     const getCommandItems = (): IContextualMenuItem[] => {
       return [
         {
-          key: 'deleteRow',
-          text: 'Delete row',
-          iconProps: { iconName: 'Delete' },
-          onClick: onDeleteRow,
+          key: 'recalculate',
+          text: 'Recalculate Consensus',
+          iconProps: { iconName: 'Refresh' },
+          onClick: onRecalculate,
         },
         {
           key: 'saveRow',
-          text: 'Save Results',
+          text: 'Save Consensus',
           iconProps: { iconName: 'Save' },
           onClick: onSaveEvents,
         },
       ]
     }
 
-    const onDeleteRow = (): void => {
+    const onRecalculate = (): void => {
       if (selection.getSelectedCount() > 0) {
         setToggleDelete(true)
         setStateMessage(`${selection.getSelectedCount()} item(s) were successfully deleted`)
@@ -298,10 +158,9 @@ const StatsTable: React.FC<ScoreItemProps> = (props) => {
     }
 
 
-  
-
     return (
       <div data-is-scrollable={true}>
+
         <Fabric className="Table">
           <CommandBar
             styles={commandBarStyles}
@@ -315,14 +174,13 @@ const StatsTable: React.FC<ScoreItemProps> = (props) => {
               columns={columns}
               selectionMode={SelectionMode.multiple}
               selection={selection}
-              getKey={getKey}
               setKey="none"
               layoutMode={DetailsListLayoutMode.justified}
               checkboxVisibility={CheckboxVisibility.onHover}
               isHeaderVisible={true}
               enterModalSelectionOnTouch={true}
-              onItemInvoked={onItemInvoked}
               onRenderRow={onRenderRow}
+              onRenderItemColumn={onRenderItemColumn}
           />
         </Fabric>
       </div>

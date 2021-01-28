@@ -35,6 +35,35 @@ namespace ScouterApi.Controllers
             this._mapper = mapper;
         }
 
+        /// <summary>Gets the game's events.</summary>
+        /// <param name="id"></param>
+        /// <returns>scoreEvent&lt;EventModel&gt;.</returns>
+        [HttpGet("game/events")]
+        [ValidateModelState]
+        [SwaggerOperation("events")]
+        [SwaggerResponse(statusCode: 200, type: typeof(ScouterApi.Models.EventModel), description: "the Score object containing Events")]
+        public async Task<IEnumerable<ScouterApi.Models.EventModel>> GetGameEventsAsync([FromQuery] string id)
+        {
+            const string partitionKey = "/gameId";
+
+            try
+            {
+                using (var db = new CosmosUtil<Scouter.Data.EventModelDTO>("events", partitionKey: partitionKey))
+                {
+                    //Check if the item is already exist, and then replace it
+                    var eventData = await db.GetItemsAsync(
+                        $"SELECT * FROM c WHERE c.gameId = '{id}'");
+                    var gameEvents = _mapper.Map<Scouter.Data.EventModelDTO[], IEnumerable<ScouterApi.Models.EventModel>>(eventData.ToArray());
+                    return gameEvents;
+                }
+            }
+            catch (Exception e)
+            {
+                LogUtil.LogError(this._logger, e.Message, nameof(this.GetGameStatsAsync));
+                Console.WriteLine(e);
+                throw;
+            }
+        }
 
         /// <summary>Gets the game's stats.</summary>
         /// <param name="id"></param>

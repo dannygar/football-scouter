@@ -5,13 +5,13 @@ import '../Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
 import { authProvider } from '../Auth/AuthProvider'
 import { AccessTokenResponse } from 'react-aad-msal';
+import { Bar } from '@reactchartjs/react-chart.js'
 
-import { getEvents, addEvent, saveEvents } from '../API/EventAPI'
-import { IEvent } from '../Models/EventModel'
+import { getEvents, addEvent, saveEvents, getGameEvents } from '../API/EventAPI'
+import { IEvent, IEventModel } from '../Models/EventModel'
 import AddEvent from './AddEvent'
 import Navigation from './Navigation'
-import EventTable  from './EventTable'
-import { IGame } from '../Models/GameModel';
+import { IGame } from '../Models/GameModel'
 
 // Global context
 // import { navBarContext } from '../NavBar/NavBar.Context'
@@ -19,8 +19,8 @@ import { IGame } from '../Models/GameModel';
 // import { NIL } from 'uuid';
 import { getGames } from '../API/GameAPI';
 import { getGameStats } from '../API/ScoreAPI';
-import { IScoreModel } from '../Models/ScoreModel';
 import StatsTable from './StatsTable';
+import IConsensusModel from '../Models/ConsensusModel';
 
 const dropdownStyles = { dropdown: { width: 500 }, label: { color: 'White' } };
 
@@ -30,21 +30,34 @@ type StatsProps = {
   userName: string
 }
 
+const barOptions = {
+  scales: {
+    yAxes: [
+      {
+        ticks: {
+          beginAtZero: true,
+        },
+      },
+    ],
+  },
+}
+
 const Stats: React.FC<StatsProps> = (props) => {
   const [readOnly, ] = useState<boolean>(!(props.userName === process.env.REACT_APP_ADMIN ?? ''))
   const [selectedGame, setSelectedGame] = useState<IGame>()
   const [games, setGames] = useState<IGame[]>([])
   const [gamesList, setGamesList] = useState<IDropdownOption[]>([])
-  const [gameStats, setGameStats] = useState<IScoreModel[]>([])
+  const [gameStats, setGameStats] = useState<IConsensusModel[]>([])
   const [newEvent, setNewEvent] = useState<IEvent | null>(null)
   const [toggled, setToggled] = useState(false)
   const [eventsLoaded, setEventsLoaded] = useState(false)
+  const [isInitialized, setInitialized] = useState(false)
   const [signedIn, setSignedStatus] = useState(false)
   const [userName, setUserName] = useState<string | undefined>()
   const [displayName, setDisplayName] = useState<string | undefined>()
   const [statusMsg, setStatusMsg] = useState<string>('')
-
-
+  const [chartData, setChartData] = useState({})
+  const [gameEvents, setGameEvents] = useState<IEventModel[]>([])
   
   // const name = authProvider.getAccountInfo()?.account.name
   const accountId = authProvider.getAccountInfo()?.account.accountIdentifier
@@ -101,7 +114,7 @@ const Stats: React.FC<StatsProps> = (props) => {
         } else {
           setGameStats([])
         }
-        setEventsLoaded(true)
+        setInitialized(true)
         console.log("scores have been updated")
       } catch (error) {
           if (error.response?.status !== 404)
@@ -116,16 +129,7 @@ const Stats: React.FC<StatsProps> = (props) => {
   })
 
 
-  const handleAddEvent = (e: React.FormEvent, formData: IEvent): void => {
-    e.preventDefault()
-    const _form: any = e.currentTarget
-    formData = {...formData, advTeam: _form.elements[1].value, eventType: _form.elements[2].value, position: formData.position ?? 0, significance: formData.significance ?? 0}
-    setNewEvent(formData)
-    setToggled(true)
-  }
-
-
-  const handleSaveEvent = async (scores: IScoreModel[]):  Promise<string>  => {
+  const handleSaveEvent = async (scores: IEventModel[]):  Promise<string>  => {
     return "OK"
     // return await saveEvents(events, accountId as string, userName as string, (selectedGame as IGame).id)
   }
@@ -135,13 +139,31 @@ const Stats: React.FC<StatsProps> = (props) => {
       setSelectedGame(item.data)
       const fetchScores = async (gameId: string): Promise<void> => {
         try {
+          // get game's stats
           const gameStats = await getGameStats(gameId)
+          setGameStats(gameStats)
+
+          // get game's all events
+          const gameEvents = await getGameEvents(gameId)
+          setGameEvents(gameEvents)
+          
           if (gameStats) {
-            setGameStats(gameStats)
-          } else {
-            setGameStats([])
+            const chartData = {
+              labels: gameStats.map(a => a.time),
+              datasets: [
+                {
+                  data: gameStats.map(a => a.eventsCount),
+                  backgroundColor: 'cyan',
+                  borderColor: 'rgba(255, 206, 86, 1)',
+                  borderWidth: 1,
+                  barPercentage: 0.2,
+                },
+              ],
+            }
+
+            setChartData(chartData)
           }
-          setEventsLoaded(true)
+          setInitialized(true)
           console.log("scores have been updated")
       } catch (error) {
           if (error.response?.status !== 404)
@@ -164,11 +186,23 @@ const Stats: React.FC<StatsProps> = (props) => {
     }
   }
 
+  const chartOptions = {
+    maintainAspectRatio: false,
+    legend: { display: false },
+    scales: {
+      yAxes: [{ ticks: { beginAtZero: true } }],
+    },
+    title: {
+      display: true,
+      text: "IRR Consensus",
+    },
+  };
+
   return (
     <div className="ms-Grid" dir="ltr">
         <div className="ms-Grid-row">
           <div className="ms-Grid-col ms-sm1 ms-xl1">
-            <Navigation selectedKey="dash" />
+            <Navigation selectedKey="stats" />
           </div>
           <Stack tokens={stackTokens} verticalAlign="end">
             <Stack.Item align="end">
@@ -186,29 +220,20 @@ const Stats: React.FC<StatsProps> = (props) => {
                   styles={dropdownStyles}
                   onChange={onGameChanged}
                 />
-                {eventsLoaded ? (games.length > 0 ? (
-                <Stack.Item align="auto">
-                  <Text block className="Title" variant='xxLarge'>{selectedGame?.homeTeam} vs {selectedGame?.awayTeam}</Text>
-                </Stack.Item> ) : (
-                  <br/>
-                )
-                ) : (
-                  <Stack.Item align="auto">
-                    <Text block className="Title" variant='xxLarge'>Loading...</Text>
-                  </Stack.Item>
-                ) }
               </Stack.Item>
             </Stack>
             <Stack.Item align="auto">
-              <main className='App'>
-                <AddEvent saveEvent={handleAddEvent} game={selectedGame as IGame} />
-              </main>
+              {!toggled && <main className='chart'>
+                  {isInitialized && 
+                    <Bar type='bar' data={chartData} options={chartOptions} />
+                  }
+              </main>}
             </Stack.Item>
             <Stack.Item align="stretch">
               {!toggled && <main className='App'>
-                {eventsLoaded && 
+                {isInitialized && 
                   <StatsTable 
-                    gameStats={gameStats} 
+                    gameStats={gameEvents} 
                     saveStats={handleSaveEvent}
                   />                  
                 }

@@ -195,6 +195,15 @@ body {
     color: #777 !important;
 }
 
+.chart {
+  display: block;
+  max-width: 1280px;
+  min-height: 400px;
+  margin: 1rem auto;
+  background-color: white;
+}
+
+
 .hide-button {
     display: none;
 }

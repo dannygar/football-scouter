@@ -204,6 +204,11 @@
              </summary>
             [Authorize]
         </member>
+        <member name="M:ScouterApi.Controllers.EventsController.GetGameEventsAsync(System.String)">
+            <summary>Gets the game's events.</summary>
+            <param name="id"></param>
+            <returns>scoreEvent&lt;EventModel&gt;.</returns>
+        </member>
         <member name="M:ScouterApi.Controllers.EventsController.GetGameStatsAsync(System.String)">
             <summary>Gets the game's stats.</summary>
             <param name="id"></param>

@@ -17,7 +17,7 @@ namespace ScouterApi.Processors
         /// </summary>
         /// <param name="agentScores"></param>
         /// <returns></returns>
-        public static async Task<IOrderedEnumerable<ConsensusModel>> ProcessScoresAsync(IEnumerable<Scouter.Data.EventModelDTO> agentScores)
+        public static async Task<IEnumerable<ConsensusModel>> ProcessScoresAsync(IEnumerable<Scouter.Data.EventModelDTO> agentScores)
         {
             try
             {
@@ -35,7 +35,8 @@ namespace ScouterApi.Processors
                     score.Time = score.Time < eventScore.EventTime ? eventScore.EventTime : score.Time;
                 }
 
-                return scores.Where(score => score.EventsCount > 0).OrderByDescending<ConsensusModel, int>(score => score.EventsCount);
+                // return scores.Where(score => score.EventsCount > 0).OrderByDescending<ConsensusModel, int>(score => score.EventsCount);
+                return scores.Where(score => score.EventsCount > 0).ToList();
             }
             catch (Exception e)
             {
