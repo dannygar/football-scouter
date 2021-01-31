@@ -209,10 +209,11 @@
             <param name="id"></param>
             <returns>scoreEvent&lt;EventModel&gt;.</returns>
         </member>
-        <member name="M:ScouterApi.Controllers.EventsController.GetGameStatsAsync(System.String)">
+        <member name="M:ScouterApi.Controllers.EventsController.GetGameStatsAsync(ScouterApi.Models.GoldCircleModel)">
             <summary>Gets the game's stats.</summary>
-            <param name="id"></param>
-            <returns>scoreEvent&lt;EventModel&gt;.</returns>
+            <param name="gameId"></param>
+            <param name="agentKeys"></param>
+            <returns>scoreEvent&lt;ConsensusModel&gt;.</returns>
         </member>
         <member name="M:ScouterApi.Controllers.EventsController.GetEventsByAccountAsync(System.String,System.String)">
             <summary>Gets the user's Scores for the specific game.</summary>
@@ -301,6 +302,11 @@
         <member name="T:ScouterApi.Models.IGame">
             <summary>
              IGame model
+            </summary>
+        </member>
+        <member name="P:ScouterApi.Models.GoldCircleModel.GameId">
+            <summary>
+            Gets or sets Game Id.
             </summary>
         </member>
         <member name="T:ScouterApi.Models.SignificantEvent">

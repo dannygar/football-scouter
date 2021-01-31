@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ScouterApi.Attributes;
 using ScouterApi.Constants;
+using ScouterApi.Models;
 using ScouterApi.Processors;
 using ScouterApi.Utils;
 using Swashbuckle.AspNetCore.Annotations;
@@ -66,14 +67,17 @@ namespace ScouterApi.Controllers
         }
 
         /// <summary>Gets the game's stats.</summary>
-        /// <param name="id"></param>
-        /// <returns>scoreEvent&lt;EventModel&gt;.</returns>
-        [HttpGet("game/stats")]
+        /// <param name="gameId"></param>
+        /// <param name="agentKeys"></param>
+        /// <returns>scoreEvent&lt;ConsensusModel&gt;.</returns>
+        [HttpPost("game/stats")]
         [ValidateModelState]
         [SwaggerOperation("events")]
-        [SwaggerResponse(statusCode: 200, type: typeof(ScouterApi.Models.EventModel), description: "the Score object containing Events")]
-        public async Task<IEnumerable<ScouterApi.Models.ConsensusModel>> GetGameStatsAsync([FromQuery] string id)
+        [SwaggerResponse(statusCode: 200, type: typeof(IEnumerable<ScouterApi.Models.ConsensusModel>), description: "the Score object containing Events")]
+        public async Task<IEnumerable<ScouterApi.Models.ConsensusModel>> GetGameStatsAsync([FromBody] GoldCircleModel goldCircle)
         {
+            if (!goldCircle.AgentIds.Any()) return null;
+
             const string partitionKey = "/gameId";
 
             try
@@ -82,10 +86,15 @@ namespace ScouterApi.Controllers
                 {
                     //Check if the item is already exist, and then replace it
                     var eventData = await db.GetItemsAsync(
-                        $"SELECT * FROM c WHERE c.gameId = '{id}'");
+                        $"SELECT * FROM c WHERE c.gameId = '{goldCircle.GameId}'");
                     if (eventData.Count() == 0) return null;
 
-                    var scoreStats = await ScoresProcessor.ProcessScoresAsync(eventData);
+                    // Filter event data to include only the keys from the selected agents
+                    var filteredData = (from key in goldCircle.AgentIds
+                                        let data = eventData.Where(d => d.Account == key).FirstOrDefault()
+                                        where data != null
+                                        select data).ToList();
+                    var scoreStats = await ScoresProcessor.ProcessScoresAsync(filteredData);
                     return scoreStats;
                 }
             }
@@ -192,6 +201,5 @@ namespace ScouterApi.Controllers
                 throw;
             }
         }
-
     }
 }

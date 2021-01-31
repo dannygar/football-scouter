@@ -15,10 +15,12 @@ import {
     ICommandBarStyles,
     Selection,
     Fabric,
+    IObjectWithKey,
   } from '@fluentui/react';
 import { IEventModel } from '../Models/EventModel';
 
 type ScoreItemProps = {
+  selectionChanged: (scores: string[]) => Promise<void>
   saveStats: (scores: IEventModel[]) => Promise<string>
   gameStats: IEventModel[]
 }
@@ -31,7 +33,6 @@ const StatsTable: React.FC<ScoreItemProps> = (props) => {
     const [columns, setColumns] = useState<IColumn[]>([])
     const [items, setItems] = useState<IEventModel[]>([])
     const [selectedItems, setSelectedItems] = useState<IEventModel[]>([])
-    const [toggleDelete, setToggleDelete] = useState(false)
     const [stateMessage, setStateMessage] = useState<string>('')
     const [scouters, setScouters] = useState<string[]>([])
     const [loaded, setLoaded] = useState(false)
@@ -80,6 +81,8 @@ const StatsTable: React.FC<ScoreItemProps> = (props) => {
     const onItemsSelectionChanged  = () => {
       const selectedItems = selection.getSelection()
       setSelectedItems(selectedItems as IEventModel[])
+
+      console.log(getSelectionDetails())
     }
 
     const [selection, ] = useState<Selection>(new Selection({
@@ -87,17 +90,17 @@ const StatsTable: React.FC<ScoreItemProps> = (props) => {
     }))
 
 
-    useEffect(() => {
-      const resetSelection = () => {
-        selection.setAllSelected(false)
-      }
+    // useEffect(() => {
+    //   const resetSelection = () => {
+    //     selection.setAllSelected(false)
+    //   }
       
-      if (toggleDelete && selectedItems.length > 0) {
-        const updatedItemsList = items.filter((item, index) => !selectedItems.includes(item))
-        setToggleDelete(false)
-        resetSelection()
-      } 
-    }, [props, props.gameStats, items, selection, selectedItems, toggleDelete])
+    //   if (selectedItems.length > 0) {
+    //     const updatedItemsList = items.filter((item, index) => !selectedItems.includes(item))
+    //     setItems(updatedItemsList)
+    //     resetSelection()
+    //   } 
+    // }, [props, props.gameStats, items, selection, selectedItems])
   
     const onRenderRow = (props: IDetailsRowProps | undefined): JSX.Element => {
       // Set each other row's background a bit lighter
@@ -143,20 +146,40 @@ const StatsTable: React.FC<ScoreItemProps> = (props) => {
       ]
     }
 
-    const onRecalculate = (): void => {
+    const onRecalculate = (): boolean | void => {
       if (selection.getSelectedCount() > 0) {
-        setToggleDelete(true)
-        setStateMessage(`${selection.getSelectedCount()} item(s) were successfully deleted`)
+        const selectedItems = (selection.getSelection() as IEventModel[]).flatMap(s => s.account)
+        props.selectionChanged(selectedItems).then (() => {
+          setStateMessage(`${selection.getSelectedCount()} item(s) were recalculated`)
+        })
       } else {
-        alert('Please select at least one row to be deleted.')
+        alert('Please select at least one row to be calculated.')
       }
     }
   
-    const onSaveEvents = async (): Promise<void> => {
-      const response = await props.saveStats(items)
-      setStateMessage(response)
+    const onSaveEvents = (): boolean | void => {
+      props.saveStats(items).then (response => {
+        setStateMessage(response)
+      })
     }
 
+    const getSelectionDetails = (): string => {
+      const selectionCount = selection.getSelectedCount();
+  
+      switch (selectionCount) {
+        case 0:
+          return 'No items selected';
+        case 1:
+          return '1 item selected: ' + (selection.getSelection()[0] as IEventModel).id;
+        default:
+          return `${selectionCount} items selected`;
+      }
+    }
+
+
+    const getKey = (item: any, index?: number | undefined): string => {
+      return item.account
+    }
 
     return (
       <div data-is-scrollable={true}>
@@ -174,7 +197,9 @@ const StatsTable: React.FC<ScoreItemProps> = (props) => {
               columns={columns}
               selectionMode={SelectionMode.multiple}
               selection={selection}
-              setKey="none"
+              selectionPreservedOnEmptyClick={true}
+              setKey="multiple"
+              getKey={getKey}
               layoutMode={DetailsListLayoutMode.justified}
               checkboxVisibility={CheckboxVisibility.onHover}
               isHeaderVisible={true}

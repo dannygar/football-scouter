@@ -67,6 +67,11 @@ export type EventDataType = {
 }
 
 export interface IEventDetailsListState {
-    columns: IColumn[];
-    items: IEvent[];
+    columns: IColumn[]
+    items: IEvent[]
+}
+
+export interface IGoldCircle {
+    gameId: string
+    agentIds: string[]
 }
