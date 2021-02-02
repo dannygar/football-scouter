@@ -64,20 +64,6 @@ export const saveEvents = async (
 ): Promise<string> => {
   try {
     const apiUrl = `${baseUrl}/save`
-    // const significances: IEvent[] = []
-    // events.forEach(event => {
-    //   significances.push({ 
-    //     id: event.id, 
-    //     eventTime: event.eventTime,
-    //     eventType: event.eventType,
-    //     advTeam: event.advTeam,
-    //     position: event.position,
-    //     significance: event.significance,
-    //     credit: event.credit ?? '',
-    //     blame: event.blame ?? '',
-    //     comments: event.comments ?? ''
-    //   })
-    // })
     const scores: IEventModel = {
       id: uuid(),
       account: account,

@@ -6,6 +6,7 @@ import 'office-ui-fabric-react/dist/css/fabric.css';
 import { authProvider } from '../Auth/AuthProvider'
 import { AccessTokenResponse } from 'react-aad-msal';
 import { Bar } from '@reactchartjs/react-chart.js'
+import { v4 as uuid } from 'uuid'
 
 import { getEvents, addEvent, saveEvents, getGameEvents } from '../API/EventAPI'
 import { IEvent, IEventModel } from '../Models/EventModel'
@@ -21,6 +22,7 @@ import { getGames } from '../API/GameAPI';
 import { getGameStats } from '../API/ScoreAPI';
 import StatsTable from './StatsTable';
 import IConsensusModel from '../Models/ConsensusModel';
+import EventTable from './EventTable';
 
 const dropdownStyles = { dropdown: { width: 500 }, label: { color: 'White' } };
 
@@ -58,10 +60,13 @@ const Stats: React.FC<StatsProps> = (props) => {
   const [chartData, setChartData] = useState({})
   const [gameEvents, setGameEvents] = useState<IEventModel[]>([])
   const [goldCircle, setGoldCircle] = useState<string[]>([])
+  const [events, setEvents] = useState<IEvent[]>([])
+  const [newEvent, setNewEvent] = useState<IEvent | null>(null)
+  const [toggled, setToggled] = useState(false)
   
   // const name = authProvider.getAccountInfo()?.account.name
   const accountId = authProvider.getAccountInfo()?.account.accountIdentifier
-  
+    
   const stackTokens: IStackTokens = { childrenGap: 20 };
 
 
@@ -74,7 +79,34 @@ const Stats: React.FC<StatsProps> = (props) => {
   }
   authenticate()
 
-  const dropdownRef = React.createRef<IDropdown>();
+  const dropdownRef = React.createRef<IDropdown>()
+
+  const renderConsensusResults = async (consensus: IConsensusModel[]): Promise<void> => {
+    try {
+      const events = consensus.flatMap(i => i.time)
+      const uniqueTimes = [...new Set(events)]
+      const filteredTimes = uniqueTimes.filter(t => consensus.findIndex(s => s.time === t) >= 0)
+      const consensusEvents: IEvent[] = []
+      filteredTimes.forEach(time => {
+        consensusEvents.push( {
+          id: uuid(),
+          eventTime: time,
+          eventType: 0,
+          advTeam: '',
+          position: 0,
+          significance: 0,
+          credit: '',
+          blame: '',
+          comments: ''
+        })
+      })
+      setEvents(consensusEvents)
+      console.log("events have been updated")
+    } catch (error) {
+        if (error.response?.status !== 404)
+          alert(`Failed to fetch all significances for this game. Please try again later. Error details: ${error.message}`)      
+    }
+  }
 
   useEffect(() => {
     console.log("Component Did Mount")
@@ -117,6 +149,7 @@ const Stats: React.FC<StatsProps> = (props) => {
 
         if (isChartChanged) {
           updateChart(stats)
+          renderConsensusResults(stats)
           setChartChanged(false)
         }
         setInitialized(true)
@@ -150,10 +183,25 @@ const Stats: React.FC<StatsProps> = (props) => {
       changeGameStatsHandler(selectedGame?.id as string)
       setChartChanged(false)
     }
+
+    const addEventHandler = async (formData: IEvent): Promise<void> => {
+      await addEvent(formData, events)
+      .then(({ data }) => {
+        setEvents(data.events)
+        console.log(`added total of ${events.length} events`)
+      })
+      .catch((err) => console.log(err))
+    }  
+
+    if (toggled && newEvent !== null) {
+      addEventHandler(newEvent)
+      setToggled(false)
+    }
+  
   })
 
 
-  const handleSaveEvent = async (scores: IEventModel[]):  Promise<string>  => {
+  const handleSaveStats = async (scores: IEventModel[]):  Promise<string>  => {
     return "OK"
     // return await saveEvents(events, accountId as string, userName as string, (selectedGame as IGame).id)
   }
@@ -174,16 +222,16 @@ const Stats: React.FC<StatsProps> = (props) => {
             agentKeys.push(gameEvent.account)
             return agentKeys
           }) 
-          const gameStats = await getGameStats(gameId, agentKeys)
-          setGameStats(gameStats)
+          const stats = await getGameStats(gameId, agentKeys)
+          setGameStats(stats)
           setGoldCircle(agentKeys)
 
-          if (gameStats) {
+          if (stats) {
             const chartData = {
-              labels: gameStats.map(a => a.time),
+              labels: stats.map(a => a.time),
               datasets: [
                 {
-                  data: gameStats.map(a => a.eventsCount),
+                  data: stats.map(a => a.eventsCount),
                   backgroundColor: 'cyan',
                   borderColor: 'rgba(255, 206, 86, 1)',
                   borderWidth: 1,
@@ -192,6 +240,7 @@ const Stats: React.FC<StatsProps> = (props) => {
               ],
             }
 
+            renderConsensusResults(stats)
             setChartData(chartData)
             setChartChanged(false)
           }
@@ -221,27 +270,6 @@ const Stats: React.FC<StatsProps> = (props) => {
   const handleSelectionChangedEvent = async (agentKeys: string[]):  Promise<void>  => {
     setGoldCircle(agentKeys)
     setChartChanged(true)
-    // setInitialized(false)
-    // const gameStats = await getGameStats((selectedGame as IGame).id, agentKeys)
-    // setGameStats(gameStats)
-
-    // if (gameStats) {
-    //   const chartData = {
-    //     labels: gameStats.map(a => a.time),
-    //     datasets: [
-    //       {
-    //         data: gameStats.map(a => a.eventsCount),
-    //         backgroundColor: 'cyan',
-    //         borderColor: 'rgba(255, 206, 86, 1)',
-    //         borderWidth: 1,
-    //         barPercentage: 0.2,
-    //       },
-    //     ],
-    //   }
-
-    //   setChartData(chartData)
-    //   setInitialized(false)
-    // }
   }
 
   const chartOptions = {
@@ -254,7 +282,25 @@ const Stats: React.FC<StatsProps> = (props) => {
       display: true,
       text: "IRR Consensus",
     },
-  };
+  }
+
+  const handleAddEvent = (e: React.FormEvent, formData: IEvent): void => {
+    e.preventDefault()
+    const _form: any = e.currentTarget
+    formData = {...formData, advTeam: _form.elements[1].value, eventType: _form.elements[2].value, position: formData.position ?? 0, significance: formData.significance ?? 0}
+    setNewEvent(formData)
+    setToggled(true)
+  }
+
+  const handleSaveEvent = async (events: IEvent[]):  Promise<string>  => {
+    return await saveEvents(events, accountId as string, userName as string, (selectedGame as IGame).id)
+  }
+
+  const handleDeleteEvent = (deletedItems: IEvent[]): void => {
+    const updatedItemsList = events.filter((item, index) => !deletedItems.includes(item))
+    setEvents(updatedItemsList)
+  }
+
 
   return (
     <div className="ms-Grid" dir="ltr">
@@ -289,9 +335,28 @@ const Stats: React.FC<StatsProps> = (props) => {
               {isInitialized && <main className='App'>
                 <StatsTable 
                   gameStats={gameEvents} 
-                  saveStats={handleSaveEvent}
+                  saveStats={handleSaveStats}
                   selectionChanged={handleSelectionChangedEvent}
                 />                  
+              </main>}
+            </Stack.Item>
+            <Stack.Item align="auto">
+              <Text block className="Title" variant='xxLarge'>IRR Game Challenge Significance Scores</Text>
+            </Stack.Item>
+            <Stack.Item align="auto">
+              <main className='App'>
+                <AddEvent saveEvent={handleAddEvent} game={selectedGame as IGame} />
+              </main>
+            </Stack.Item>
+            <Stack.Item align="stretch">
+              {!toggled && <main className='App'>
+                {isInitialized && 
+                  <EventTable 
+                    events={events} 
+                    saveEvents={handleSaveEvent}
+                    deleteItemsEvent={handleDeleteEvent}
+                  />                  
+                }
               </main>}
             </Stack.Item>
           </Stack>

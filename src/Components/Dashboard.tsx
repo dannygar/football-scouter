@@ -19,7 +19,7 @@ import { IGame } from '../Models/GameModel';
 // import { NIL } from 'uuid';
 import { getGames } from '../API/GameAPI';
 
-const dropdownStyles = { dropdown: { width: 500 }, label: { color: 'White' } };
+const dropdownStyles = { dropdown: { width: 500 }, label: { color: 'Blue' } };
 
 const signIcon: IIconProps = { iconName: 'SignIn' };
 

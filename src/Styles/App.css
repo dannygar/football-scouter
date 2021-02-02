@@ -54,6 +54,7 @@ body {
   align-items: center;
   text-align: center;
   margin: 1rem auto;
+  font-feature-settings: "blwm";
   color: white;
   font-weight: 800;
   font-size: xx-large;
@@ -66,6 +67,7 @@ body {
   text-align: left;
   margin: 10px 0 0 0;
   color: white;
+  font-feature-settings: "blwm";
   font-weight: 600;
   font-size: x-large;
 }
