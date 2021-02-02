@@ -1,4 +1,3 @@
-import { IObjectWithKey } from '@fluentui/react'
 import axios, { AxiosResponse } from 'axios'
 import IConsensusModel from '../Models/ConsensusModel'
 import { IGoldCircle } from '../Models/EventModel'

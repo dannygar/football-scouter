@@ -15,7 +15,6 @@ import {
     ICommandBarStyles,
     Selection,
     Fabric,
-    IObjectWithKey,
   } from '@fluentui/react';
 import { IEventModel } from '../Models/EventModel';
 
@@ -90,18 +89,6 @@ const StatsTable: React.FC<ScoreItemProps> = (props) => {
     }))
 
 
-    // useEffect(() => {
-    //   const resetSelection = () => {
-    //     selection.setAllSelected(false)
-    //   }
-      
-    //   if (selectedItems.length > 0) {
-    //     const updatedItemsList = items.filter((item, index) => !selectedItems.includes(item))
-    //     setItems(updatedItemsList)
-    //     resetSelection()
-    //   } 
-    // }, [props, props.gameStats, items, selection, selectedItems])
-  
     const onRenderRow = (props: IDetailsRowProps | undefined): JSX.Element => {
       // Set each other row's background a bit lighter
       const customStyles: Partial<IDetailsRowStyles> = {}
@@ -139,7 +126,7 @@ const StatsTable: React.FC<ScoreItemProps> = (props) => {
         },
         {
           key: 'saveRow',
-          text: 'Save Consensus',
+          text: 'Save Golden Circle',
           iconProps: { iconName: 'Save' },
           onClick: onSaveEvents,
         },
@@ -158,7 +145,7 @@ const StatsTable: React.FC<ScoreItemProps> = (props) => {
     }
   
     const onSaveEvents = (): boolean | void => {
-      props.saveStats(items).then (response => {
+      props.saveStats(selectedItems).then (response => {
         setStateMessage(response)
       })
     }

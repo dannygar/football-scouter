@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react'
-import { Dropdown, Text, IDropdown, IStackTokens, Stack, IDropdownOption, ActionButton, IIconProps, IObjectWithKey } from '@fluentui/react'
+import { Dropdown, Text, IDropdown, IStackTokens, Stack, IDropdownOption, ActionButton, IIconProps } from '@fluentui/react'
 import '../Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
 import { authProvider } from '../Auth/AuthProvider'
@@ -8,7 +8,7 @@ import { AccessTokenResponse } from 'react-aad-msal';
 import { Bar } from '@reactchartjs/react-chart.js'
 import { v4 as uuid } from 'uuid'
 
-import { getEvents, addEvent, saveEvents, getGameEvents } from '../API/EventAPI'
+import { addEvent, saveEvents, getGameEvents } from '../API/EventAPI'
 import { IEvent, IEventModel } from '../Models/EventModel'
 import AddEvent from './AddEvent'
 import Navigation from './Navigation'
@@ -23,8 +23,10 @@ import { getGameStats } from '../API/ScoreAPI';
 import StatsTable from './StatsTable';
 import IConsensusModel from '../Models/ConsensusModel';
 import EventTable from './EventTable';
+import IGoldCircleModel from '../Models/GoldCircleModel';
+import { getGoldCircle, saveGoldCircle } from '../API/StatsAPI';
 
-const dropdownStyles = { dropdown: { width: 500 }, label: { color: 'White' } };
+const dropdownStyles = { dropdown: { width: 500 }, label: { color: 'Blue' } };
 
 const signIcon: IIconProps = { iconName: 'SignIn' };
 
@@ -32,24 +34,12 @@ type StatsProps = {
   userName: string
 }
 
-const barOptions = {
-  scales: {
-    yAxes: [
-      {
-        ticks: {
-          beginAtZero: true,
-        },
-      },
-    ],
-  },
-}
-
 const Stats: React.FC<StatsProps> = (props) => {
   const [readOnly, ] = useState<boolean>(!(props.userName === process.env.REACT_APP_ADMIN ?? ''))
   const [selectedGame, setSelectedGame] = useState<IGame>()
   const [games, setGames] = useState<IGame[]>([])
   const [gamesList, setGamesList] = useState<IDropdownOption[]>([])
-  const [gameStats, setGameStats] = useState<IConsensusModel[]>([])
+  // const [gameStats, setGameStats] = useState<IConsensusModel[]>([])
   const [gamesLoaded, setGamesLoaded] = useState(false)
   const [isInitialized, setInitialized] = useState(false)
   const [isChartChanged, setChartChanged] = useState(false)
@@ -145,12 +135,11 @@ const Stats: React.FC<StatsProps> = (props) => {
       try {
         console.log(`retrieving game stats for ${goldCircle.length} scores`)
         const stats = await getGameStats(gameId, goldCircle)
-        setGameStats(stats ?? [])
 
         if (isChartChanged) {
           updateChart(stats)
-          renderConsensusResults(stats)
           setChartChanged(false)
+          if (!readOnly) renderConsensusResults(stats)
         }
         setInitialized(true)
       } catch (error) {
@@ -159,13 +148,13 @@ const Stats: React.FC<StatsProps> = (props) => {
       }
     }
 
-    const updateChart = (gameStats: IConsensusModel[]): void => {
-      console.log(`updating chart with ${gameStats.length} data points`)
+    const updateChart = (consensus: IConsensusModel[]): void => {
+      console.log(`updating chart with ${consensus.length} data points`)
       const chartData = {
-        labels: gameStats.map(a => a.time),
+        labels: consensus.map(a => a.time),
         datasets: [
           {
-            data: gameStats.map(a => a.eventsCount),
+            data: consensus.map(a => a.eventsCount),
             backgroundColor: 'cyan',
             borderColor: 'rgba(255, 206, 86, 1)',
             borderWidth: 1,
@@ -201,11 +190,6 @@ const Stats: React.FC<StatsProps> = (props) => {
   })
 
 
-  const handleSaveStats = async (scores: IEventModel[]):  Promise<string>  => {
-    return "OK"
-    // return await saveEvents(events, accountId as string, userName as string, (selectedGame as IGame).id)
-  }
-
   const onGameChanged = (event: React.FormEvent<HTMLDivElement>, item?: IDropdownOption, index?: number): void => {
     if (item && item.data) {
       setSelectedGame(item.data)
@@ -217,14 +201,21 @@ const Stats: React.FC<StatsProps> = (props) => {
           setInitialized(false)
 
           // get game's stats
-          const agentKeys: string[] = []
-          gameEvents.map(gameEvent => {
-            agentKeys.push(gameEvent.account)
-            return agentKeys
-          }) 
-          const stats = await getGameStats(gameId, agentKeys)
-          setGameStats(stats)
-          setGoldCircle(agentKeys)
+          let stats: IConsensusModel[]
+          const goldenCircle = await getGoldCircle(gameId)
+          if (goldenCircle !== null) {
+            stats = await getGameStats(gameId, goldenCircle.agentIds)
+            setGoldCircle(goldenCircle.agentIds)
+          }
+          else {
+            const agentKeys: string[] = []
+            gameEvents.map(gameEvent => {
+              agentKeys.push(gameEvent.account)
+              return agentKeys
+            }) 
+            stats = await getGameStats(gameId, agentKeys)
+            setGoldCircle(agentKeys)
+          }
 
           if (stats) {
             const chartData = {
@@ -240,7 +231,7 @@ const Stats: React.FC<StatsProps> = (props) => {
               ],
             }
 
-            renderConsensusResults(stats)
+            if (!readOnly) renderConsensusResults(stats)
             setChartData(chartData)
             setChartChanged(false)
           }
@@ -292,7 +283,19 @@ const Stats: React.FC<StatsProps> = (props) => {
     setToggled(true)
   }
 
-  const handleSaveEvent = async (events: IEvent[]):  Promise<string>  => {
+  const handleSaveGoldCircle = async (selection: IEventModel[]):  Promise<string>  => {
+    const goldCircleSelection: IGoldCircleModel = {
+      id: uuid(),
+      updatedOn: '',
+      gameId: (selectedGame as IGame).id,
+      agentIds: selection.flatMap(s => s.account)
+    }
+
+    // Save Gold Circle selection
+    return await saveGoldCircle(goldCircleSelection)
+  }
+
+  const handleSaveConsensus = async (events: IEvent[]):  Promise<string>  => {
     return await saveEvents(events, accountId as string, userName as string, (selectedGame as IGame).id)
   }
 
@@ -335,32 +338,38 @@ const Stats: React.FC<StatsProps> = (props) => {
               {isInitialized && <main className='App'>
                 <StatsTable 
                   gameStats={gameEvents} 
-                  saveStats={handleSaveStats}
+                  saveStats={handleSaveGoldCircle}
                   selectionChanged={handleSelectionChangedEvent}
                 />                  
               </main>}
             </Stack.Item>
-            <Stack.Item align="auto">
-              <Text block className="Title" variant='xxLarge'>IRR Game Challenge Significance Scores</Text>
-            </Stack.Item>
-            <Stack.Item align="auto">
-              <main className='App'>
-                <AddEvent saveEvent={handleAddEvent} game={selectedGame as IGame} />
-              </main>
-            </Stack.Item>
-            <Stack.Item align="stretch">
-              {!toggled && <main className='App'>
-                {isInitialized && 
-                  <EventTable 
-                    events={events} 
-                    saveEvents={handleSaveEvent}
-                    deleteItemsEvent={handleDeleteEvent}
-                  />                  
-                }
-              </main>}
-            </Stack.Item>
           </Stack>
+          {!readOnly && 
+            <Stack>
+              <Stack.Item align="auto">
+                <Text block className="Title" variant='xxLarge'>IRR Game Challenge Significance Scores</Text>
+              </Stack.Item>
+              <Stack.Item align="auto">
+                <main className='App'>
+                  <AddEvent saveEvent={handleAddEvent} game={selectedGame as IGame} />
+                </main>
+              </Stack.Item>
+              <Stack.Item align="stretch">
+                {!toggled && <main className='App'>
+                  {isInitialized && 
+                    <EventTable 
+                      events={events} 
+                      saveEvents={handleSaveConsensus}
+                      deleteItemsEvent={handleDeleteEvent}
+                    />                  
+                  }
+                </main>}
+              </Stack.Item>
+            </Stack>}
         </div>
+        <footer>
+          {statusMsg}
+        </footer>
     </div>      
   )
 }

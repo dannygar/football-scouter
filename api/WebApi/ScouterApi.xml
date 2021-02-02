@@ -198,6 +198,11 @@
             Route agent
             </summary>
         </member>
+        <member name="F:ScouterApi.Constants.HttpRouteConstants.StatsRoutePrefix">
+            <summary>
+            Route agent
+            </summary>
+        </member>
         <member name="T:ScouterApi.Controllers.EventsController">
              <summary>
              Scouter Controller
@@ -258,6 +263,22 @@
             Get the default content of home page.
             </summary>
             <returns>Default content.</returns>
+        </member>
+        <member name="T:ScouterApi.Controllers.StatsController">
+             <summary>
+             Scouter Controller
+             </summary>
+            [Authorize]
+        </member>
+        <member name="M:ScouterApi.Controllers.StatsController.SaveGoldCirclePostAsync(ScouterApi.Models.GoldCircleModel)">
+            <summary>Saves the Golden Circle.</summary>
+            <param name="goldCircle">The Gold Circle collection.</param>
+            <returns>Task&lt;System.Boolean&gt;.</returns>
+        </member>
+        <member name="M:ScouterApi.Controllers.StatsController.SaveConsensusPostAsync(ScouterApi.Models.EventModel)">
+            <summary>Saves the Consensus Result.</summary>
+            <param name="goldCircle">The Gold Circle collection.</param>
+            <returns>Task&lt;System.Boolean&gt;.</returns>
         </member>
         <member name="T:ScouterApi.Mappings.MappingProfile">
             <summary>

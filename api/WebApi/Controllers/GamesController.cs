@@ -51,7 +51,7 @@ namespace ScouterApi.Controllers
             }
             catch (Exception e)
             {
-                LogUtil.LogError(this._logger, e.Message, nameof(this.PostAsync));
+                LogUtil.LogError(this._logger, e.Message, nameof(this.GetAsync));
                 Console.WriteLine(e);
                 throw;
             }
