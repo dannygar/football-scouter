@@ -12,6 +12,7 @@ import { useMenu } from './NavBar/NavBar.Hook'
 import Dashboard from './Components/Dashboard';
 import Games from './Components/Games';
 import Stats from './Components/Stats';
+import Results from './Components/Results';
 
 // Initialize icons in case this page uses them
 initializeIcons();
@@ -32,6 +33,7 @@ const App: React.FC = () => {
             <Switch>
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/stats" children={<Stats userName={userName as string} />} />
+              <Route path="/results" children={<Results userName={userName as string} />} />
               <Route path="/games" children={<Games userName={userName as string} />} />
               <Redirect from="*" to="/dashboard" />
             </Switch>

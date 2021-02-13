@@ -35,7 +35,7 @@ type StatsProps = {
   userName: string
 }
 
-const Stats: React.FC<StatsProps> = (props) => {
+const Results: React.FC<StatsProps> = (props) => {
   const [readOnly, ] = useState<boolean>(!(props.userName === process.env.REACT_APP_ADMIN ?? ''))
   const [selectedGame, setSelectedGame] = useState<IGame>()
   const [games, setGames] = useState<IGame[]>([])
@@ -331,7 +331,7 @@ const Stats: React.FC<StatsProps> = (props) => {
     <div className="ms-Grid" dir="ltr">
         <div className="ms-Grid-row">
           <div className="ms-Grid-col ms-sm1 ms-xl1">
-            <Navigation selectedKey="stats" />
+            <Navigation selectedKey="results" />
           </div>
           <Stack tokens={stackTokens} verticalAlign="end">
             <Stack.Item align="end">
@@ -343,7 +343,7 @@ const Stats: React.FC<StatsProps> = (props) => {
                 <Dropdown
                   componentRef={dropdownRef}
                   placeholder={gamesLoaded ? ( games.length > 0 ? "Select a game" : "No games found") : "please, wait..."}
-                  label="Select a Game for Which You Want To See The Analysis"
+                  label="Select a Game For Which You Want To View The Results"
                   options={gamesList}
                   required
                   styles={dropdownStyles}
@@ -397,4 +397,4 @@ const Stats: React.FC<StatsProps> = (props) => {
   )
 }
 
-export default Stats
+export default Results

@@ -37,7 +37,21 @@ const links = [
             key: 'stats',
             url: '/stats',
             iconProps: {
-                iconName: 'PowerBILogo',
+                iconName: 'AnalyticsView',
+                styles: {
+                    root: {
+                        fontSize: 20,
+                        color: '#106ebe',
+                    },
+                }
+            }
+        },
+        {
+            name: 'Results',
+            key: 'results',
+            url: '/results',
+            iconProps: {
+                iconName: 'AccountBrowser',
                 styles: {
                     root: {
                         fontSize: 20,
