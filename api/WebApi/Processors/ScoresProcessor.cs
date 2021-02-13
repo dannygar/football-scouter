@@ -23,17 +23,31 @@ namespace ScouterApi.Processors
             {
                 // Calculate consensus times
                 var scores = GenerateGameTime(agentScores.ToList());
-                foreach (var (score, eventScore) in scores.SelectMany(
-                    score => agentScores.Where(agentScore => agentScore.IsGoldenCircle)
-                    .SelectMany(agentScore => agentScore.Events.Where(
-                        eventScore => (eventScore.ProcessedTime >= (score.ProcessedTime - 0.005M))
-                        && (eventScore.ProcessedTime <= (score.ProcessedTime + 0.005M)))
-                    .Select(eventScore => (score, eventScore)
-                    ))))
+                foreach (var (score, eventScore) in scores
+                    .SelectMany(score => agentScores
+                    .SelectMany(agentScore => agentScore.Events
+                    .Where(eventScore => eventScore.ProcessedTime >= (score.ProcessedTime - 0.005M)
+                                                     && (eventScore.ProcessedTime <= (score.ProcessedTime + 0.005M)))
+                    .Select(eventScore => (score, eventScore)))))
                 {
                     score.EventsCount++;
                     score.Time = score.Time < eventScore.EventTime ? eventScore.EventTime : score.Time;
                 }
+
+                //var scoreList =  scores.Where(score => score.EventsCount > 0).ToList();
+
+                //var scores2 = GenerateGameTime(agentScores.ToList());
+                //foreach (var (score, eventScore) in scores2.SelectMany( score => agentScores.Where(agentScore => agentScore.IsGoldenCircle)
+                //    .SelectMany(agentScore => agentScore.Events.Where(
+                //        eventScore => (eventScore.ProcessedTime >= (score.ProcessedTime - 0.005M))
+                //        && (eventScore.ProcessedTime <= (score.ProcessedTime + 0.005M)))
+                //    .Select(eventScore => (score, eventScore)
+                //    ))))
+                //{
+                //    score.EventsCount++;
+                //    score.Time = score.Time < eventScore.EventTime ? eventScore.EventTime : score.Time;
+                //}
+                //var score2List = scores2.Where(score => score.EventsCount > 0).ToList();
 
                 // return scores.Where(score => score.EventsCount > 0).OrderByDescending<ConsensusModel, int>(score => score.EventsCount);
                 return scores.Where(score => score.EventsCount > 0).ToList();

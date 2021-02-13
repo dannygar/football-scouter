@@ -17,10 +17,12 @@ import {
     Fabric,
   } from '@fluentui/react';
 import { IEventModel } from '../Models/EventModel';
+import IGoldCircleModel from '../Models/GoldCircleModel';
 
 type ScoreItemProps = {
   selectionChanged: (scores: string[]) => Promise<void>
   saveStats: (scores: IEventModel[]) => Promise<string>
+  goldenCircle: IGoldCircleModel | null
   gameStats: IEventModel[]
 }
 
@@ -43,7 +45,7 @@ const StatsTable: React.FC<ScoreItemProps> = (props) => {
         setScouters(scouters)
         setLoaded(true)
      }
-    },[props.gameStats, items.length])
+    },[props.gameStats, items, props.goldenCircle])
 
     useEffect(() => {
       if (loaded) {
@@ -72,7 +74,26 @@ const StatsTable: React.FC<ScoreItemProps> = (props) => {
           })
         });
         setColumns(columns)
-        selection.setAllSelected(true)
+
+        // select only golden circle agents, if provided
+        if (props.goldenCircle && props.goldenCircle.agentIds.length > 0) {
+          selection.setAllSelected(false)
+          const selectedIndexes: number[] = []
+          const _items: IEventModel[] = selection.getItems() as IEventModel[]
+          _items.forEach((item, index) => {
+            const isSelected = props.goldenCircle?.agentIds.filter(id => id === item.account)
+            if (isSelected && isSelected?.length > 0) {
+              selectedIndexes.push(index)
+            }
+          })
+
+          selectedIndexes.forEach(index => {
+            selection.setIndexSelected(index, true, false)
+          })
+        }
+        else {
+          selection.setAllSelected(true)
+        }
       }
 
     }, [items])
@@ -84,7 +105,7 @@ const StatsTable: React.FC<ScoreItemProps> = (props) => {
       console.log(getSelectionDetails())
     }
 
-    const [selection, ] = useState<Selection>(new Selection({
+    const [selection, setSelection ] = useState<Selection>(new Selection({
       onSelectionChanged: onItemsSelectionChanged,
     }))
 

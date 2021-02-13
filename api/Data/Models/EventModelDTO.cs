@@ -34,12 +34,6 @@ namespace Scouter.Data
         public Guid GameId { get; set; }
 
         /// <summary>
-        /// Gets or sets Golden Circle.
-        /// </summary>
-        [DataMember(Name = "isGoldenCircle")]
-        public bool IsGoldenCircle { get; set; }
-
-        /// <summary>
         ///  Gets or sets the Events.
         /// </summary>
         [DataMember(Name = "events")]

@@ -7,8 +7,9 @@ import { authProvider } from '../Auth/AuthProvider'
 import { AccessTokenResponse } from 'react-aad-msal';
 import { Bar } from '@reactchartjs/react-chart.js'
 import { v4 as uuid } from 'uuid'
+import { Confirm } from 'react-st-modal'
 
-import { addEvent, saveEvents, getGameEvents } from '../API/EventAPI'
+import { addEvent, saveEvents, getGameEvents, getEvents } from '../API/EventAPI'
 import { IEvent, IEventModel } from '../Models/EventModel'
 import AddEvent from './AddEvent'
 import Navigation from './Navigation'
@@ -39,7 +40,6 @@ const Stats: React.FC<StatsProps> = (props) => {
   const [selectedGame, setSelectedGame] = useState<IGame>()
   const [games, setGames] = useState<IGame[]>([])
   const [gamesList, setGamesList] = useState<IDropdownOption[]>([])
-  // const [gameStats, setGameStats] = useState<IConsensusModel[]>([])
   const [gamesLoaded, setGamesLoaded] = useState(false)
   const [isInitialized, setInitialized] = useState(false)
   const [isChartChanged, setChartChanged] = useState(false)
@@ -49,7 +49,7 @@ const Stats: React.FC<StatsProps> = (props) => {
   const [statusMsg, setStatusMsg] = useState<string>('')
   const [chartData, setChartData] = useState({})
   const [gameEvents, setGameEvents] = useState<IEventModel[]>([])
-  const [goldCircle, setGoldCircle] = useState<string[]>([])
+  const [goldenCircle, setGoldenCircle] = useState<IGoldCircleModel | null>(null)
   const [events, setEvents] = useState<IEvent[]>([])
   const [newEvent, setNewEvent] = useState<IEvent | null>(null)
   const [toggled, setToggled] = useState(false)
@@ -133,15 +133,15 @@ const Stats: React.FC<StatsProps> = (props) => {
     console.log(isInitialized? 'isInitialized is true' : 'isInitialized is false')
     const changeGameStatsHandler = async (gameId: string): Promise<void> => {
       try {
-        console.log(`retrieving game stats for ${goldCircle.length} scores`)
-        const stats = await getGameStats(gameId, goldCircle)
+        setInitialized(true)
+        console.log(`retrieving game stats for ${goldenCircle?.agentIds.length} scores`)
+        const stats = await getGameStats(gameId, goldenCircle?.agentIds as string[])
 
         if (isChartChanged) {
           updateChart(stats)
           setChartChanged(false)
           if (!readOnly) renderConsensusResults(stats)
         }
-        setInitialized(true)
       } catch (error) {
           if (error.response?.status !== 404)
             alert(`Failed to fetch all significances for this game. Please try again later. Error details: ${error.message}`)      
@@ -168,7 +168,7 @@ const Stats: React.FC<StatsProps> = (props) => {
       console.log("Consensus Chart has been updated")
     }
 
-    if (!isInitialized || isChartChanged) {
+    if (goldenCircle && (!isInitialized || isChartChanged)) {
       changeGameStatsHandler(selectedGame?.id as string)
       setChartChanged(false)
     }
@@ -205,7 +205,7 @@ const Stats: React.FC<StatsProps> = (props) => {
           const goldenCircle = await getGoldCircle(gameId)
           if (goldenCircle !== null) {
             stats = await getGameStats(gameId, goldenCircle.agentIds)
-            setGoldCircle(goldenCircle.agentIds)
+            setGoldenCircle(goldenCircle)
           }
           else {
             const agentKeys: string[] = []
@@ -214,7 +214,6 @@ const Stats: React.FC<StatsProps> = (props) => {
               return agentKeys
             }) 
             stats = await getGameStats(gameId, agentKeys)
-            setGoldCircle(agentKeys)
           }
 
           if (stats) {
@@ -231,7 +230,30 @@ const Stats: React.FC<StatsProps> = (props) => {
               ],
             }
 
-            if (!readOnly) renderConsensusResults(stats)
+            //fetch the events for the current user
+            const fetchEvents = async (gameId: string): Promise<void> => {
+              try {
+                const retrievedEvents = await getEvents(gameId, accountId)
+                if (retrievedEvents) {
+                  const loadFromDb = await Confirm(
+                    "Already saved significance events found. Load them instead?", 
+                    "Significant Scores Load", 
+                    "Load Saved Events",
+                    "Load from the current Consensus")
+                  if (loadFromDb) {
+                    setEvents(retrievedEvents.events)
+                  } else {
+                    setEvents([])
+                    if (!readOnly) renderConsensusResults(stats)
+                  }
+                }
+            } catch (error) {
+                if (error.response?.status !== 404)
+                  alert(`Failed to fetch all significances for this game. Please try again later. Error details: ${error.message}`)      
+              }
+            }
+      
+            fetchEvents(gameId)
             setChartData(chartData)
             setChartChanged(false)
           }
@@ -259,7 +281,7 @@ const Stats: React.FC<StatsProps> = (props) => {
   }
 
   const handleSelectionChangedEvent = async (agentKeys: string[]):  Promise<void>  => {
-    setGoldCircle(agentKeys)
+    setGoldenCircle({id: uuid(), updatedOn: "", gameId: selectedGame?.id as string, agentIds: agentKeys})
     setChartChanged(true)
   }
 
@@ -337,6 +359,7 @@ const Stats: React.FC<StatsProps> = (props) => {
             <Stack.Item align="stretch">
               {isInitialized && <main className='App'>
                 <StatsTable 
+                  goldenCircle={goldenCircle}
                   gameStats={gameEvents} 
                   saveStats={handleSaveGoldCircle}
                   selectionChanged={handleSelectionChangedEvent}
