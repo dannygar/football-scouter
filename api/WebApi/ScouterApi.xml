@@ -315,6 +315,11 @@
             Gets or sets Game Id.
             </summary>
         </member>
+        <member name="P:ScouterApi.Models.EventModel.IsMaster">
+            <summary>
+            Gets or sets Master indication.
+            </summary>
+        </member>
         <member name="P:ScouterApi.Models.EventModel.Events">
             <summary>
              Gets or sets the Events.

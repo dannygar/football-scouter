@@ -318,7 +318,7 @@ const Stats: React.FC<StatsProps> = (props) => {
   }
 
   const handleSaveConsensus = async (events: IEvent[]):  Promise<string>  => {
-    return await saveEvents(events, accountId as string, userName as string, (selectedGame as IGame).id)
+    return await saveEvents(events, accountId as string, userName as string, (selectedGame as IGame).id, true)
   }
 
   const handleDeleteEvent = (deletedItems: IEvent[]): void => {

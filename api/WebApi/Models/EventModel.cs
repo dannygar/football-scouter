@@ -34,6 +34,12 @@ namespace ScouterApi.Models
         public Guid GameId { get; set; }
 
         /// <summary>
+        /// Gets or sets Master indication.
+        /// </summary>
+        [DataMember(Name = "isMaster")]
+        public bool IsMaster { get; set; }
+
+        /// <summary>
         ///  Gets or sets the Events.
         /// </summary>
         [DataMember(Name = "events")]

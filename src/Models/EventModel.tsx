@@ -44,6 +44,7 @@ export interface IEventModel extends BaseModel {
     account: string
     email: string
     gameId: string
+    isMaster: boolean
     events: IEvent[]
 }
 

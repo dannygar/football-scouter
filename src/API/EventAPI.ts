@@ -60,7 +60,7 @@ export const addEvent = async (
 
 
 export const saveEvents = async (
-  events: IEvent[], account: string, email: string, gameId: string
+  events: IEvent[], account: string, email: string, gameId: string, isMaster: boolean
 ): Promise<string> => {
   try {
     const apiUrl = `${baseUrl}/save`
@@ -70,6 +70,7 @@ export const saveEvents = async (
       email: email,
       gameId: gameId,
       updatedOn: '',
+      isMaster: isMaster,
       events: events
     }
     const response: AxiosResponse<boolean> = await axios.post(

@@ -116,7 +116,7 @@ const Dashboard: React.FC = () => {
 
 
   const handleSaveEvent = async (events: IEvent[]):  Promise<string>  => {
-    return await saveEvents(events, accountId as string, userName as string, (selectedGame as IGame).id)
+    return await saveEvents(events, accountId as string, userName as string, (selectedGame as IGame).id, false)
   }
 
   const handleDeleteEvent = (deletedItems: IEvent[]): void => {
