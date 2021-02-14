@@ -11,44 +11,29 @@ import Navigation from '../Components/Navigation'
 import { IGame } from '../Models/GameModel';
 import AddGame from './AddGame';
 import GameTable from './GameTable';
+import { Agent } from '../Models/Agent'
 
 const signIcon: IIconProps = { iconName: 'SignIn' };
+const stackTokens: IStackTokens = { childrenGap: 20 };
 
-// Initialize icons in case this page uses them
-// initializeIcons();
-
-type GameProps = {
-  userName: string
+type AuthProps = {
+  user: Agent
+  authenticate: () => Promise<void>
 }
 
-const Games: React.FC<GameProps> = (props) => {
-  const [readOnly, ] = useState<boolean>(!(props.userName === process.env.REACT_APP_ADMIN ?? ''))
+const Games: React.FC<AuthProps> = (props) => {
   const [games, setGames] = useState<IGame[]>([])
   const [newGame, setNewGame] = useState<IGame | null>(null)
   const [toggled, setToggled] = useState(false)
-  const [signedIn, setSignedStatus] = useState(false)
-  const [userName, setUserName] = useState<string | undefined>()
-  const [displayName, setDisplayName] = useState<string | undefined>()
   const [statusMsg, setStatusMsg] = useState<string>('')
 
-  const stackTokens: IStackTokens = { childrenGap: 20 };
-
-  const authenticate = (): void => {
-    authProvider.getAccessToken().then (() => {
-      setUserName(authProvider.getAccountInfo()?.account.userName)
-      setDisplayName(authProvider.getAccountInfo()?.account.name)
-      setSignedStatus((userName && userName.length > 0) ? true : false)
-    })
-  }
-  authenticate()
-
   const onSignInOutClicked = (): void => {
-    if (signedIn) {
+    if (props.user.isSigned) {
       authProvider.logout()
-      setSignedStatus(false)
+      props.user.isSigned = false
     } else {
       authProvider.login()
-      authenticate()
+      props.authenticate()
     }
   }
 
@@ -124,11 +109,11 @@ const Games: React.FC<GameProps> = (props) => {
           </div>
           <Stack tokens={stackTokens} verticalAlign="end">
             <Stack.Item align="end">
-            <Text className="Header">{displayName ?? 'Anonymous'}</Text>
-              <ActionButton className="button" text={signedIn ? 'Sign Out' : 'Sign In'} iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={onSignInOutClicked} />
+            <Text className="Header">{props.user.displayName ?? 'Anonymous'}</Text>
+              <ActionButton className="button" text={props.user.isSigned ? 'Sign Out' : 'Sign In'} iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={onSignInOutClicked} />
             </Stack.Item>
 
-          {!readOnly ? (
+          {props.user.isMaster ? (
             <Stack.Item align="auto">
               <main className='App'>
                 <AddGame addGame={handleAddGame} />
@@ -143,7 +128,7 @@ const Games: React.FC<GameProps> = (props) => {
                   games={games} 
                   saveGames={handleSaveGames}
                   deleteItemsEvent={handleDeleteEvent}
-                  readOnly={readOnly}
+                  access={props.user.isMaster}
                 />                  
               </main>}
             </Stack.Item>

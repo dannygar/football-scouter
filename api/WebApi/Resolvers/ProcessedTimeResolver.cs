@@ -28,7 +28,7 @@ namespace ScouterApi.Resolvers
         {
             var whole = Math.Truncate(source.EventTime);
 
-            return whole + (source.EventTime - whole) / TIME2DEC_CONVERTOR;
+            return Math.Round(whole + (source.EventTime - whole) / TIME2DEC_CONVERTOR, 1);
         }
     }
 }

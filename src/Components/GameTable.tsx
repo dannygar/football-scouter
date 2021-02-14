@@ -24,7 +24,7 @@ type GameItemProps = {
     saveGames: (games: IGame[]) => Promise<string>
     deleteItemsEvent: (deletedItems: IGame[]) => void
     games: IGame[]
-    readOnly: boolean
+    access: boolean
 }
 
 const theme = getTheme();
@@ -236,7 +236,7 @@ const GameTable: React.FC<GameItemProps> = (props) => {
     return (
       <div data-is-scrollable={true}>
         <Fabric className="Table">
-          {!props.readOnly ? (
+          {props.access ? (
             <CommandBar
               styles={commandBarStyles}
               items={getCommandItems()}

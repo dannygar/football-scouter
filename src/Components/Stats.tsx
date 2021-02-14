@@ -4,7 +4,6 @@ import { Dropdown, Text, IDropdown, IStackTokens, Stack, IDropdownOption, Action
 import '../Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
 import { authProvider } from '../Auth/AuthProvider'
-import { AccessTokenResponse } from 'react-aad-msal';
 import { Bar } from '@reactchartjs/react-chart.js'
 import { v4 as uuid } from 'uuid'
 import { Confirm } from 'react-st-modal'
@@ -26,26 +25,25 @@ import IConsensusModel from '../Models/ConsensusModel';
 import EventTable from './EventTable';
 import IGoldCircleModel from '../Models/GoldCircleModel';
 import { getGoldCircle, saveGoldCircle } from '../API/StatsAPI';
+import { Agent } from '../Models/Agent';
 
 const dropdownStyles = { dropdown: { width: 500 }, label: { color: 'Blue' } };
-
+const stackTokens: IStackTokens = { childrenGap: 20 };
 const signIcon: IIconProps = { iconName: 'SignIn' };
 
-type StatsProps = {
-  userName: string
+type AuthProps = {
+  user: Agent
+  authenticate: () => Promise<void>
 }
 
-const Stats: React.FC<StatsProps> = (props) => {
-  const [readOnly, ] = useState<boolean>(!(props.userName === process.env.REACT_APP_ADMIN ?? ''))
+
+const Stats: React.FC<AuthProps> = (props) => {
   const [selectedGame, setSelectedGame] = useState<IGame>()
   const [games, setGames] = useState<IGame[]>([])
   const [gamesList, setGamesList] = useState<IDropdownOption[]>([])
   const [gamesLoaded, setGamesLoaded] = useState(false)
   const [isInitialized, setInitialized] = useState(false)
   const [isChartChanged, setChartChanged] = useState(false)
-  const [signedIn, setSignedStatus] = useState(false)
-  const [userName, setUserName] = useState<string | undefined>()
-  const [displayName, setDisplayName] = useState<string | undefined>()
   const [statusMsg, setStatusMsg] = useState<string>('')
   const [chartData, setChartData] = useState({})
   const [gameEvents, setGameEvents] = useState<IEventModel[]>([])
@@ -54,24 +52,10 @@ const Stats: React.FC<StatsProps> = (props) => {
   const [newEvent, setNewEvent] = useState<IEvent | null>(null)
   const [toggled, setToggled] = useState(false)
   
-  // const name = authProvider.getAccountInfo()?.account.name
-  const accountId = authProvider.getAccountInfo()?.account.accountIdentifier
-    
-  const stackTokens: IStackTokens = { childrenGap: 20 };
-
-
-  const authenticate = (): void => {
-    authProvider.getAccessToken().then ((value: AccessTokenResponse) => {
-      setUserName(authProvider.getAccountInfo()?.account.userName)
-      setDisplayName(authProvider.getAccountInfo()?.account.name)
-      setSignedStatus((userName && userName.length > 0) ? true : false)
-    })
-  }
-  authenticate()
-
   const dropdownRef = React.createRef<IDropdown>()
 
   const renderConsensusResults = async (consensus: IConsensusModel[]): Promise<void> => {
+    console.log("Rendering Consensus results...")
     try {
       const events = consensus.flatMap(i => i.time)
       const uniqueTimes = [...new Set(events)]
@@ -91,7 +75,7 @@ const Stats: React.FC<StatsProps> = (props) => {
         })
       })
       setEvents(consensusEvents)
-      console.log("events have been updated")
+      console.log("The Events have been updated from the Consensus Data")
     } catch (error) {
         if (error.response?.status !== 404)
           alert(`Failed to fetch all significances for this game. Please try again later. Error details: ${error.message}`)      
@@ -122,7 +106,7 @@ const Stats: React.FC<StatsProps> = (props) => {
         return true
       }
       fetchGames()
-      setInitialized(true)
+      // setInitialized(true)
     } catch (error) {
       setStatusMsg("Failed to retrieve the list of games")
     }
@@ -133,14 +117,14 @@ const Stats: React.FC<StatsProps> = (props) => {
     console.log(isInitialized? 'isInitialized is true' : 'isInitialized is false')
     const changeGameStatsHandler = async (gameId: string): Promise<void> => {
       try {
-        setInitialized(true)
+        // setInitialized(true)
         console.log(`retrieving game stats for ${goldenCircle?.agentIds.length} scores`)
         const stats = await getGameStats(gameId, goldenCircle?.agentIds as string[])
 
         if (isChartChanged) {
           updateChart(stats)
           setChartChanged(false)
-          if (!readOnly) renderConsensusResults(stats)
+          if (props.user.isMaster) await renderConsensusResults(stats)
         }
       } catch (error) {
           if (error.response?.status !== 404)
@@ -217,6 +201,32 @@ const Stats: React.FC<StatsProps> = (props) => {
           }
 
           if (stats) {
+            if (props.user.isMaster) {
+              // Get consensus events
+              const retrievedEvents = await getEvents(gameId, props.user.id)
+              if (retrievedEvents) {
+                const loadFromDb = await Confirm(
+                  "Already saved significance events found. Load them instead?", 
+                  "Consensus Data", 
+                  "Load Saved Events",
+                  "Load from the current Consensus")
+                if (loadFromDb) {
+                  setEvents(retrievedEvents.events)
+                } else {
+                  await renderConsensusResults(stats)
+                }
+              } else {
+                await Confirm(
+                  "No saved Consensus events found. Rendering Consensus data", 
+                  "Consensus Data", 
+                  "Ok")
+                await renderConsensusResults(stats)
+              }
+              setInitialized(true)
+            } else {
+              setInitialized(true)
+            }
+  
             const chartData = {
               labels: stats.map(a => a.time),
               datasets: [
@@ -229,36 +239,11 @@ const Stats: React.FC<StatsProps> = (props) => {
                 },
               ],
             }
-
-            //fetch the events for the current user
-            const fetchEvents = async (gameId: string): Promise<void> => {
-              try {
-                const retrievedEvents = await getEvents(gameId, accountId)
-                if (retrievedEvents) {
-                  const loadFromDb = await Confirm(
-                    "Already saved significance events found. Load them instead?", 
-                    "Significant Scores Load", 
-                    "Load Saved Events",
-                    "Load from the current Consensus")
-                  if (loadFromDb) {
-                    setEvents(retrievedEvents.events)
-                  } else {
-                    setEvents([])
-                    if (!readOnly) renderConsensusResults(stats)
-                  }
-                }
-            } catch (error) {
-                if (error.response?.status !== 404)
-                  alert(`Failed to fetch all significances for this game. Please try again later. Error details: ${error.message}`)      
-              }
-            }
       
-            fetchEvents(gameId)
             setChartData(chartData)
             setChartChanged(false)
+            console.log("scores have been updated")
           }
-          setInitialized(true)
-          console.log("scores have been updated")
       } catch (error) {
           if (error.response?.status !== 404)
             alert(`Failed to fetch all significances for this game. Please try again later. Error details: ${error.message}`)      
@@ -271,12 +256,12 @@ const Stats: React.FC<StatsProps> = (props) => {
   }
 
   const onSignInOutClicked = (): void => {
-    if (signedIn) {
+    if (props.user.isSigned) {
       authProvider.logout()
-      setSignedStatus(false)
+      props.user.isSigned = false
     } else {
       authProvider.login()
-      authenticate()
+      props.authenticate()
     }
   }
 
@@ -318,7 +303,7 @@ const Stats: React.FC<StatsProps> = (props) => {
   }
 
   const handleSaveConsensus = async (events: IEvent[]):  Promise<string>  => {
-    return await saveEvents(events, accountId as string, userName as string, (selectedGame as IGame).id, true)
+    return await saveEvents(events, props.user.id as string, props.user.userName as string, (selectedGame as IGame).id, true)
   }
 
   const handleDeleteEvent = (deletedItems: IEvent[]): void => {
@@ -335,8 +320,8 @@ const Stats: React.FC<StatsProps> = (props) => {
           </div>
           <Stack tokens={stackTokens} verticalAlign="end">
             <Stack.Item align="end">
-              <Text className="Header">{displayName ?? 'Anonymous'}</Text>
-              <ActionButton className="button" text={signedIn ? 'Sign Out' : 'Sign In'} iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={onSignInOutClicked} />
+              <Text className="Header">{props.user.displayName ?? 'Anonymous'}</Text>
+              <ActionButton className="button" text={props.user.isSigned ? 'Sign Out' : 'Sign In'} iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={onSignInOutClicked} />
             </Stack.Item>
             <Stack horizontalAlign="center">
               <Stack.Item align="auto">
@@ -367,7 +352,7 @@ const Stats: React.FC<StatsProps> = (props) => {
               </main>}
             </Stack.Item>
           </Stack>
-          {!readOnly && 
+          {props.user.isMaster && 
             <Stack>
               <Stack.Item align="auto">
                 <Text block className="Title" variant='xxLarge'>IRR Game Challenge Significance Scores</Text>

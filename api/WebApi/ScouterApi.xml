@@ -203,6 +203,16 @@
             Route agent
             </summary>
         </member>
+        <member name="F:ScouterApi.Constants.HttpRouteConstants.ResultsRoutePrefix">
+            <summary>
+            Route agent
+            </summary>
+        </member>
+        <member name="F:ScouterApi.Constants.HttpRouteConstants.MastersRoutePrefix">
+            <summary>
+            Route agent
+            </summary>
+        </member>
         <member name="T:ScouterApi.Controllers.EventsController">
              <summary>
              Scouter Controller
@@ -263,6 +273,25 @@
             Get the default content of home page.
             </summary>
             <returns>Default content.</returns>
+        </member>
+        <member name="T:ScouterApi.Controllers.MastersController">
+             <summary>
+             Scouter Controller
+             </summary>
+            [Authorize]
+        </member>
+        <member name="M:ScouterApi.Controllers.MastersController.IsMasterAsync(System.String)">
+            <summary>
+            IsMasterAsync
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ScouterApi.Controllers.ResultsController">
+             <summary>
+             Scouter Controller
+             </summary>
+            [Authorize]
         </member>
         <member name="T:ScouterApi.Controllers.StatsController">
              <summary>
@@ -414,6 +443,13 @@
             ProcessScoresAsync
             </summary>
             <param name="agentScores"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ScouterApi.Processors.ScoresProcessor.ProcessHits(System.Collections.Generic.IEnumerable{Scouter.Data.EventModelDTO})">
+            <summary>
+            Process Game Hits for all agents
+            </summary>
+            <param name="eventData"></param>
             <returns></returns>
         </member>
         <member name="T:ScouterApi.Resolvers.ProcessedTimeResolver">

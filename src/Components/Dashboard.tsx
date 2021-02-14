@@ -4,7 +4,6 @@ import { Dropdown, Text, IDropdown, IStackTokens, Stack, IDropdownOption, Action
 import '../Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
 import { authProvider } from '../Auth/AuthProvider'
-import { AccessTokenResponse } from 'react-aad-msal';
 
 import { getEvents, addEvent, saveEvents } from '../API/EventAPI'
 import { IEvent } from '../Models/EventModel'
@@ -18,15 +17,20 @@ import { IGame } from '../Models/GameModel';
 // import { useMenu } from '../NavBar/NavBar.Hook'
 // import { NIL } from 'uuid';
 import { getGames } from '../API/GameAPI';
+import { Agent } from '../Models/Agent';
 
 const dropdownStyles = { dropdown: { width: 500 }, label: { color: 'Blue' } };
-
 const signIcon: IIconProps = { iconName: 'SignIn' };
+const stackTokens: IStackTokens = { childrenGap: 20 };
+const dropdownRef = React.createRef<IDropdown>();
 
-// Initialize icons in case this page uses them
-// initializeIcons();
 
-const Dashboard: React.FC = () => {
+type AuthProps = {
+  user: Agent
+  authenticate: () => Promise<void>
+}
+
+const Dashboard: React.FC<AuthProps> = (props) => {
   const [selectedGame, setSelectedGame] = useState<IGame>()
   const [games, setGames] = useState<IGame[]>([])
   const [gamesList, setGamesList] = useState<IDropdownOption[]>([])
@@ -34,31 +38,7 @@ const Dashboard: React.FC = () => {
   const [newEvent, setNewEvent] = useState<IEvent | null>(null)
   const [toggled, setToggled] = useState(false)
   const [eventsLoaded, setEventsLoaded] = useState(false)
-  const [signedIn, setSignedStatus] = useState(false)
-  // const [token, setToken] = useState<string>('')
-  const [userName, setUserName] = useState<string | undefined>()
-  const [displayName, setDisplayName] = useState<string | undefined>()
   const [statusMsg, setStatusMsg] = useState<string>('')
-
-
-  
-  // const name = authProvider.getAccountInfo()?.account.name
-  const accountId = authProvider.getAccountInfo()?.account.accountIdentifier
-  
-  const stackTokens: IStackTokens = { childrenGap: 20 };
-
-
-  const authenticate = (): void => {
-    authProvider.getAccessToken().then ((value: AccessTokenResponse) => {
-      // setToken(value.accessToken)
-      setUserName(authProvider.getAccountInfo()?.account.userName)
-      setDisplayName(authProvider.getAccountInfo()?.account.name)
-      setSignedStatus((userName && userName.length > 0) ? true : false)
-    })
-  }
-  authenticate()
-
-  const dropdownRef = React.createRef<IDropdown>();
 
   useEffect(() => {
     console.log("Component Did Mount")
@@ -116,7 +96,7 @@ const Dashboard: React.FC = () => {
 
 
   const handleSaveEvent = async (events: IEvent[]):  Promise<string>  => {
-    return await saveEvents(events, accountId as string, userName as string, (selectedGame as IGame).id, false)
+    return await saveEvents(events, props.user.id as string, props.user.userName as string, (selectedGame as IGame).id, false)
   }
 
   const handleDeleteEvent = (deletedItems: IEvent[]): void => {
@@ -129,7 +109,7 @@ const Dashboard: React.FC = () => {
       setSelectedGame(item.data)
       const fetchEvents = async (gameId: string): Promise<void> => {
         try {
-          const retrievedEvents = await getEvents(gameId, accountId)
+          const retrievedEvents = await getEvents(gameId, props.user.id)
           if (retrievedEvents) {
             setEvents(retrievedEvents.events)
           } else {
@@ -149,12 +129,12 @@ const Dashboard: React.FC = () => {
   }
 
   const onSignInOutClicked = (): void => {
-    if (signedIn) {
+    if (props.user.isSigned) {
       authProvider.logout()
-      setSignedStatus(false)
+      props.user.isSigned = false
     } else {
       authProvider.login()
-      authenticate()
+      props.authenticate()
     }
   }
 
@@ -166,8 +146,8 @@ const Dashboard: React.FC = () => {
           </div>
           <Stack tokens={stackTokens} verticalAlign="end">
             <Stack.Item align="end">
-              <Text className="Header">{displayName ?? 'Anonymous'}</Text>
-              <ActionButton className="button" text={signedIn ? 'Sign Out' : 'Sign In'} iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={onSignInOutClicked} />
+              <Text className="Header">{props.user.displayName ?? 'Anonymous'}</Text>
+              <ActionButton className="button" text={props.user.isSigned ? 'Sign Out' : 'Sign In'} iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={onSignInOutClicked} />
             </Stack.Item>
             <Stack horizontalAlign="center">
               <Stack.Item align="auto">

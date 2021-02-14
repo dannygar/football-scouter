@@ -34,22 +34,6 @@ namespace ScouterApi.Processors
                     score.Time = score.Time < eventScore.EventTime ? eventScore.EventTime : score.Time;
                 }
 
-                //var scoreList =  scores.Where(score => score.EventsCount > 0).ToList();
-
-                //var scores2 = GenerateGameTime(agentScores.ToList());
-                //foreach (var (score, eventScore) in scores2.SelectMany( score => agentScores.Where(agentScore => agentScore.IsGoldenCircle)
-                //    .SelectMany(agentScore => agentScore.Events.Where(
-                //        eventScore => (eventScore.ProcessedTime >= (score.ProcessedTime - 0.005M))
-                //        && (eventScore.ProcessedTime <= (score.ProcessedTime + 0.005M)))
-                //    .Select(eventScore => (score, eventScore)
-                //    ))))
-                //{
-                //    score.EventsCount++;
-                //    score.Time = score.Time < eventScore.EventTime ? eventScore.EventTime : score.Time;
-                //}
-                //var score2List = scores2.Where(score => score.EventsCount > 0).ToList();
-
-                // return scores.Where(score => score.EventsCount > 0).OrderByDescending<ConsensusModel, int>(score => score.EventsCount);
                 return scores.Where(score => score.EventsCount > 0).ToList();
             }
             catch (Exception e)
@@ -58,6 +42,46 @@ namespace ScouterApi.Processors
                 throw;
             }
         }
+
+
+        /// <summary>
+        /// Process Game Hits for all agents
+        /// </summary>
+        /// <param name="eventData"></param>
+        /// <returns></returns>
+        public static Dictionary<string, int> ProcessHits(IEnumerable<Scouter.Data.EventModelDTO> eventData)
+        {
+            try
+            {
+                //Filter to get the Master record
+                var masterData = eventData.Where(d => d.IsMaster).FirstOrDefault();
+                if (masterData == null) return null;
+
+                Dictionary<string, int> hits = new Dictionary<string, int>();
+
+                // Calculate hits for each agent
+                foreach (var data in eventData)
+                {
+                    var agentHits = 0;
+                    foreach (var masterScore in masterData.Events)
+                    {
+                        if (data.Events.Any(eventScore => Math.Round(eventScore.ProcessedTime, 1) == Math.Round(masterScore.ProcessedTime, 1)))
+                        {
+                            agentHits++;
+                        }
+                    }
+                    hits.Add(data.Account, agentHits);
+                }
+
+                return hits;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
 
         private static List<ConsensusModel> GenerateGameTime(List<Scouter.Data.EventModelDTO> agentScores)
         {

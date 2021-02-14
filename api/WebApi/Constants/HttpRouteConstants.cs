@@ -33,5 +33,15 @@ namespace ScouterApi.Constants
         /// </summary>
         public const string StatsRoutePrefix = "api/stats";
 
+        /// <summary>
+        /// Route agent
+        /// </summary>
+        public const string ResultsRoutePrefix = "api/results";
+
+        /// <summary>
+        /// Route agent
+        /// </summary>
+        public const string MastersRoutePrefix = "api/masters";
+
     }
 }

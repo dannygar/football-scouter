@@ -42,7 +42,7 @@ namespace ScouterApi.Controllers
         [ValidateModelState]
         [SwaggerOperation("stats")]
         [SwaggerResponse(statusCode: 200, type: typeof(GoldCircleModel), description: "The Gold Circle for the specific game")]
-        public async Task<GoldCircleModel> GetGoldenCircleSsync([FromQuery] string id)
+        public async Task<GoldCircleModel> GetGoldenCircleAsync([FromQuery] string id)
         {
             const string partitionKey = "/gameId";
             try
@@ -57,7 +57,7 @@ namespace ScouterApi.Controllers
             }
             catch (Exception e)
             {
-                LogUtil.LogError(this._logger, e.Message, nameof(this.GetGoldenCircleSsync));
+                LogUtil.LogError(this._logger, e.Message, nameof(this.GetGoldenCircleAsync));
                 Console.WriteLine(e);
                 throw;
             }
@@ -168,6 +168,5 @@ namespace ScouterApi.Controllers
                 throw;
             }
         }
-
     }
 }
