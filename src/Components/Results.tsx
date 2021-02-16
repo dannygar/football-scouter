@@ -26,10 +26,48 @@ import EventTable from './EventTable';
 import IGoldCircleModel from '../Models/GoldCircleModel';
 import { getGoldCircle, saveGoldCircle } from '../API/StatsAPI';
 import { Agent } from '../Models/Agent';
+import { getGameResults } from '../API/ResultsAPI';
+import { IResultsModel } from '../Models/ResultsModel';
 
 const dropdownStyles = { dropdown: { width: 500 }, label: { color: 'Blue' } };
 const stackTokens: IStackTokens = { childrenGap: 20 };
 const signIcon: IIconProps = { iconName: 'SignIn' };
+
+// Chart Options
+const chartHitsOptions = {
+  maintainAspectRatio: false,
+  legend: { display: false },
+  scales: {
+    yAxes: [{ ticks: { beginAtZero: true } }],
+  },
+  title: {
+    display: true,
+    text: "Hits",
+  },
+}
+const chartMavericksOptions = {
+  maintainAspectRatio: false,
+  legend: { display: false },
+  scales: {
+    yAxes: [{ ticks: { beginAtZero: true } }],
+  },
+  title: {
+    display: true,
+    text: "Mavericks",
+  },
+}
+const chartScoresOptions = {
+  maintainAspectRatio: false,
+  legend: { display: false },
+  scales: {
+    yAxes: [{ ticks: { beginAtZero: true } }],
+  },
+  title: {
+    display: true,
+    text: "Scores",
+  },
+}
+
 
 type AuthProps = {
   user: Agent
@@ -38,49 +76,16 @@ type AuthProps = {
 
 
 const Results: React.FC<AuthProps> = (props) => {
-  const [selectedGame, setSelectedGame] = useState<IGame>()
   const [games, setGames] = useState<IGame[]>([])
   const [gamesList, setGamesList] = useState<IDropdownOption[]>([])
   const [gamesLoaded, setGamesLoaded] = useState(false)
   const [isInitialized, setInitialized] = useState(false)
-  const [isChartChanged, setChartChanged] = useState(false)
   const [statusMsg, setStatusMsg] = useState<string>('')
-  const [chartData, setChartData] = useState({})
-  const [gameEvents, setGameEvents] = useState<IEventModel[]>([])
-  const [goldenCircle, setGoldenCircle] = useState<IGoldCircleModel | null>(null)
-  const [events, setEvents] = useState<IEvent[]>([])
-  const [newEvent, setNewEvent] = useState<IEvent | null>(null)
-  const [toggled, setToggled] = useState(false)
+  const [chartHits, setChartHits] = useState({})
+  const [chartMavericks, setChartMavericks] = useState({})
+  const [chartScores, setChartScores] = useState({})
   
   const dropdownRef = React.createRef<IDropdown>()
-
-  const renderConsensusResults = async (consensus: IConsensusModel[]): Promise<void> => {
-    console.log("Rendering Consensus results...")
-    try {
-      const events = consensus.flatMap(i => i.time)
-      const uniqueTimes = [...new Set(events)]
-      const filteredTimes = uniqueTimes.filter(t => consensus.findIndex(s => s.time === t) >= 0)
-      const consensusEvents: IEvent[] = []
-      filteredTimes.forEach(time => {
-        consensusEvents.push( {
-          id: uuid(),
-          eventTime: time,
-          eventType: 0,
-          advTeam: '',
-          position: 0,
-          significance: 0,
-          credit: '',
-          blame: '',
-          comments: ''
-        })
-      })
-      setEvents(consensusEvents)
-      console.log("The Events have been updated from the Consensus Data")
-    } catch (error) {
-        if (error.response?.status !== 404)
-          alert(`Failed to fetch all significances for this game. Please try again later. Error details: ${error.message}`)      
-    }
-  }
 
   useEffect(() => {
     console.log("Component Did Mount")
@@ -106,143 +111,62 @@ const Results: React.FC<AuthProps> = (props) => {
         return true
       }
       fetchGames()
-      // setInitialized(true)
     } catch (error) {
       setStatusMsg("Failed to retrieve the list of games")
     }
   }, [])
 
-  useEffect(() => {
-    console.log("Component is updated")
-    console.log(isInitialized? 'isInitialized is true' : 'isInitialized is false')
-    const changeGameStatsHandler = async (gameId: string): Promise<void> => {
-      try {
-        // setInitialized(true)
-        console.log(`retrieving game stats for ${goldenCircle?.agentIds.length} scores`)
-        const stats = await getGameStats(gameId, goldenCircle?.agentIds as string[])
 
-        if (isChartChanged) {
-          updateChart(stats)
-          setChartChanged(false)
-          if (props.user.isMaster) await renderConsensusResults(stats)
-        }
-      } catch (error) {
-          if (error.response?.status !== 404)
-            alert(`Failed to fetch all significances for this game. Please try again later. Error details: ${error.message}`)      
-      }
-    }
-
-    const updateChart = (consensus: IConsensusModel[]): void => {
-      console.log(`updating chart with ${consensus.length} data points`)
-      const chartData = {
-        labels: consensus.map(a => a.time),
-        datasets: [
-          {
-            data: consensus.map(a => a.eventsCount),
-            backgroundColor: 'cyan',
-            borderColor: 'rgba(255, 206, 86, 1)',
-            borderWidth: 1,
-            barPercentage: 0.2,
-          },
-        ],
-      }
-
-      setChartData(chartData)
-      console.log(`total of data: ${chartData.datasets[0].data.length}`)
-      console.log("Consensus Chart has been updated")
-    }
-
-    if (goldenCircle && (!isInitialized || isChartChanged)) {
-      changeGameStatsHandler(selectedGame?.id as string)
-      setChartChanged(false)
-    }
-
-    const addEventHandler = async (formData: IEvent): Promise<void> => {
-      await addEvent(formData, events)
-      .then(({ data }) => {
-        setEvents(data.events)
-        console.log(`added total of ${events.length} events`)
-      })
-      .catch((err) => console.log(err))
-    }  
-
-    if (toggled && newEvent !== null) {
-      addEventHandler(newEvent)
-      setToggled(false)
-    }
-  
-  })
-
-
-  const onGameChanged = (event: React.FormEvent<HTMLDivElement>, item?: IDropdownOption, index?: number): void => {
+  const onGameChanged = async (event: React.FormEvent<HTMLDivElement>, item?: IDropdownOption, index?: number): Promise<void> => {
     if (item && item.data) {
-      setSelectedGame(item.data)
-      const fetchScores = async (gameId: string): Promise<void> => {
+      const getResults = async (gameId: string): Promise<void> => {
         try {
-          // get game's all events
-          const gameEvents = await getGameEvents(gameId)
-          setGameEvents(gameEvents)
-          setInitialized(false)
+          // get game's results
+          const gameResults = await getGameResults(gameId)
 
-          // get game's stats
-          let stats: IConsensusModel[]
-          const goldenCircle = await getGoldCircle(gameId)
-          if (goldenCircle !== null) {
-            stats = await getGameStats(gameId, goldenCircle.agentIds)
-            setGoldenCircle(goldenCircle)
-          }
-          else {
-            const agentKeys: string[] = []
-            gameEvents.map(gameEvent => {
-              agentKeys.push(gameEvent.account)
-              return agentKeys
-            }) 
-            stats = await getGameStats(gameId, agentKeys)
-          }
-
-          if (stats) {
-            if (props.user.isMaster) {
-              // Get consensus events
-              const retrievedEvents = await getEvents(gameId, props.user.id)
-              if (retrievedEvents) {
-                const loadFromDb = await Confirm(
-                  "Already saved significance events found. Load them instead?", 
-                  "Consensus Data", 
-                  "Load Saved Events",
-                  "Load from the current Consensus")
-                if (loadFromDb) {
-                  setEvents(retrievedEvents.events)
-                } else {
-                  await renderConsensusResults(stats)
-                }
-              } else {
-                await Confirm(
-                  "No saved Consensus events found. Rendering Consensus data", 
-                  "Consensus Data", 
-                  "Ok")
-                await renderConsensusResults(stats)
-              }
-              setInitialized(true)
-            } else {
-              setInitialized(true)
-            }
-  
-            const chartData = {
-              labels: stats.map(a => a.time),
+          if (gameResults) {
+            const chartHits = {
+              labels: gameResults.map(a => a.displayName),
               datasets: [
                 {
-                  data: stats.map(a => a.eventsCount),
-                  backgroundColor: 'cyan',
+                  data: gameResults.map(a => a.hits),
+                  backgroundColor: 'blue',
                   borderColor: 'rgba(255, 206, 86, 1)',
                   borderWidth: 1,
                   barPercentage: 0.2,
                 },
               ],
             }
-      
-            setChartData(chartData)
-            setChartChanged(false)
-            console.log("scores have been updated")
+            const chartMavericks = {
+              labels: gameResults.map(a => a.displayName),
+              datasets: [
+                {
+                  data: gameResults.map(a => a.maverics),
+                  backgroundColor: 'purple',
+                  borderColor: 'rgba(255, 206, 86, 1)',
+                  borderWidth: 1,
+                  barPercentage: 0.2,
+                },
+              ],
+            }
+            const chartScores = {
+              labels: gameResults.map(a => a.displayName),
+              datasets: [
+                {
+                  data: gameResults.map(a => a.score),
+                  backgroundColor: 'green',
+                  borderColor: 'rgba(255, 206, 86, 1)',
+                  borderWidth: 1,
+                  barPercentage: 0.2,
+                },
+              ],
+            }
+
+            setChartHits(chartHits)
+            setChartMavericks(chartMavericks)
+            setChartScores(chartScores)
+            setInitialized(true)
+            console.log("Results have been updated")
           }
       } catch (error) {
           if (error.response?.status !== 404)
@@ -250,9 +174,8 @@ const Results: React.FC<AuthProps> = (props) => {
         }
       }
 
-      fetchScores(item.data?.id)
+      await getResults(item.data?.id)
     }
-    console.log(`Selected: ${item?.text}`)
   }
 
   const onSignInOutClicked = (): void => {
@@ -265,58 +188,13 @@ const Results: React.FC<AuthProps> = (props) => {
     }
   }
 
-  const handleSelectionChangedEvent = async (agentKeys: string[]):  Promise<void>  => {
-    setGoldenCircle({id: uuid(), updatedOn: "", gameId: selectedGame?.id as string, agentIds: agentKeys})
-    setChartChanged(true)
-  }
-
-  const chartOptions = {
-    maintainAspectRatio: false,
-    legend: { display: false },
-    scales: {
-      yAxes: [{ ticks: { beginAtZero: true } }],
-    },
-    title: {
-      display: true,
-      text: "IRR Consensus",
-    },
-  }
-
-  const handleAddEvent = (e: React.FormEvent, formData: IEvent): void => {
-    e.preventDefault()
-    const _form: any = e.currentTarget
-    formData = {...formData, advTeam: _form.elements[1].value, eventType: _form.elements[2].value, position: formData.position ?? 0, significance: formData.significance ?? 0}
-    setNewEvent(formData)
-    setToggled(true)
-  }
-
-  const handleSaveGoldCircle = async (selection: IEventModel[]):  Promise<string>  => {
-    const goldCircleSelection: IGoldCircleModel = {
-      id: uuid(),
-      updatedOn: '',
-      gameId: (selectedGame as IGame).id,
-      agentIds: selection.flatMap(s => s.account)
-    }
-
-    // Save Gold Circle selection
-    return await saveGoldCircle(goldCircleSelection)
-  }
-
-  const handleSaveConsensus = async (events: IEvent[]):  Promise<string>  => {
-    return await saveEvents(events, props.user.id as string, props.user.userName as string, (selectedGame as IGame).id, true)
-  }
-
-  const handleDeleteEvent = (deletedItems: IEvent[]): void => {
-    const updatedItemsList = events.filter((item, index) => !deletedItems.includes(item))
-    setEvents(updatedItemsList)
-  }
 
 
   return (
     <div className="ms-Grid" dir="ltr">
         <div className="ms-Grid-row">
           <div className="ms-Grid-col ms-sm1 ms-xl1">
-            <Navigation selectedKey="stats" />
+            <Navigation selectedKey="results" />
           </div>
           <Stack tokens={stackTokens} verticalAlign="end">
             <Stack.Item align="end">
@@ -336,44 +214,24 @@ const Results: React.FC<AuthProps> = (props) => {
                 />
               </Stack.Item>
             </Stack>
-            <Stack.Item align="auto">
-              {!isChartChanged && <main className='chart'>
-                  <Bar type='bar' data={chartData} options={chartOptions} />
-              </main>}
-            </Stack.Item>
-            <Stack.Item align="stretch">
-              {isInitialized && <main className='App'>
-                <StatsTable 
-                  goldenCircle={goldenCircle}
-                  gameStats={gameEvents} 
-                  saveStats={handleSaveGoldCircle}
-                  selectionChanged={handleSelectionChangedEvent}
-                />                  
-              </main>}
-            </Stack.Item>
-          </Stack>
-          {props.user.isMaster && 
-            <Stack>
+            {isInitialized && <Stack verticalAlign="stretch">
               <Stack.Item align="auto">
-                <Text block className="Title" variant='xxLarge'>IRR Game Challenge Significance Scores</Text>
-              </Stack.Item>
-              <Stack.Item align="auto">
-                <main className='App'>
-                  <AddEvent saveEvent={handleAddEvent} game={selectedGame as IGame} />
+                <main className='chart'>
+                    <Bar type='bar' data={chartHits} options={chartHitsOptions} />
                 </main>
               </Stack.Item>
-              <Stack.Item align="stretch">
-                {!toggled && <main className='App'>
-                  {isInitialized && 
-                    <EventTable 
-                      events={events} 
-                      saveEvents={handleSaveConsensus}
-                      deleteItemsEvent={handleDeleteEvent}
-                    />                  
-                  }
-                </main>}
+              <Stack.Item align="auto">
+                <main className='chart'>
+                    <Bar type='bar' data={chartMavericks} options={chartMavericksOptions} />
+                </main>
+              </Stack.Item>
+              <Stack.Item align="auto">
+                <main className='chart'>
+                    <Bar type='bar' data={chartScores} options={chartScoresOptions} />
+                </main>
               </Stack.Item>
             </Stack>}
+          </Stack>
         </div>
         <footer>
           {statusMsg}

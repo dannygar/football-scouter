@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Scouter.Common.Models;
 using ScouterApi.Attributes;
 using ScouterApi.Constants;
 using ScouterApi.Models;
@@ -53,7 +54,7 @@ namespace ScouterApi.Controllers
                 {
                     //Check if the item is already exist, and then replace it
                     var eventData = await db.GetItemsAsync(
-                        $"SELECT * FROM c WHERE c.gameId = '{id}'");
+                        $"SELECT * FROM c WHERE c.gameId = '{id}' and c.isMaster = false");
                     var gameEvents = _mapper.Map<Scouter.Data.EventModelDTO[], IEnumerable<ScouterApi.Models.EventModel>>(eventData.ToArray());
                     return gameEvents;
                 }
@@ -94,7 +95,7 @@ namespace ScouterApi.Controllers
                                         let data = eventData.Where(d => d.Account == key).FirstOrDefault()
                                         where data != null
                                         select data).ToList();
-                    var scoreStats = await ScoresProcessor.ProcessScoresAsync(filteredData);
+                    var scoreStats = ScoresProcessor.ProcessScores(filteredData);
                     return scoreStats;
                 }
             }
@@ -163,11 +164,18 @@ namespace ScouterApi.Controllers
                 // Map API data object to Data
                 var scoreDTO = _mapper.Map<Scouter.Data.EventModelDTO>(scoreEvent);
 
+                IEnumerable<Scouter.Data.EventModelDTO> gameScores = null;
+
                 using (var db = new CosmosUtil<Scouter.Data.EventModelDTO>("events", partitionKey: partitionKey))
                 {
+                    // Get all game scores
+                    gameScores = await db.GetItemsAsync(
+                        $"SELECT * FROM c WHERE c.gameId = '{scoreEvent.GameId}'");
+
                     //Check if the item is already exist, and then replace it
-                    var oldScores = await db.GetItemsAsync(
-                        $"SELECT * FROM c WHERE c.gameId = '{scoreEvent.GameId}' and c.account = '{scoreEvent.Account}'");
+                    var oldScores = gameScores.Where(s => s.Account == scoreEvent.Account).ToList();
+                    //var oldScores = await db.GetItemsAsync(
+                    //    $"SELECT * FROM c WHERE c.gameId = '{scoreEvent.GameId}' and c.account = '{scoreEvent.Account}'");
                     if (oldScores.Count() > 0)
                     {
                         // delete any old items except the last one
@@ -190,9 +198,23 @@ namespace ScouterApi.Controllers
                         // Create a new one
                         await db.AddItemAsync(scoreDTO, partitionKey: scoreEvent.GameId.ToString());
                     }
-
-                    return true;
                 }
+
+                if (scoreDTO.IsMaster)
+                {
+                    // Calculate the game results and save it in the Database
+                    var gameResults = ScoresProcessor.ProcessResults(gameScores).ToList();
+                    if (gameResults == null) return false;
+
+                    // Save to the database
+                    using (var db = new CosmosUtil<ResultsModel>("results", partitionKey: partitionKey))
+                    {
+                        // Create or update the results
+                        await db.UpsertArrayAsync(gameResults, partitionKey: scoreEvent.GameId.ToString());
+                    }
+                }
+
+                return true;
             }
             catch (Exception e)
             {

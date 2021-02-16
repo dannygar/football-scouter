@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Scouter.Common.Models;
 using ScouterApi.Attributes;
 using ScouterApi.Constants;
 using ScouterApi.Models;
@@ -41,8 +42,36 @@ namespace ScouterApi.Controllers
         [HttpGet("")]
         [ValidateModelState]
         [SwaggerOperation("results")]
-        [SwaggerResponse(statusCode: 200, type: typeof(GoldCircleModel), description: "The Results for the specific game")]
-        public async Task<Dictionary<string, int>> GetGameResultsAsync([FromQuery] string id)
+        [SwaggerResponse(statusCode: 200, type: typeof(IEnumerable<ResultsModel>), description: "The Results for the specific game")]
+        public async Task<IEnumerable<ResultsModel>> GetGameResultsAsync([FromQuery] string id)
+        {
+            const string partitionKey = "/gameId";
+            try
+            {
+                using (var db = new CosmosUtil<ResultsModel>("results", partitionKey: partitionKey))
+                {
+                    //Check if the item is already exist, and then replace it
+                    var results = await db.GetItemsAsync(
+                        $"SELECT * FROM c WHERE c.gameId = '{id}'");
+
+                    // Return the game results
+                    return results.OrderByDescending(r => r.Score);
+                }
+            }
+            catch (Exception e)
+            {
+                LogUtil.LogError(this._logger, e.Message, nameof(this.GetGameResultsAsync));
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+
+        [HttpGet("calculate")]
+        [ValidateModelState]
+        [SwaggerOperation("results")]
+        [SwaggerResponse(statusCode: 200, type: typeof(IEnumerable<ResultsModel>), description: "The Results for the specific game")]
+        public async Task<IEnumerable<ResultsModel>> CalculateGameResultsAsync([FromQuery] string id)
         {
             const string partitionKey = "/gameId";
             try
@@ -54,18 +83,16 @@ namespace ScouterApi.Controllers
                         $"SELECT * FROM c WHERE c.gameId = '{id}'");
                     if (eventData.Count() == 0) return null;
 
-                    // Get Hits
-                    var hits = ScoresProcessor.ProcessHits(eventData);
-                    return hits;
+                    // Return the game results
+                    return ScoresProcessor.ProcessResults(eventData);
                 }
             }
             catch (Exception e)
             {
-                LogUtil.LogError(this._logger, e.Message, nameof(this.GetGameResultsAsync));
+                LogUtil.LogError(this._logger, e.Message, nameof(this.CalculateGameResultsAsync));
                 Console.WriteLine(e);
                 throw;
             }
-
         }
 
     }

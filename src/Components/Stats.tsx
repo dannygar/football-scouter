@@ -36,6 +36,18 @@ type AuthProps = {
   authenticate: () => Promise<void>
 }
 
+const chartOptions = {
+  maintainAspectRatio: false,
+  legend: { display: false },
+  scales: {
+    yAxes: [{ ticks: { beginAtZero: true } }],
+  },
+  title: {
+    display: true,
+    text: "IRR Consensus",
+  },
+}
+
 
 const Stats: React.FC<AuthProps> = (props) => {
   const [selectedGame, setSelectedGame] = useState<IGame>()
@@ -118,10 +130,10 @@ const Stats: React.FC<AuthProps> = (props) => {
     const changeGameStatsHandler = async (gameId: string): Promise<void> => {
       try {
         // setInitialized(true)
-        console.log(`retrieving game stats for ${goldenCircle?.agentIds.length} scores`)
-        const stats = await getGameStats(gameId, goldenCircle?.agentIds as string[])
 
         if (isChartChanged) {
+          console.log(`retrieving game stats for ${goldenCircle?.agentIds.length} scores`)
+          const stats = await getGameStats(gameId, goldenCircle?.agentIds as string[])
           updateChart(stats)
           setChartChanged(false)
           if (props.user.isMaster) await renderConsensusResults(stats)
@@ -185,21 +197,20 @@ const Stats: React.FC<AuthProps> = (props) => {
           setInitialized(false)
 
           // get game's stats
-          let stats: IConsensusModel[]
+          let agentKeys: string[] = []
           const goldenCircle = await getGoldCircle(gameId)
           if (goldenCircle !== null) {
-            stats = await getGameStats(gameId, goldenCircle.agentIds)
+            agentKeys = goldenCircle.agentIds
             setGoldenCircle(goldenCircle)
           }
           else {
-            const agentKeys: string[] = []
             gameEvents.map(gameEvent => {
               agentKeys.push(gameEvent.account)
               return agentKeys
             }) 
-            stats = await getGameStats(gameId, agentKeys)
           }
 
+          const stats = await getGameStats(gameId, agentKeys)
           if (stats) {
             if (props.user.isMaster) {
               // Get consensus events
@@ -222,11 +233,8 @@ const Stats: React.FC<AuthProps> = (props) => {
                   "Ok")
                 await renderConsensusResults(stats)
               }
-              setInitialized(true)
-            } else {
-              setInitialized(true)
             }
-  
+
             const chartData = {
               labels: stats.map(a => a.time),
               datasets: [
@@ -242,6 +250,7 @@ const Stats: React.FC<AuthProps> = (props) => {
       
             setChartData(chartData)
             setChartChanged(false)
+            setInitialized(true)
             console.log("scores have been updated")
           }
       } catch (error) {
@@ -268,18 +277,6 @@ const Stats: React.FC<AuthProps> = (props) => {
   const handleSelectionChangedEvent = async (agentKeys: string[]):  Promise<void>  => {
     setGoldenCircle({id: uuid(), updatedOn: "", gameId: selectedGame?.id as string, agentIds: agentKeys})
     setChartChanged(true)
-  }
-
-  const chartOptions = {
-    maintainAspectRatio: false,
-    legend: { display: false },
-    scales: {
-      yAxes: [{ ticks: { beginAtZero: true } }],
-    },
-    title: {
-      display: true,
-      text: "IRR Consensus",
-    },
   }
 
   const handleAddEvent = (e: React.FormEvent, formData: IEvent): void => {

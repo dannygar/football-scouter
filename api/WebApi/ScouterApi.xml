@@ -438,14 +438,14 @@
             Agent Processor
             </summary>
         </member>
-        <member name="M:ScouterApi.Processors.ScoresProcessor.ProcessScoresAsync(System.Collections.Generic.IEnumerable{Scouter.Data.EventModelDTO})">
+        <member name="M:ScouterApi.Processors.ScoresProcessor.ProcessScores(System.Collections.Generic.IEnumerable{Scouter.Data.EventModelDTO})">
             <summary>
             ProcessScoresAsync
             </summary>
             <param name="agentScores"></param>
             <returns></returns>
         </member>
-        <member name="M:ScouterApi.Processors.ScoresProcessor.ProcessHits(System.Collections.Generic.IEnumerable{Scouter.Data.EventModelDTO})">
+        <member name="M:ScouterApi.Processors.ScoresProcessor.ProcessResults(System.Collections.Generic.IEnumerable{Scouter.Data.EventModelDTO})">
             <summary>
             Process Game Hits for all agents
             </summary>
