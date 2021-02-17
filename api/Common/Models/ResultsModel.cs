@@ -2,7 +2,7 @@
 
 namespace Scouter.Common.Models
 {
-    public class ResultsModel : BaseModel
+    public class ResultsModel: BaseModel
     {
         [DataMember(Name = "gameId")]
         public string GameId { get; set; }

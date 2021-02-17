@@ -209,8 +209,24 @@ namespace ScouterApi.Controllers
                     // Save to the database
                     using (var db = new CosmosUtil<ResultsModel>("results", partitionKey: partitionKey))
                     {
+                        // Get all game scores
+                        var results = await db.GetItemsAsync(
+                            $"SELECT * FROM c WHERE c.gameId = '{scoreEvent.GameId}'");
+
+                        if (results.Count() > 0)
+                        {
+
+                            // Replace any old items with the new ones
+                            foreach (var item in results)
+                            {
+                                //Delete old document
+                                await db.DeleteItemAsync(item.Id.ToString(), partitionKey: scoreEvent.GameId.ToString());
+                            }
+                        }
+
                         // Create or update the results
                         await db.UpsertArrayAsync(gameResults, partitionKey: scoreEvent.GameId.ToString());
+
                     }
                 }
 

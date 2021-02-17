@@ -81,7 +81,7 @@ namespace ScouterApi.Processors
                 {
                     var agentResult = new ResultsModel
                     {
-                        Id = Guid.Parse(data.Account),
+                        Id = Guid.NewGuid(),
                         UpdatedOn = DateTime.UtcNow.ToString(),
                         GameId = data.GameId.ToString(),
                         AgentId = data.Account,

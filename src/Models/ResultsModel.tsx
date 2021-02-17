@@ -1,4 +1,5 @@
 export interface IResultsModel {
+    id: string
     gameId: string
     agentId: string
     displayName: string
