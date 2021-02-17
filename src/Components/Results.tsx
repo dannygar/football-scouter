@@ -5,12 +5,7 @@ import '../Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
 import { authProvider } from '../Auth/AuthProvider'
 import { Bar } from '@reactchartjs/react-chart.js'
-import { v4 as uuid } from 'uuid'
-import { Confirm } from 'react-st-modal'
 
-import { addEvent, saveEvents, getGameEvents, getEvents } from '../API/EventAPI'
-import { IEvent, IEventModel } from '../Models/EventModel'
-import AddEvent from './AddEvent'
 import Navigation from './Navigation'
 import { IGame } from '../Models/GameModel'
 
@@ -19,15 +14,8 @@ import { IGame } from '../Models/GameModel'
 // import { useMenu } from '../NavBar/NavBar.Hook'
 // import { NIL } from 'uuid';
 import { getGames } from '../API/GameAPI';
-import { getGameStats } from '../API/ScoreAPI';
-import StatsTable from './StatsTable';
-import IConsensusModel from '../Models/ConsensusModel';
-import EventTable from './EventTable';
-import IGoldCircleModel from '../Models/GoldCircleModel';
-import { getGoldCircle, saveGoldCircle } from '../API/StatsAPI';
-import { Agent } from '../Models/Agent';
 import { getGameResults } from '../API/ResultsAPI';
-import { IResultsModel } from '../Models/ResultsModel';
+import { AuthProps } from '../App';
 
 const dropdownStyles = { dropdown: { width: 500 }, label: { color: 'Blue' } };
 const stackTokens: IStackTokens = { childrenGap: 20 };
@@ -66,12 +54,6 @@ const chartScoresOptions = {
     display: true,
     text: "Scores",
   },
-}
-
-
-type AuthProps = {
-  user: Agent
-  authenticate: () => Promise<void>
 }
 
 
@@ -206,7 +188,7 @@ const Results: React.FC<AuthProps> = (props) => {
                 <Dropdown
                   componentRef={dropdownRef}
                   placeholder={gamesLoaded ? ( games.length > 0 ? "Select a game" : "No games found") : "please, wait..."}
-                  label="Select a Game for Which You Want To See The Analysis"
+                  label="Select a Game for Which You Want To See The Results"
                   options={gamesList}
                   required
                   styles={dropdownStyles}

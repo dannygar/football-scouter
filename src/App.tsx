@@ -15,14 +15,22 @@ import Stats from './Components/Stats';
 import Results from './Components/Results';
 import { isMaster } from './API/MasterAPI';
 import { Agent } from './Models/Agent';
+import Standings from './Components/Standings';
+import Rules from './Components/Rules';
 
 // Initialize icons in case this page uses them
 initializeIcons();
+
+export type AuthProps = {
+  user: Agent
+  authenticate: () => Promise<void>
+}
 
 const App: React.FC = () => {
   const currentMenu = useMenu()
   const [isInitialized, setInitialized] = useState(false)
   const [user, setUser] = useState<Agent | null>(null)
+  const [numOfGames, setNumOfGames] = useState<number>(0)
 
   // Authenticate user
   const authenticate = async (): Promise<void> => {
@@ -45,6 +53,8 @@ const App: React.FC = () => {
     console.log("Component Did Mount")
     try {
       authenticate()
+      const numOfGames = Number.parseInt(process.env.REACT_APP_STANDINGS_GAMES as string)
+      setNumOfGames(Number.isInteger(numOfGames) ? numOfGames : 0)
     } catch (error) {
       alert("Failed to authenticate the current user")
     }
@@ -60,6 +70,8 @@ const App: React.FC = () => {
               <Route path="/dashboard" children={<Dashboard user={user as Agent} authenticate={authenticate} />} />
               <Route path="/stats" children={<Stats user={user as Agent}  authenticate={authenticate} />} />
               <Route path="/results" children={<Results user={user as Agent}  authenticate={authenticate} />} />
+              <Route path="/standings" children={<Standings user={user as Agent}  authenticate={authenticate} numOfGames={numOfGames} />} />
+              <Route path="/rules" children={<Rules user={user as Agent}  authenticate={authenticate} />} />
               <Route path="/games" children={<Games user={user as Agent}  authenticate={authenticate} />} />
               <Redirect from="*" to="/dashboard" />
             </Switch>

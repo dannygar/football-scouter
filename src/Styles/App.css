@@ -11,7 +11,8 @@ body {
     -moz-osx-font-smoothing: grayscale;
     color: #fff;
     /* background: #333; */
-    background-image: url('https://wallpapercave.com/wp/wc1689557.jpg');
+    /* background-image: url('https://wallpapercave.com/wp/wc1689557.jpg'); */
+    background-image: url('/src/Images/football.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     background-blend-mode: multiply;
@@ -96,6 +97,19 @@ body {
   justify-content: space-between;
   align-items: center;
   background: #444;
+  margin-bottom: 1rem;
+  margin-left: 0vh;
+  border-bottom: 1px solid #333333;
+  color: #fff;
+}
+
+.Rules {
+  justify-content: space-between;
+  align-items: center;
+  font-style: italic;
+  font-size: x-large;
+  background: #444;
+  padding-left: 2em;
   margin-bottom: 1rem;
   margin-left: 0vh;
   border-bottom: 1px solid #333333;
@@ -218,3 +232,14 @@ body {
   padding: 0;
 }
 
+.list-content ul li{
+  list-style-Type: none;
+  padding: 0 0 4px 23px;
+  margin-left: 2em;
+  background: url(https://www.computerhope.com/cdn/arrow.png) no-repeat left center;
+}
+
+.list-subcontent ul li {
+  list-style-Type: lower-alpha;
+  padding-bottom: 0;
+}

@@ -114,7 +114,11 @@ const StatsTable: React.FC<ScoreItemProps> = (props) => {
       // Set each other row's background a bit lighter
       const customStyles: Partial<IDetailsRowStyles> = {}
       if (props) {
-        if (props.itemIndex % 2 === 0) {
+        const currentItem = props.item as IEventModel
+        if (currentItem.isMaster) {
+          customStyles.root = { backgroundColor: theme.palette.accent }
+        }
+        else if (props.itemIndex % 2 === 0) {
           // Every other row renders with a different background color
           customStyles.root = { backgroundColor: theme.palette.themeLighterAlt }
         }
@@ -193,17 +197,18 @@ const StatsTable: React.FC<ScoreItemProps> = (props) => {
       <div data-is-scrollable={true}>
 
         <Fabric className="Table">
+          {props.goldenCircle !== null &&
           <CommandBar
             styles={commandBarStyles}
             items={getCommandItems()}
             farItems={[{ key: 'state', text: `${stateMessage ?? ''}` }]}
-          />
+          />}
 
           <DetailsList
               items={items}
               compact={false}
               columns={columns}
-              selectionMode={SelectionMode.multiple}
+              selectionMode={props.goldenCircle !== null ? SelectionMode.multiple : SelectionMode.none}
               selection={selection}
               selectionPreservedOnEmptyClick={true}
               setKey="multiple"

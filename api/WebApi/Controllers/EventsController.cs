@@ -54,7 +54,9 @@ namespace ScouterApi.Controllers
                 {
                     //Check if the item is already exist, and then replace it
                     var eventData = await db.GetItemsAsync(
-                        $"SELECT * FROM c WHERE c.gameId = '{id}' and c.isMaster = false");
+                        $"SELECT * FROM c WHERE c.gameId = '{id}'");
+                    //var eventData = await db.GetItemsAsync(
+                    //    $"SELECT * FROM c WHERE c.gameId = '{id}' and c.isMaster = false");
                     var gameEvents = _mapper.Map<Scouter.Data.EventModelDTO[], IEnumerable<ScouterApi.Models.EventModel>>(eventData.ToArray());
                     return gameEvents;
                 }

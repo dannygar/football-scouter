@@ -11,15 +11,10 @@ import Navigation from '../Components/Navigation'
 import { IGame } from '../Models/GameModel';
 import AddGame from './AddGame';
 import GameTable from './GameTable';
-import { Agent } from '../Models/Agent'
+import { AuthProps } from '../App'
 
 const signIcon: IIconProps = { iconName: 'SignIn' };
 const stackTokens: IStackTokens = { childrenGap: 20 };
-
-type AuthProps = {
-  user: Agent
-  authenticate: () => Promise<void>
-}
 
 const Games: React.FC<AuthProps> = (props) => {
   const [games, setGames] = useState<IGame[]>([])

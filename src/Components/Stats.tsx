@@ -118,7 +118,6 @@ const Stats: React.FC<AuthProps> = (props) => {
         return true
       }
       fetchGames()
-      // setInitialized(true)
     } catch (error) {
       setStatusMsg("Failed to retrieve the list of games")
     }
@@ -129,8 +128,6 @@ const Stats: React.FC<AuthProps> = (props) => {
     console.log(isInitialized? 'isInitialized is true' : 'isInitialized is false')
     const changeGameStatsHandler = async (gameId: string): Promise<void> => {
       try {
-        // setInitialized(true)
-
         if (isChartChanged) {
           console.log(`retrieving game stats for ${goldenCircle?.agentIds.length} scores`)
           const stats = await getGameStats(gameId, goldenCircle?.agentIds as string[])
@@ -192,16 +189,26 @@ const Stats: React.FC<AuthProps> = (props) => {
       const fetchScores = async (gameId: string): Promise<void> => {
         try {
           // get game's all events
-          const gameEvents = await getGameEvents(gameId)
+          const gameAllEvents = await getGameEvents(gameId)
+          // filter the master record out if this is the master's view
+          const gameEvents = (props.user.isMaster) ? gameAllEvents.filter(g => g.isMaster === false) : gameAllEvents
           setGameEvents(gameEvents)
           setInitialized(false)
 
           // get game's stats
           let agentKeys: string[] = []
-          const goldenCircle = await getGoldCircle(gameId)
-          if (goldenCircle !== null) {
-            agentKeys = goldenCircle.agentIds
-            setGoldenCircle(goldenCircle)
+          if (props.user.isMaster) {
+            const goldenCircle = await getGoldCircle(gameId)
+            if (goldenCircle !== null) {
+              agentKeys = goldenCircle.agentIds
+              setGoldenCircle(goldenCircle)
+            }
+            else {
+              gameEvents.map(gameEvent => {
+                agentKeys.push(gameEvent.account)
+                return agentKeys
+              }) 
+            }
           }
           else {
             gameEvents.map(gameEvent => {

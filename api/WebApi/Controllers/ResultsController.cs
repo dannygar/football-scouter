@@ -95,5 +95,71 @@ namespace ScouterApi.Controllers
             }
         }
 
+
+        [HttpGet("standings")]
+        [ValidateModelState]
+        [SwaggerOperation("results")]
+        [SwaggerResponse(statusCode: 200, type: typeof(IEnumerable<StandingModel>), description: "The Current Standing for the specified number of weeks (games)")]
+        public async Task<IEnumerable<StandingModel>> GetStandingTableAsync([FromQuery] int numOfGames)
+        {
+            const string partitionKey = "/gameId";
+            var standings = new List<StandingModel>();
+            IEnumerable<IGame> lastGames = null;
+
+            try
+            {
+                using (var db = new CosmosUtil<IGame>("games", partitionKey: "/id"))
+                {
+                    // Return all games
+                    var allGames = await db.GetItemsAsync("SELECT * FROM c");
+
+                    // Take only the last numOfGames
+                    lastGames = (numOfGames > 0) ? allGames.TakeLast(numOfGames) : allGames;
+                }
+
+                using (var db = new CosmosUtil<ResultsModel>("results", partitionKey: partitionKey))
+                {
+                    //Check if the item is already exist, and then replace it
+                    var allResults = await db.GetItemsAsync($"SELECT * FROM c");
+
+                    // Obtain the results for only the last # of games
+                    List<ResultsModel> lastResults = (from result in allResults
+                                                      let gameResult = lastGames.Where(g => g.Id.ToString() == result.GameId).FirstOrDefault()
+                                                      where gameResult != null
+                                                      select result).ToList();
+
+                    // Generate the current standing based on the last # of game results
+                    foreach (var result in lastResults)
+                    {
+                        var standing = standings.Where(s => s.AgentId == result.AgentId).FirstOrDefault();
+                        if (standing != null)
+                        {
+                            standing.Score += result.Score;
+                        }
+                        else
+                        {
+                            standings.Add(new StandingModel
+                            {
+                                Id = Guid.NewGuid(),
+                                UpdatedOn = DateTime.UtcNow.ToString(),
+                                AgentId = result.AgentId,
+                                DisplayName = result.DisplayName,
+                                Score = result.Score
+                            });
+                        }
+                    }
+
+                    return standings.OrderByDescending(s => s.Score);
+                }
+            }
+            catch (Exception e)
+            {
+                LogUtil.LogError(this._logger, e.Message, nameof(this.GetStandingTableAsync));
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+
     }
 }

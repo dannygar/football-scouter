@@ -61,9 +61,9 @@ const links = [
             }
         },
         {
-            name: 'Standing',
-            key: 'stand',
-            url: '/standing',
+            name: 'Standings',
+            key: 'standings',
+            url: '/standings',
             iconProps: {
                 iconName: 'PeopleAlert',
                 styles: {

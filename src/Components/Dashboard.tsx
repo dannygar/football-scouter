@@ -17,18 +17,12 @@ import { IGame } from '../Models/GameModel';
 // import { useMenu } from '../NavBar/NavBar.Hook'
 // import { NIL } from 'uuid';
 import { getGames } from '../API/GameAPI';
-import { Agent } from '../Models/Agent';
+import { AuthProps } from '../App';
 
 const dropdownStyles = { dropdown: { width: 500 }, label: { color: 'Blue' } };
 const signIcon: IIconProps = { iconName: 'SignIn' };
 const stackTokens: IStackTokens = { childrenGap: 20 };
 const dropdownRef = React.createRef<IDropdown>();
-
-
-type AuthProps = {
-  user: Agent
-  authenticate: () => Promise<void>
-}
 
 const Dashboard: React.FC<AuthProps> = (props) => {
   const [selectedGame, setSelectedGame] = useState<IGame>()
