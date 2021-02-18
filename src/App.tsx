@@ -54,9 +54,13 @@ const App: React.FC = () => {
         setInitialized(true)
       }
     } catch (error) {
-      if (error.response.status === 401) {
-        alert('Access is denied. Please check with your admin and try again.')
-      } else {
+      try {
+        if (error.response.status === 401) {
+          alert('Access is denied. Please check with your admin and try again.')
+        } else {
+          alert (`Failed to authenticate. Error: ${error.message}`)      
+        }
+      } catch (error) {
         alert (`Failed to authenticate. Error: ${error.message}`)      
       }
       authProvider.logout()

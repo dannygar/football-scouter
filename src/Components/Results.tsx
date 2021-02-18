@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from 'react'
-import { Dropdown, Text, IDropdown, IStackTokens, Stack, IDropdownOption, ActionButton, IIconProps } from '@fluentui/react'
+import { Dropdown, Text, IDropdown, IStackTokens, Stack, IDropdownOption, ActionButton, IIconProps, Spinner } from '@fluentui/react'
 import '../Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
 import { authContext, authProvider } from '../Auth/AuthProvider'
@@ -188,6 +188,7 @@ const Results: React.FC = () => {
                 />
               </Stack.Item>
             </Stack>
+            {gamesLoaded && !isInitialized && <Spinner label="Please, wait. Loading..." />}
             {isInitialized && <Stack verticalAlign="stretch">
               <Stack.Item align="auto">
                 <main className='chart'>

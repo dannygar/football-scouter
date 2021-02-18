@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from 'react'
-import { Text, IStackTokens, Stack, ActionButton, IIconProps } from '@fluentui/react'
+import { Text, IStackTokens, Stack, ActionButton, IIconProps, Spinner } from '@fluentui/react'
 import '../Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
 import { authContext, authProvider } from '../Auth/AuthProvider'
@@ -92,6 +92,7 @@ const Standings: React.FC<StandingProps> = (props) => {
               <ActionButton className="button" text={authUserContext.authUser.isSigned ? 'Sign Out' : 'Sign In'} 
               iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={authUserContext.onSignInOutClicked} />
             </Stack.Item>
+            {!isInitialized && <Spinner label="Please, wait. Loading..." />}
             {isInitialized && <Stack verticalAlign="stretch">
               <Stack.Item align="auto">
                 <main className='chart'>
