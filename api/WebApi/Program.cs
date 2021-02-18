@@ -30,7 +30,7 @@ namespace ScouterApi
                     // add built-in providers manually, as needed
                     logging.AddConsole();
                     logging.AddDebug();
-                    logging.AddEventLog();
+                    // logging.AddEventLog();
                     logging.AddEventSourceLogger();
                 })
                 .ConfigureAppConfiguration((hostingContext, config) =>

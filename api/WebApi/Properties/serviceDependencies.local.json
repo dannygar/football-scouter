@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "appInsights1": {
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/microsoft.insights/components/footballscouterapi",
+      "type": "appInsights.azure",
+      "connectionId": "APPINSIGHTS_CONNECTIONSTRING",
+      "secretStore": "LocalSecretsFile"
+    },
+    "cosmosdb1": {
+      "type": "cosmosdb.azure",
+      "connectionId": "CosmosDb",
+      "secretStore": null
+    }
+  }
+}

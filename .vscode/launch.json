@@ -31,12 +31,10 @@
         "type": "coreclr",
         "request": "launch",
         "preLaunchTask": "build",
-        // If you have changed target frameworks, make sure to update the program path.
         "program": "${workspaceFolder}/bin/Debug/netcoreapp2.1/Microsoft.Teams.App.VirtualConsult.dll",
         "args": [],
         "cwd": "${workspaceFolder}",
         "stopAtEntry": false,
-        // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
         "serverReadyAction": {
             "action": "openExternally",
             "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
@@ -66,7 +64,14 @@
         "request": "attach",
         "name": "Front-end Attach to Chrome",
         "port": 9222,
-        "webRoot": "${workspaceFolder}",
+        "webRoot": "${workspaceFolder}"
+    },
+    {
+        "name": "Docker Node.js Launch",
+        "type": "docker",
+        "request": "launch",
+        "preLaunchTask": "docker-run: debug",
+        "platform": "node"
     }
-    ]
+]
 }

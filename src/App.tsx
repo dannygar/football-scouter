@@ -61,7 +61,7 @@ const App: React.FC = () => {
           alert (`Failed to authenticate. Error: ${error.message}`)      
         }
       } catch (error) {
-        alert (`Failed to authenticate. Error: ${error.message}`)      
+        alert (`Failed to authenticate. Check that API is up and running and try again.`)      
       }
       authProvider.logout()
     }

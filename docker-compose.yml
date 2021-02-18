@@ -1,0 +1,13 @@
+version: '3.4'
+
+services:
+  footballscouter:
+    image: football-scouter-image
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+      HTTPS: 'true'
+    ports:
+      - 3001:3001

@@ -114,6 +114,7 @@ namespace ScouterApi
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
+            services.AddApplicationInsightsTelemetry(settings.ApplicationInsights.InstrumentationKey);
 
         }
 
