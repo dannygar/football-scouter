@@ -1,0 +1,16 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+scouterweb:
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: traefik 
+    hosts:
+      - dev.scouterweb.<REPLACE_ME_WITH_HOST_SUFFIX>  # Assumes deployment to the 'dev' namespace
+
+scouterapi:
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: traefik 
+    hosts:
+      - dev.scouterapi.<REPLACE_ME_WITH_HOST_SUFFIX>  # Assumes deployment to the 'dev' namespace

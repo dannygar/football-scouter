@@ -1,11 +1,14 @@
-# Default values for scouterapi.
+# Default values for scouterweb.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-fullnameOverride: scouterapi
+
+apiName: scouterapi
+
+fullnameOverride: scouterweb
 replicaCount: 1
 image:
-  repository: scouterapi
-  tag: stable
+  repository: footscouter.azurecr.io/scouterweb
+  tag: v1
   pullPolicy: IfNotPresent
 imagePullSecrets: []
   # Optionally specify an array of imagePullSecrets.
@@ -25,12 +28,12 @@ probes:
   enabled: false
 
 ingress:
-  enabled: false
-  annotations: {}
-    # kubernetes.io/tls-acme: "true"
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: traefik
   path: /
-  # hosts:
-  #   - chart-example.local
+  hosts:
+  - dev.scouterweb.<REPLACE_ME_WITH_HOST_SUFFIX>
   tls: []
     # - secretName: chart-example-tls
     #   hosts:

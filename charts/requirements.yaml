@@ -1,0 +1,7 @@
+dependencies:
+  - name: scouterweb
+    version: 0.1.0
+    repository: "file://../src/charts/scouterweb"
+  - name: scouterapi
+    version: 0.1.0
+    repository: "file://../api/charts/scouterapi"
