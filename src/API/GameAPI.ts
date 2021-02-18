@@ -1,13 +1,19 @@
 import { v4 as uuid } from 'uuid'
-import axios, { AxiosResponse } from 'axios'
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import { IGame } from '../Models/GameModel'
 
 const baseUrl: string = `${process.env.REACT_APP_API_URL}/api/games`
 
-export const getGames = async (): Promise<IGame[]> => {
+export const getGames = async (token: string): Promise<IGame[]> => {
   try {
     const apiUrl = baseUrl
-    const response: AxiosResponse<IGame[]> = await axios.get(apiUrl)
+    const config: AxiosRequestConfig = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+
+    const response: AxiosResponse<IGame[]> = await axios.get(apiUrl, config)
     return (response.status === 200)? response.data : []
   } catch (error) {
     return []

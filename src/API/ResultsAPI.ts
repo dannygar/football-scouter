@@ -1,32 +1,50 @@
-import axios, { AxiosResponse } from 'axios'
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import { IResultsModel, IStandingsModel } from '../Models/ResultsModel'
 
 const baseUrl: string = `${process.env.REACT_APP_API_URL}/api/results`
 
-export const getGameResults = async (gameId: string): Promise<IResultsModel[]> => {
+export const getGameResults = async (gameId: string, token: string): Promise<IResultsModel[]> => {
   try {
     const apiUrl = `${baseUrl}?id=${gameId}`
-    const response: AxiosResponse<IResultsModel[]> = await axios.get(apiUrl)
+    const config: AxiosRequestConfig = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+
+    const response: AxiosResponse<IResultsModel[]> = await axios.get(apiUrl, config)
     return (response.status === 200)? response.data : []
   } catch (error) {
     throw error
   }
 }
 
-export const calculateGameResults = async (gameId: string): Promise<IResultsModel[]> => {
+export const calculateGameResults = async (gameId: string, token: string): Promise<IResultsModel[]> => {
   try {
     const apiUrl = `${baseUrl}/calculate?id=${gameId}`
-    const response: AxiosResponse<IResultsModel[]> = await axios.get(apiUrl)
+    const config: AxiosRequestConfig = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+
+    const response: AxiosResponse<IResultsModel[]> = await axios.get(apiUrl, config)
     return (response.status === 200)? response.data : []
   } catch (error) {
     throw error
   }
 }
 
-export const getCurrentStandings = async (numOfGames: number): Promise<IStandingsModel[]> => {
+export const getCurrentStandings = async (numOfGames: number, token: string): Promise<IStandingsModel[]> => {
   try {
     const apiUrl = `${baseUrl}/standings?numOfGames=${numOfGames}`
-    const response: AxiosResponse<IStandingsModel[]> = await axios.get(apiUrl)
+    const config: AxiosRequestConfig = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+
+    const response: AxiosResponse<IStandingsModel[]> = await axios.get(apiUrl, config)
     return (response.status === 200)? response.data : []
   } catch (error) {
     throw error

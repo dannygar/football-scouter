@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 import { initializeIcons } from '@fluentui/react';
 import './Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
-import { authProvider } from './Auth/AuthProvider'
-import { AccessTokenResponse } from 'react-aad-msal'
+import { authProvider, authContext } from './Auth/AuthProvider'
 
 // Global context
 import { navBarContext } from './NavBar/NavBar.Context'
@@ -32,20 +31,35 @@ const App: React.FC = () => {
   const [user, setUser] = useState<Agent | null>(null)
   const [numOfGames, setNumOfGames] = useState<number>(0)
 
+  // Set Auth Context
+  const authContextProvider = useContext(authContext)
+
   // Authenticate user
   const authenticate = async (): Promise<void> => {
-    const accessTokenResponse = await authProvider.getAccessToken()
-    const userInfo = authProvider.getAccountInfo()
-    if (userInfo !== null) {
-      setUser({
-        id: userInfo.account.accountIdentifier as string,
-        userName: userInfo.account.userName,
-        displayName: userInfo.account.name,
-        token: accessTokenResponse.accessToken,
-        isMaster: await isMaster(userInfo.account.accountIdentifier as string),
-        isSigned: (userInfo.account.userName && userInfo.account.userName.length > 0) ? true : false
-      })
-      setInitialized(true)
+    try {
+      const accessTokenResponse = await authProvider.getAccessToken()
+      const userInfo = authProvider.getAccountInfo()
+      if (userInfo !== null) {
+        // Set Auth User
+        authContextProvider.authUser = {
+          id: userInfo.account.accountIdentifier as string,
+          userName: userInfo.account.userName,
+          displayName: userInfo.account.name,
+          token: accessTokenResponse.accessToken,
+          isMaster: await isMaster(userInfo.account.accountIdentifier as string, accessTokenResponse.accessToken),
+          isSigned: (userInfo.account.userName && userInfo.account.userName.length > 0) ? true : false,
+        }
+
+        //setUser(authUser)
+        setInitialized(true)
+      }
+    } catch (error) {
+      if (error.response.status === 401) {
+        alert('Access is denied. Please check with your admin and try again.')
+      } else {
+        alert (`Failed to authenticate. Error: ${error.message}`)      
+      }
+      authProvider.logout()
     }
   }
   
@@ -60,22 +74,34 @@ const App: React.FC = () => {
     }
   }, [isInitialized])
 
+  authContextProvider.onSignInOutClicked = (): void => {
+    if (authContextProvider.authUser.isSigned) {
+      authProvider.logout()
+      authContextProvider.authUser.isSigned = false
+    } else {
+      authProvider.login()
+      authenticate()
+    }
+  }  
 
   return (
     <div className="ms-Grid" dir="ltr">
       {isInitialized && 
       <navBarContext.Provider value={currentMenu}>
-        <Router>
-            <Switch>
-              <Route path="/dashboard" children={<Dashboard user={user as Agent} authenticate={authenticate} />} />
-              <Route path="/stats" children={<Stats user={user as Agent}  authenticate={authenticate} />} />
-              <Route path="/results" children={<Results user={user as Agent}  authenticate={authenticate} />} />
-              <Route path="/standings" children={<Standings user={user as Agent}  authenticate={authenticate} numOfGames={numOfGames} />} />
-              <Route path="/rules" children={<Rules user={user as Agent}  authenticate={authenticate} />} />
-              <Route path="/games" children={<Games user={user as Agent}  authenticate={authenticate} />} />
-              <Redirect from="*" to="/dashboard" />
-            </Switch>
-        </Router>
+        <authContext.Provider value={authContextProvider}>
+          <Router>
+              <Switch>
+                <Route path="/dashboard" children={<Dashboard />} />
+                {/* <Route path="/dashboard" children={<Dashboard user={user as Agent} authenticate={authenticate} />} /> */}
+                <Route path="/stats" children={<Stats />} />
+                <Route path="/results" children={<Results />} />
+                <Route path="/standings" children={<Standings numOfGames={numOfGames} />} />
+                <Route path="/rules" children={<Rules />} />
+                <Route path="/games" children={<Games />} />
+                <Redirect from="*" to="/dashboard" />
+              </Switch>
+          </Router>
+        </authContext.Provider>
       </navBarContext.Provider>
       }
     </div>

@@ -1,37 +1,24 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React from 'react'
+import React, { useContext } from 'react'
 import { Text, IStackTokens, Stack, ActionButton, IIconProps, VerticalDivider } from '@fluentui/react'
 import '../Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
-import { authProvider } from '../Auth/AuthProvider'
+import { authContext, authProvider } from '../Auth/AuthProvider'
 import Navigation from './Navigation'
 
 // Global context
 // import { navBarContext } from '../NavBar/NavBar.Context'
 // import { useMenu } from '../NavBar/NavBar.Hook'
 // import { NIL } from 'uuid';
-import { AuthProps } from '../App';
 
 const stackTokens: IStackTokens = { childrenGap: 20 };
 const signIcon: IIconProps = { iconName: 'SignIn' };
 
-const Rules: React.FC<AuthProps> = (props) => {
+const Rules: React.FC = () => {
+
+  // Get Auth Context
+  const authUserContext = useContext(authContext)
   
-  const onSignInOutClicked = (): void => {
-    if (props.user.isSigned) {
-      authProvider.logout()
-      props.user.isSigned = false
-    } else {
-      authProvider.login()
-      props.authenticate()
-    }
-  }
-
-  const createItems = (): any[] | undefined => {
-    return ['Item1', 'Item2'] as any[]
-  }
-
-
   return (
     <div className="ms-Grid" dir="ltr">
         <div className="ms-Grid-row">
@@ -40,8 +27,9 @@ const Rules: React.FC<AuthProps> = (props) => {
           </div>
           <Stack tokens={stackTokens} verticalAlign="end">
             <Stack.Item align="end">
-              <Text className="Header">{props.user.displayName ?? 'Anonymous'}</Text>
-              <ActionButton className="button" text={props.user.isSigned ? 'Sign Out' : 'Sign In'} iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={onSignInOutClicked} />
+              <Text className="Header">{authUserContext.authUser.displayName ?? 'Anonymous'}</Text>
+              <ActionButton className="button" text={authUserContext.authUser.isSigned ? 'Sign Out' : 'Sign In'} 
+              iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={authUserContext.onSignInOutClicked} />
             </Stack.Item>
             <Stack verticalAlign="stretch">
               <Text variant={'xxLarge'} block>
@@ -85,15 +73,11 @@ const Rules: React.FC<AuthProps> = (props) => {
                     <li>And the error is a consequence of below expected skill execution (relative to English Premier League)</li>
                   </ul>
                 </li>
-                <li>Run
+                <li>Run - A player makes a skillful, well timed, or motivated run to:
                   <ul className="list-subcontent">
-                    <li>A player makes a skillful, well timed, or motivated run to
-                      <ul className="list-subcontent">
-                        <li>Give a team mate an option AND receive a pass</li>
-                        <li>Give a team mate an option AND drag an opposition player out of position</li>
-                        <li>Intercept a pass</li>
-                      </ul>
-                    </li>
+                    <li>Give a team mate an option AND receive a pass</li>
+                    <li>Give a team mate an option AND drag an opposition player out of position</li>
+                    <li>Intercept a pass</li>
                   </ul>
                 </li>
                 </ul>

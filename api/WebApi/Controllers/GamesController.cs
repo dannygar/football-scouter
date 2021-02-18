@@ -18,7 +18,7 @@ namespace ScouterApi.Controllers
     /// <summary>
     /// Scouter Controller
     /// </summary>
-    ///[Authorize]
+    [Authorize]
     [Route(HttpRouteConstants.GameRoutePrefix)]
     [ApiController]
     public class GamesController : ControllerBase

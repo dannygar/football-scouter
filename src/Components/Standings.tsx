@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Text, IStackTokens, Stack, ActionButton, IIconProps } from '@fluentui/react'
 import '../Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
-import { authProvider } from '../Auth/AuthProvider'
+import { authContext, authProvider } from '../Auth/AuthProvider'
 import { Bar } from '@reactchartjs/react-chart.js'
 import Navigation from './Navigation'
 
@@ -12,12 +12,11 @@ import Navigation from './Navigation'
 // import { useMenu } from '../NavBar/NavBar.Hook'
 // import { NIL } from 'uuid';
 import { getCurrentStandings } from '../API/ResultsAPI';
-import { AuthProps } from '../App';
 
 const stackTokens: IStackTokens = { childrenGap: 20 };
 const signIcon: IIconProps = { iconName: 'SignIn' };
 
-interface StandingProps extends AuthProps {
+interface StandingProps {
   numOfGames: number
 }
 
@@ -27,13 +26,16 @@ const Standings: React.FC<StandingProps> = (props) => {
   const [statusMsg, setStatusMsg] = useState<string>('')
   const [chartScores, setChartScores] = useState({})
   
+  // Get Auth Context
+  const authUserContext = useContext(authContext)
+
   useEffect(() => {
     console.log("Component Did Mount")
     try {
       const getStandings = async (numOfGames: number): Promise<void> => {
         try {
           // get standing results
-          const currentStandings = await getCurrentStandings(numOfGames)
+          const currentStandings = await getCurrentStandings(numOfGames, authUserContext.authUser.token)
 
           if (currentStandings) {
             const chartScores = {
@@ -78,19 +80,6 @@ const Standings: React.FC<StandingProps> = (props) => {
     },
   }
 
-
-  const onSignInOutClicked = (): void => {
-    if (props.user.isSigned) {
-      authProvider.logout()
-      props.user.isSigned = false
-    } else {
-      authProvider.login()
-      props.authenticate()
-    }
-  }
-
-
-
   return (
     <div className="ms-Grid" dir="ltr">
         <div className="ms-Grid-row">
@@ -99,8 +88,9 @@ const Standings: React.FC<StandingProps> = (props) => {
           </div>
           <Stack tokens={stackTokens} verticalAlign="end">
             <Stack.Item align="end">
-              <Text className="Header">{props.user.displayName ?? 'Anonymous'}</Text>
-              <ActionButton className="button" text={props.user.isSigned ? 'Sign Out' : 'Sign In'} iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={onSignInOutClicked} />
+              <Text className="Header">{authUserContext.authUser.displayName ?? 'Anonymous'}</Text>
+              <ActionButton className="button" text={authUserContext.authUser.isSigned ? 'Sign Out' : 'Sign In'} 
+              iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={authUserContext.onSignInOutClicked} />
             </Stack.Item>
             {isInitialized && <Stack verticalAlign="stretch">
               <Stack.Item align="auto">

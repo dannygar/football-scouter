@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Dropdown, Text, IDropdown, IStackTokens, Stack, IDropdownOption, ActionButton, IIconProps } from '@fluentui/react'
 import '../Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
-import { authProvider } from '../Auth/AuthProvider'
+import { authContext, authProvider } from '../Auth/AuthProvider'
 import { Bar } from '@reactchartjs/react-chart.js'
 
 import Navigation from './Navigation'
@@ -57,7 +57,7 @@ const chartScoresOptions = {
 }
 
 
-const Results: React.FC<AuthProps> = (props) => {
+const Results: React.FC = () => {
   const [games, setGames] = useState<IGame[]>([])
   const [gamesList, setGamesList] = useState<IDropdownOption[]>([])
   const [gamesLoaded, setGamesLoaded] = useState(false)
@@ -67,13 +67,16 @@ const Results: React.FC<AuthProps> = (props) => {
   const [chartMavericks, setChartMavericks] = useState({})
   const [chartScores, setChartScores] = useState({})
   
+  // Get Auth Context
+  const authUserContext = useContext(authContext)
+
   const dropdownRef = React.createRef<IDropdown>()
 
   useEffect(() => {
     console.log("Component Did Mount")
     try {
       const fetchGames = async (): Promise<boolean> => {
-        const retrievedGames = await getGames()
+        const retrievedGames = await getGames(authUserContext.authUser.token)
         if (retrievedGames.length === 0) {
           setStatusMsg("Failed to retrieve the list of games")
           return false
@@ -104,7 +107,7 @@ const Results: React.FC<AuthProps> = (props) => {
       const getResults = async (gameId: string): Promise<void> => {
         try {
           // get game's results
-          const gameResults = await getGameResults(gameId)
+          const gameResults = await getGameResults(gameId, authUserContext.authUser.token)
 
           if (gameResults) {
             const chartHits = {
@@ -160,18 +163,6 @@ const Results: React.FC<AuthProps> = (props) => {
     }
   }
 
-  const onSignInOutClicked = (): void => {
-    if (props.user.isSigned) {
-      authProvider.logout()
-      props.user.isSigned = false
-    } else {
-      authProvider.login()
-      props.authenticate()
-    }
-  }
-
-
-
   return (
     <div className="ms-Grid" dir="ltr">
         <div className="ms-Grid-row">
@@ -180,8 +171,9 @@ const Results: React.FC<AuthProps> = (props) => {
           </div>
           <Stack tokens={stackTokens} verticalAlign="end">
             <Stack.Item align="end">
-              <Text className="Header">{props.user.displayName ?? 'Anonymous'}</Text>
-              <ActionButton className="button" text={props.user.isSigned ? 'Sign Out' : 'Sign In'} iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={onSignInOutClicked} />
+              <Text className="Header">{authUserContext.authUser.displayName ?? 'Anonymous'}</Text>
+              <ActionButton className="button" text={authUserContext.authUser.isSigned ? 'Sign Out' : 'Sign In'} 
+              iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={authUserContext.onSignInOutClicked} />
             </Stack.Item>
             <Stack horizontalAlign="center">
               <Stack.Item align="auto">

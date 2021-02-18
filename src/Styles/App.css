@@ -243,3 +243,10 @@ body {
   list-style-Type: lower-alpha;
   padding-bottom: 0;
 }
+
+.list-numbered ol li{
+  list-style-Type: lower-alpha;
+  padding: 0 0 4px 23px;
+  margin-left: 2em;
+  padding-bottom: 0;
+}

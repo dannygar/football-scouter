@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Dropdown, Text, IDropdown, IStackTokens, Stack, IDropdownOption, ActionButton, IIconProps } from '@fluentui/react'
 import '../Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
-import { authProvider } from '../Auth/AuthProvider'
+import { authContext } from '../Auth/AuthProvider'
 import { Bar } from '@reactchartjs/react-chart.js'
 import { v4 as uuid } from 'uuid'
 import { Confirm } from 'react-st-modal'
@@ -25,16 +25,10 @@ import IConsensusModel from '../Models/ConsensusModel';
 import EventTable from './EventTable';
 import IGoldCircleModel from '../Models/GoldCircleModel';
 import { getGoldCircle, saveGoldCircle } from '../API/StatsAPI';
-import { Agent } from '../Models/Agent';
 
 const dropdownStyles = { dropdown: { width: 500 }, label: { color: 'Blue' } };
 const stackTokens: IStackTokens = { childrenGap: 20 };
 const signIcon: IIconProps = { iconName: 'SignIn' };
-
-type AuthProps = {
-  user: Agent
-  authenticate: () => Promise<void>
-}
 
 const chartOptions = {
   maintainAspectRatio: false,
@@ -49,7 +43,7 @@ const chartOptions = {
 }
 
 
-const Stats: React.FC<AuthProps> = (props) => {
+const Stats: React.FC = () => {
   const [selectedGame, setSelectedGame] = useState<IGame>()
   const [games, setGames] = useState<IGame[]>([])
   const [gamesList, setGamesList] = useState<IDropdownOption[]>([])
@@ -65,6 +59,9 @@ const Stats: React.FC<AuthProps> = (props) => {
   const [toggled, setToggled] = useState(false)
   
   const dropdownRef = React.createRef<IDropdown>()
+
+  // Get Auth Context
+  const authUserContext = useContext(authContext)
 
   const renderConsensusResults = async (consensus: IConsensusModel[]): Promise<void> => {
     console.log("Rendering Consensus results...")
@@ -98,7 +95,7 @@ const Stats: React.FC<AuthProps> = (props) => {
     console.log("Component Did Mount")
     try {
       const fetchGames = async (): Promise<boolean> => {
-        const retrievedGames = await getGames()
+        const retrievedGames = await getGames(authUserContext.authUser.token)
         if (retrievedGames.length === 0) {
           setStatusMsg("Failed to retrieve the list of games")
           return false
@@ -130,10 +127,10 @@ const Stats: React.FC<AuthProps> = (props) => {
       try {
         if (isChartChanged) {
           console.log(`retrieving game stats for ${goldenCircle?.agentIds.length} scores`)
-          const stats = await getGameStats(gameId, goldenCircle?.agentIds as string[])
+          const stats = await getGameStats(gameId, goldenCircle?.agentIds as string[], authUserContext.authUser.token)
           updateChart(stats)
           setChartChanged(false)
-          if (props.user.isMaster) await renderConsensusResults(stats)
+          if (authUserContext.authUser.isMaster) await renderConsensusResults(stats)
         }
       } catch (error) {
           if (error.response?.status !== 404)
@@ -189,16 +186,16 @@ const Stats: React.FC<AuthProps> = (props) => {
       const fetchScores = async (gameId: string): Promise<void> => {
         try {
           // get game's all events
-          const gameAllEvents = await getGameEvents(gameId)
+          const gameAllEvents = await getGameEvents(gameId, authUserContext.authUser.token)
           // filter the master record out if this is the master's view
-          const gameEvents = (props.user.isMaster) ? gameAllEvents.filter(g => g.isMaster === false) : gameAllEvents
+          const gameEvents = (authUserContext.authUser.isMaster) ? gameAllEvents.filter(g => g.isMaster === false) : gameAllEvents
           setGameEvents(gameEvents)
           setInitialized(false)
 
           // get game's stats
           let agentKeys: string[] = []
-          if (props.user.isMaster) {
-            const goldenCircle = await getGoldCircle(gameId)
+          if (authUserContext.authUser.isMaster) {
+            const goldenCircle = await getGoldCircle(gameId, authUserContext.authUser.token)
             if (goldenCircle !== null) {
               agentKeys = goldenCircle.agentIds
               setGoldenCircle(goldenCircle)
@@ -217,11 +214,11 @@ const Stats: React.FC<AuthProps> = (props) => {
             }) 
           }
 
-          const stats = await getGameStats(gameId, agentKeys)
+          const stats = await getGameStats(gameId, agentKeys, authUserContext.authUser.token)
           if (stats) {
-            if (props.user.isMaster) {
+            if (authUserContext.authUser.isMaster) {
               // Get consensus events
-              const retrievedEvents = await getEvents(gameId, props.user.id)
+              const retrievedEvents = await getEvents(gameId, authUserContext.authUser.id, authUserContext.authUser.token)
               if (retrievedEvents) {
                 const loadFromDb = await Confirm(
                   "Already saved significance events found. Load them instead?", 
@@ -271,16 +268,6 @@ const Stats: React.FC<AuthProps> = (props) => {
     console.log(`Selected: ${item?.text}`)
   }
 
-  const onSignInOutClicked = (): void => {
-    if (props.user.isSigned) {
-      authProvider.logout()
-      props.user.isSigned = false
-    } else {
-      authProvider.login()
-      props.authenticate()
-    }
-  }
-
   const handleSelectionChangedEvent = async (agentKeys: string[]):  Promise<void>  => {
     setGoldenCircle({id: uuid(), updatedOn: "", gameId: selectedGame?.id as string, agentIds: agentKeys})
     setChartChanged(true)
@@ -303,11 +290,17 @@ const Stats: React.FC<AuthProps> = (props) => {
     }
 
     // Save Gold Circle selection
-    return await saveGoldCircle(goldCircleSelection)
+    return await saveGoldCircle(goldCircleSelection, authUserContext.authUser.token)
   }
 
   const handleSaveConsensus = async (events: IEvent[]):  Promise<string>  => {
-    return await saveEvents(events, props.user.id as string, props.user.userName as string, (selectedGame as IGame).id, true)
+    return await saveEvents(
+      events, 
+      authUserContext.authUser.id as string, 
+      authUserContext.authUser.userName as string, 
+      (selectedGame as IGame).id, 
+      true,
+      authUserContext.authUser.token)
   }
 
   const handleDeleteEvent = (deletedItems: IEvent[]): void => {
@@ -324,8 +317,9 @@ const Stats: React.FC<AuthProps> = (props) => {
           </div>
           <Stack tokens={stackTokens} verticalAlign="end">
             <Stack.Item align="end">
-              <Text className="Header">{props.user.displayName ?? 'Anonymous'}</Text>
-              <ActionButton className="button" text={props.user.isSigned ? 'Sign Out' : 'Sign In'} iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={onSignInOutClicked} />
+              <Text className="Header">{authUserContext.authUser.displayName ?? 'Anonymous'}</Text>
+              <ActionButton className="button" text={authUserContext.authUser.isSigned ? 'Sign Out' : 'Sign In'} 
+                iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={authUserContext.onSignInOutClicked} />
             </Stack.Item>
             <Stack horizontalAlign="center">
               <Stack.Item align="auto">
@@ -356,7 +350,7 @@ const Stats: React.FC<AuthProps> = (props) => {
               </main>}
             </Stack.Item>
           </Stack>
-          {props.user.isMaster && 
+          {authUserContext.authUser.isMaster && 
             <Stack>
               <Stack.Item align="auto">
                 <Text block className="Title" variant='xxLarge'>IRR Game Challenge Significance Scores</Text>

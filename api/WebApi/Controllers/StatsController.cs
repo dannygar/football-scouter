@@ -19,7 +19,7 @@ namespace ScouterApi.Controllers
     /// <summary>
     /// Scouter Controller
     /// </summary>
-    ///[Authorize]
+    [Authorize]
     [Route(HttpRouteConstants.StatsRoutePrefix)]
     [ApiController]
     public class StatsController : ControllerBase

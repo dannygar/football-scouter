@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { IStackTokens, Stack, Text, ActionButton, IIconProps } from '@fluentui/react'
-import { authProvider } from '../Auth/AuthProvider'
+import { authContext } from '../Auth/AuthProvider'
 import '../Styles/App.css'
 import 'office-ui-fabric-react/dist/css/fabric.css'
 import { v4 as uuid } from 'uuid'
@@ -11,32 +11,24 @@ import Navigation from '../Components/Navigation'
 import { IGame } from '../Models/GameModel';
 import AddGame from './AddGame';
 import GameTable from './GameTable';
-import { AuthProps } from '../App'
 
 const signIcon: IIconProps = { iconName: 'SignIn' };
 const stackTokens: IStackTokens = { childrenGap: 20 };
 
-const Games: React.FC<AuthProps> = (props) => {
+const Games: React.FC = () => {
   const [games, setGames] = useState<IGame[]>([])
   const [newGame, setNewGame] = useState<IGame | null>(null)
   const [toggled, setToggled] = useState(false)
   const [statusMsg, setStatusMsg] = useState<string>('')
 
-  const onSignInOutClicked = (): void => {
-    if (props.user.isSigned) {
-      authProvider.logout()
-      props.user.isSigned = false
-    } else {
-      authProvider.login()
-      props.authenticate()
-    }
-  }
+  // Get Auth Context
+  const authUserContext = useContext(authContext)
 
   useEffect(() => {
     console.log("Did mount")
     try {
       const fetchGames = async (): Promise<void> => {
-        const retrievedGames = await getGames()
+        const retrievedGames = await getGames(authUserContext.authUser.token)
         setGames(retrievedGames)
       }
       fetchGames()
@@ -104,11 +96,12 @@ const Games: React.FC<AuthProps> = (props) => {
           </div>
           <Stack tokens={stackTokens} verticalAlign="end">
             <Stack.Item align="end">
-            <Text className="Header">{props.user.displayName ?? 'Anonymous'}</Text>
-              <ActionButton className="button" text={props.user.isSigned ? 'Sign Out' : 'Sign In'} iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={onSignInOutClicked} />
+            <Text className="Header">{authUserContext.authUser.displayName ?? 'Anonymous'}</Text>
+              <ActionButton className="button" text={authUserContext.authUser.isSigned ? 'Sign Out' : 'Sign In'} 
+              iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={authUserContext.onSignInOutClicked} />
             </Stack.Item>
 
-          {props.user.isMaster ? (
+          {authUserContext.authUser.isMaster ? (
             <Stack.Item align="auto">
               <main className='App'>
                 <AddGame addGame={handleAddGame} />
@@ -123,7 +116,7 @@ const Games: React.FC<AuthProps> = (props) => {
                   games={games} 
                   saveGames={handleSaveGames}
                   deleteItemsEvent={handleDeleteEvent}
-                  access={props.user.isMaster}
+                  access={authUserContext.authUser.isMaster}
                 />                  
               </main>}
             </Stack.Item>

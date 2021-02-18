@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Dropdown, Text, IDropdown, IStackTokens, Stack, IDropdownOption, ActionButton, IIconProps } from '@fluentui/react'
 import '../Styles/App.css';
 import 'office-ui-fabric-react/dist/css/fabric.css';
-import { authProvider } from '../Auth/AuthProvider'
+import { authContext } from '../Auth/AuthProvider'
 
 import { getEvents, addEvent, saveEvents } from '../API/EventAPI'
 import { IEvent } from '../Models/EventModel'
@@ -17,14 +17,13 @@ import { IGame } from '../Models/GameModel';
 // import { useMenu } from '../NavBar/NavBar.Hook'
 // import { NIL } from 'uuid';
 import { getGames } from '../API/GameAPI';
-import { AuthProps } from '../App';
 
 const dropdownStyles = { dropdown: { width: 500 }, label: { color: 'Blue' } };
 const signIcon: IIconProps = { iconName: 'SignIn' };
 const stackTokens: IStackTokens = { childrenGap: 20 };
 const dropdownRef = React.createRef<IDropdown>();
 
-const Dashboard: React.FC<AuthProps> = (props) => {
+const Dashboard: React.FC = () => {
   const [selectedGame, setSelectedGame] = useState<IGame>()
   const [games, setGames] = useState<IGame[]>([])
   const [gamesList, setGamesList] = useState<IDropdownOption[]>([])
@@ -34,11 +33,14 @@ const Dashboard: React.FC<AuthProps> = (props) => {
   const [eventsLoaded, setEventsLoaded] = useState(false)
   const [statusMsg, setStatusMsg] = useState<string>('')
 
+  // Get Auth Context
+  const authUserContext = useContext(authContext)
+
   useEffect(() => {
     console.log("Component Did Mount")
     try {
       const fetchGames = async (): Promise<void> => {
-        const retrievedGames = await getGames()
+        const retrievedGames = await getGames(authUserContext.authUser.token)
         if (retrievedGames.length === 0) {
           setStatusMsg("Failed to retrieve the list of games")
           return
@@ -90,7 +92,14 @@ const Dashboard: React.FC<AuthProps> = (props) => {
 
 
   const handleSaveEvent = async (events: IEvent[]):  Promise<string>  => {
-    return await saveEvents(events, props.user.id as string, props.user.userName as string, (selectedGame as IGame).id, false)
+    return await saveEvents(
+      events, 
+      authUserContext.authUser.id as string, 
+      authUserContext.authUser.userName as string, 
+      (selectedGame as IGame).id, 
+      false,
+      authUserContext.authUser.token)
+    // return await saveEvents(events, props.user.id as string, props.user.userName as string, (selectedGame as IGame).id, false)
   }
 
   const handleDeleteEvent = (deletedItems: IEvent[]): void => {
@@ -103,7 +112,8 @@ const Dashboard: React.FC<AuthProps> = (props) => {
       setSelectedGame(item.data)
       const fetchEvents = async (gameId: string): Promise<void> => {
         try {
-          const retrievedEvents = await getEvents(gameId, props.user.id)
+          const retrievedEvents = await getEvents(gameId, authUserContext.authUser.id, authUserContext.authUser.token)
+          // const retrievedEvents = await getEvents(gameId, props.user.id)
           if (retrievedEvents) {
             setEvents(retrievedEvents.events)
           } else {
@@ -122,16 +132,6 @@ const Dashboard: React.FC<AuthProps> = (props) => {
     console.log(`Selected: ${item?.text}`)
   }
 
-  const onSignInOutClicked = (): void => {
-    if (props.user.isSigned) {
-      authProvider.logout()
-      props.user.isSigned = false
-    } else {
-      authProvider.login()
-      props.authenticate()
-    }
-  }
-
   return (
     <div className="ms-Grid" dir="ltr">
         <div className="ms-Grid-row">
@@ -140,8 +140,10 @@ const Dashboard: React.FC<AuthProps> = (props) => {
           </div>
           <Stack tokens={stackTokens} verticalAlign="end">
             <Stack.Item align="end">
-              <Text className="Header">{props.user.displayName ?? 'Anonymous'}</Text>
-              <ActionButton className="button" text={props.user.isSigned ? 'Sign Out' : 'Sign In'} iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={onSignInOutClicked} />
+              <Text className="Header">{authUserContext.authUser.displayName ?? 'Anonymous'}</Text>
+              <ActionButton className="button" text={authUserContext.authUser.isSigned ? 'Sign Out' : 'Sign In'} iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={authUserContext.onSignInOutClicked} />
+              {/* <Text className="Header">{props.user.displayName ?? 'Anonymous'}</Text>
+              <ActionButton className="button" text={props.user.isSigned ? 'Sign Out' : 'Sign In'} iconProps={signIcon} allowDisabledFocus disabled={false} checked={false} onClick={onSignInOutClicked} /> */}
             </Stack.Item>
             <Stack horizontalAlign="center">
               <Stack.Item align="auto">

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Scouter.Common.Models;
@@ -18,7 +19,7 @@ namespace ScouterApi.Controllers
     /// <summary>
     /// Scouter Controller
     /// </summary>
-    ///[Authorize]
+    [Authorize]
     [Route(HttpRouteConstants.EventsRoutePrefix)]
     [ApiController]
     public class EventsController : ControllerBase

@@ -20,7 +20,7 @@ namespace ScouterApi.Controllers
     /// <summary>
     /// Scouter Controller
     /// </summary>
-    ///[Authorize]
+    [Authorize]
     [Route(HttpRouteConstants.ResultsRoutePrefix)]
     [ApiController]
     public class ResultsController : ControllerBase

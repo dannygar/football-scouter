@@ -95,6 +95,7 @@ namespace ScouterApi
                     {
                         settings.AzureAD.AppId,
                         $"api://{settings.AzureAD.AppId}",
+                        $"api://{settings.AzureAD.HostDomain}/{settings.AzureAD.AppId}",
                     },
                 };
             });

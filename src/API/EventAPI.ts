@@ -1,23 +1,34 @@
 import { v4 as uuid } from 'uuid'
-import axios, { AxiosResponse } from 'axios'
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import { IEventModel, IEvent, EventDataType } from '../Models/EventModel'
 
 const baseUrl: string = `${process.env.REACT_APP_API_URL}/api/events`
 
-export const getEvents = async (gameId: string, userId: string | undefined): Promise<IEventModel | null> => {
+export const getEvents = async (gameId: string, userId: string | undefined, token: string): Promise<IEventModel | null> => {
   try {
     const apiUrl = `${baseUrl}/game/account?id=${gameId}&account=${userId}`
-    const response: AxiosResponse<IEventModel> = await axios.get(apiUrl)
+    const config: AxiosRequestConfig = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+
+    const response: AxiosResponse<IEventModel> = await axios.get(apiUrl, config)
     return (response.status === 200)? response.data : null
   } catch (error) {
     throw error
   }
 }
 
-export const getGameEvents = async (gameId: string): Promise<IEventModel[]> => {
+export const getGameEvents = async (gameId: string, token: string): Promise<IEventModel[]> => {
   try {
     const apiUrl = `${baseUrl}/game/events?id=${gameId}`
-    const response: AxiosResponse<IEventModel[]> = await axios.get(apiUrl)
+    const config: AxiosRequestConfig = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+    const response: AxiosResponse<IEventModel[]> = await axios.get(apiUrl, config)
     return (response.status === 200)? response.data : []
   } catch (error) {
     throw error
@@ -60,7 +71,7 @@ export const addEvent = async (
 
 
 export const saveEvents = async (
-  events: IEvent[], account: string, email: string, gameId: string, isMaster: boolean
+  events: IEvent[], account: string, email: string, gameId: string, isMaster: boolean, token: string
 ): Promise<string> => {
   try {
     const apiUrl = `${baseUrl}/save`
@@ -73,9 +84,16 @@ export const saveEvents = async (
       isMaster: isMaster,
       events: events
     }
+    const config: AxiosRequestConfig = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+
     const response: AxiosResponse<boolean> = await axios.post(
       apiUrl,
-      scores
+      scores,
+      config
     )
     return response ? 'Saved' : 'Failed'
   } catch (error) {
@@ -85,11 +103,19 @@ export const saveEvents = async (
 
 
 export const deleteEvent = async (
-  _id: string
+  _id: string,
+  token: string
 ): Promise<AxiosResponse<EventDataType>> => {
   try {
+    const config: AxiosRequestConfig = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+
     const deletedEvent: AxiosResponse<EventDataType> = await axios.delete(
-      `${baseUrl}/delete-event/${_id}`
+      `${baseUrl}/delete-event/${_id}`, 
+      config
     )
     return deletedEvent
   } catch (error) {

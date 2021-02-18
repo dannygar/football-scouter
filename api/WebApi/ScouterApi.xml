@@ -214,10 +214,9 @@
             </summary>
         </member>
         <member name="T:ScouterApi.Controllers.EventsController">
-             <summary>
-             Scouter Controller
-             </summary>
-            [Authorize]
+            <summary>
+            Scouter Controller
+            </summary>
         </member>
         <member name="M:ScouterApi.Controllers.EventsController.GetGameEventsAsync(System.String)">
             <summary>Gets the game's events.</summary>
@@ -242,10 +241,9 @@
             <returns>Task&lt;System.Boolean&gt;.</returns>
         </member>
         <member name="T:ScouterApi.Controllers.GamesController">
-             <summary>
-             Scouter Controller
-             </summary>
-            [Authorize]
+            <summary>
+            Scouter Controller
+            </summary>
         </member>
         <member name="M:ScouterApi.Controllers.GamesController.PostAsync(System.Collections.Generic.IEnumerable{ScouterApi.Models.IGame})">
             <summary>Posts the specified event.</summary>
@@ -275,10 +273,9 @@
             <returns>Default content.</returns>
         </member>
         <member name="T:ScouterApi.Controllers.MastersController">
-             <summary>
-             Scouter Controller
-             </summary>
-            [Authorize]
+            <summary>
+            Scouter Controller
+            </summary>
         </member>
         <member name="M:ScouterApi.Controllers.MastersController.IsMasterAsync(System.String)">
             <summary>
@@ -288,16 +285,14 @@
             <returns></returns>
         </member>
         <member name="T:ScouterApi.Controllers.ResultsController">
-             <summary>
-             Scouter Controller
-             </summary>
-            [Authorize]
+            <summary>
+            Scouter Controller
+            </summary>
         </member>
         <member name="T:ScouterApi.Controllers.StatsController">
-             <summary>
-             Scouter Controller
-             </summary>
-            [Authorize]
+            <summary>
+            Scouter Controller
+            </summary>
         </member>
         <member name="M:ScouterApi.Controllers.StatsController.SaveGoldCirclePostAsync(ScouterApi.Models.GoldCircleModel)">
             <summary>Saves the Golden Circle.</summary>
