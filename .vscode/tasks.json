@@ -71,6 +71,17 @@
             "node": {
                 "enableDebugging": true
             }
+        },
+        {
+            "label": "bridge-to-kubernetes.service",
+            "type": "bridge-to-kubernetes.service",
+            "service": "scouterweb",
+            "ports": [
+                3001
+            ],
+            "targetCluster": "ScouterAKS",
+            "targetNamespace": "footballscouterapp",
+            "useKubernetesServiceEnvironmentVariables": false
         }
     ]
 }

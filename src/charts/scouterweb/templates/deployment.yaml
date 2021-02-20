@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "webapi.fullname" . }}
+  name: {{ template "scouterweb.fullname" . }}
   labels:
-    app: {{ template "webapi.name" . }}
-    chart: {{ template "webapi.chart" . }}
+    app: {{ template "scouterweb.name" . }}
+    chart: {{ template "scouterweb.chart" . }}
     draft: {{ .Values.draft | default "draft-app" }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -13,12 +13,12 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "webapi.name" . }}
+      app: {{ template "scouterweb.name" . }}
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "webapi.name" . }}
+        app: {{ template "scouterweb.name" . }}
         draft: {{ .Values.draft | default "draft-app" }}
         release: {{ .Release.Name }}
       annotations:
@@ -49,7 +49,7 @@ spec:
             - name: {{ $ref }}_{{ $key }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "webapi.fullname" $root }}-{{ $ref | lower }}
+                  name: {{ template "scouterweb.fullname" $root }}-{{ $ref | lower }}
                   key: {{ $key }}
             {{- end }}
             {{- end }}

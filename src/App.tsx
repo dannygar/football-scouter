@@ -16,6 +16,8 @@ import { isMaster } from './API/MasterAPI';
 import { Agent } from './Models/Agent';
 import Standings from './Components/Standings';
 import Rules from './Components/Rules';
+import axios, { AxiosRequestConfig } from 'axios';
+import { config } from 'dotenv/types';
 
 // Initialize icons in case this page uses them
 initializeIcons();
@@ -25,11 +27,28 @@ export type AuthProps = {
   authenticate: () => Promise<void>
 }
 
+console.log('Starting Web app...')
+
 const App: React.FC = () => {
   const currentMenu = useMenu()
   const [isInitialized, setInitialized] = useState(false)
   const [user, setUser] = useState<Agent | null>(null)
   const [numOfGames, setNumOfGames] = useState<number>(0)
+
+  // Add a request interceptor for Bridge-to-Kubernetes to work as designed
+  // axios.interceptors.request.use((config: AxiosRequestConfig) => {
+  //   // Do something before request is sent
+  //   const kube = config.headers['kubernetes-route-as']
+  //   if (kube) {
+  //       console.log('Forwarding kubernetes-route-as header value -%s', kube)
+  //       config.headers = {...{ 'kubernetes-route-as': kube }}
+  //   }
+
+  //   return config
+  // }, (error: any) => {
+  //   // Do something with request error
+  //   return Promise.reject(error)
+  // })
 
   // Set Auth Context
   const authContextProvider = useContext(authContext)

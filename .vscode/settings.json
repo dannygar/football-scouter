@@ -1,3 +1,9 @@
 {
-    "typescript.tsdk": "node_modules\\typescript\\lib"
+    "typescript.tsdk": "node_modules\\typescript\\lib",
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/6080a61e-9056-4170-9462-7f5adf7959b1/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/footballscouterapp",
+    "appService.deploySubpath": "."
 }

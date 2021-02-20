@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "webapi.fullname" . }}
+  name: {{ template "scouterweb.fullname" . }}
   labels:
-    app: {{ template "webapi.name" . }}
-    chart: {{ template "webapi.chart" . }}
+    app: {{ template "scouterweb.name" . }}
+    chart: {{ template "scouterweb.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
@@ -15,5 +15,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: {{ template "webapi.name" . }}
+    app: {{ template "scouterweb.name" . }}
     release: {{ .Release.Name }}

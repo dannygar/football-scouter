@@ -38,7 +38,12 @@ ingress:
     # - secretName: chart-example-tls
     #   hosts:
     #     - chart-example.local
-secrets: {}
+secrets:
+  ad:
+    CLIENT_APP_ID: a6807271-358b-4616-9e63-530fb37155b6
+    APP_API_ID: 32c5a006-8a99-479d-9d1b-c029f941bb2d
+    APP_TENANT_ID: 6e164b62-93ce-4c99-9b4a-12b3123b4720
+
   # Optionally specify a set of secret objects whose values
   # will be injected as environment variables by default.
   # You should add this section to a file like secrets.yaml

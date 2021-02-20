@@ -5,6 +5,17 @@
    "version": "0.2.0",
    "configurations": [
     {
+        "type": "chrome",
+        "request": "launch",
+        "name": "Front-end Launch Chrome with Kubernetes",
+        "port": 9222,
+        "webRoot": "${workspaceFolder}",
+        "preLaunchTask": "bridge-to-kubernetes.service",
+        "env": {
+            "GRPC_DNS_RESOLVER": "native"
+        }
+    },
+    {
         "name": "Launch localhost in Microsoft Edge",
         "type": "edge",
         "request": "launch",
