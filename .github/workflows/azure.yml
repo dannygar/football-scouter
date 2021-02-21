@@ -45,51 +45,15 @@ jobs:
     - name: add process.json
       run: |
        echo '{ script: "serve", env: { PM2_SERVE_SPA: "true", PM2_SERVE_HOMEPAGE: "/index.html" } }' >> build/process.json
-    - name: REACT_APP_CLIENT_APP_ID Environment variable to Dotenv
-      uses: TickX/var-to-dotenv@v1.1.1
-      with:
-        key: 'REACT_APP_CLIENT_APP_ID' # [Required]
-        value: ${{ secrets.REACT_APP_CLIENT_APP_ID }} # [Required]
-        default: 'CLIENT_APP_ID must be provided' # [Optional] if `value` is empty, this is used instead
-        nullable: 'false' # [Optional] if the resolved value is empty, the variable will be omitted
-        envPath: '.env' # [Optional] The path to the dotenv file (defaults to `.env`)
-    - name: REACT_APP_API_ID Environment variable to Dotenv
-      uses: TickX/var-to-dotenv@v1.1.1
-      with:
-        key: 'REACT_APP_API_ID' # [Required]
-        value: ${{ secrets.REACT_APP_API_ID }} # [Required]
-        default: 'REACT_APP_API_ID must be provided' # [Optional] if `value` is empty, this is used instead
-        nullable: 'false' # [Optional] if the resolved value is empty, the variable will be omitted
-        envPath: '.env' # [Optional] The path to the dotenv file (defaults to `.env`)
-    - name: REACT_APP_TENANT_ID Environment variable to Dotenv
-      uses: TickX/var-to-dotenv@v1.1.1
-      with:
-        key: 'REACT_APP_TENANT_ID' # [Required]
-        value: ${{ secrets.REACT_APP_TENANT_ID }} # [Required]
-        default: 'REACT_APP_TENANT_ID must be provided' # [Optional] if `value` is empty, this is used instead
-        nullable: 'false' # [Optional] if the resolved value is empty, the variable will be omitted
-        envPath: '.env' # [Optional] The path to the dotenv file (defaults to `.env`)
-    - name: REACT_APP_API_URL Environment variable to Dotenv
-      uses: TickX/var-to-dotenv@v1.1.1
-      with:
-        key: 'REACT_APP_API_URL' # [Required]
-        value: ${{ secrets.REACT_APP_API_URL }} # [Required]
-        default: 'REACT_APP_API_URL must be provided' # [Optional] if `value` is empty, this is used instead
-        nullable: 'false' # [Optional] if the resolved value is empty, the variable will be omitted
-        envPath: '.env' # [Optional] The path to the dotenv file (defaults to `.env`)
-    - name: REACT_APP_STANDINGS_GAMES Environment variable to Dotenv
-      uses: TickX/var-to-dotenv@v1.1.1
-      with:
-        key: 'REACT_APP_STANDINGS_GAMES' # [Required]
-        value: ${{ secrets.REACT_APP_STANDINGS_GAMES }} # [Required]
-        default: '0' # [Optional] if `value` is empty, this is used instead
-        nullable: 'false' # [Optional] if the resolved value is empty, the variable will be omitted
-        envPath: '.env' # [Optional] The path to the dotenv file (defaults to `.env`)
     - name: Create .env file
-      uses: oppielabs/create-envfile@v1
+      uses: SpicyPizza/create-envfile@v1
       with:
-        ENV_FILE: ${{ secrets.ENV_FILE }}
-        FILE_NAME: .env        
+        envkey_REACT_APP_CLIENT_APP_ID: ${{ secrets.REACT_APP_CLIENT_APP_ID }}
+        envkey_REACT_APP_API_ID: ${{ secrets.REACT_APP_API_ID }}
+        envkey_REACT_REACT_APP_TENANT_ID: ${{ secrets.REACT_APP_TENANT_ID }}
+        envkey_REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+        envkey_REACT_APP_STANDINGS_GAMES: 4
+        file_name: .env
     - name: 'Deploy to Azure WebApp'
       uses: azure/webapps-deploy@v2
       with:
