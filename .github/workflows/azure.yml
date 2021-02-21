@@ -53,6 +53,7 @@ jobs:
         envkey_REACT_REACT_APP_TENANT_ID: ${{ secrets.REACT_APP_TENANT_ID }}
         envkey_REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
         envkey_REACT_APP_STANDINGS_GAMES: 4
+        directory: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
         file_name: .env
     - name: 'Deploy to Azure WebApp'
       uses: azure/webapps-deploy@v2
