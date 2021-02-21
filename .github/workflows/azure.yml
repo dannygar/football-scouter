@@ -22,11 +22,11 @@ env:
   AZURE_WEBAPP_PACKAGE_PATH: 'build'      # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '12.x'                # set this to the node version to use
   CI: false
-  REACT_APP_CLIENT_APP_ID: ${{ env.REACT_APP_CLIENT_APP_ID }}
-  REACT_APP_API_ID: ${{ env.REACT_APP_API_ID }}
-  REACT_APP_TENANT_ID: ${{ env.REACT_APP_TENANT_ID }}
-  REACT_APP_API_URL: ${{ env.REACT_APP_API_URL }}
-  REACT_APP_STANDINGS_GAMES: ${{ env.REACT_APP_STANDINGS_GAMES }}
+  REACT_APP_CLIENT_APP_ID: ${{ secrets.REACT_APP_CLIENT_APP_ID }}
+  REACT_APP_API_ID: ${{ secrets.REACT_APP_API_ID }}
+  REACT_APP_TENANT_ID: ${{ secrets.REACT_APP_TENANT_ID }}
+  REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+  REACT_APP_STANDINGS_GAMES: ${{ secrets.REACT_APP_STANDINGS_GAMES }}
 
 jobs:
   build-and-deploy:
