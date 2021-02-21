@@ -22,11 +22,6 @@ env:
   AZURE_WEBAPP_PACKAGE_PATH: 'build'      # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '12.x'                # set this to the node version to use
   CI: false
-  REACT_APP_CLIENT_APP_ID: ${{ secrets.REACT_APP_CLIENT_APP_ID }}
-  REACT_APP_API_ID: ${{ secrets.REACT_APP_API_ID }}
-  REACT_APP_TENANT_ID: ${{ secrets.REACT_APP_TENANT_ID }}
-  REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
-  REACT_APP_STANDINGS_GAMES: ${{ secrets.REACT_APP_STANDINGS_GAMES }}
 
 jobs:
   build-and-deploy:
@@ -58,7 +53,7 @@ jobs:
       uses: CallePuzzle/envvar-to-dotenv-action@v1.0.0
       with:
         # Comma separated names of environment variables to append to a dotenv file
-        variableNames: REACT_APP_CLIENT_APP_ID,REACT_APP_API_ID,REACT_APP_TENANT_ID,REACT_APP_API_URL,REACT_APP_STANDINGS_GAMES
+        variableNames: ${{ secrets.REACT_APP_CLIENT_APP_ID }},${{ secrets.REACT_APP_API_ID }},${{ secrets.REACT_APP_TENANT_ID }},${{ secrets.REACT_APP_API_URL }},${{ secrets.REACT_APP_STANDINGS_GAMES }}
     - name: 'Deploy to Azure WebApp'
       uses: azure/webapps-deploy@v2
       with:
