@@ -85,6 +85,11 @@ jobs:
         default: '0' # [Optional] if `value` is empty, this is used instead
         nullable: 'false' # [Optional] if the resolved value is empty, the variable will be omitted
         envPath: '.env' # [Optional] The path to the dotenv file (defaults to `.env`)
+    - name: Create .env file
+      uses: oppielabs/create-envfile@v1
+      with:
+        ENV_FILE: ${{ secrets.ENV_FILE }}
+        FILE_NAME: .env        
     - name: 'Deploy to Azure WebApp'
       uses: azure/webapps-deploy@v2
       with:
