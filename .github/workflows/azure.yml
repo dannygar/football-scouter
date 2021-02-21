@@ -52,7 +52,7 @@ jobs:
         default: 'CLIENT_APP_ID must be provided' # [Optional] if `value` is empty, this is used instead
         nullable: 'false' # [Optional] if the resolved value is empty, the variable will be omitted
         envPath: '.env' # [Optional] The path to the dotenv file (defaults to `.env`)
-    - name: REACT_APP_CLIENT_APP_ID Environment variable to Dotenv
+    - name: REACT_APP_API_ID Environment variable to Dotenv
       uses: TickX/var-to-dotenv@v1.1.1
       with:
         key: 'REACT_APP_API_ID' # [Required]
@@ -60,7 +60,7 @@ jobs:
         default: 'REACT_APP_API_ID must be provided' # [Optional] if `value` is empty, this is used instead
         nullable: 'false' # [Optional] if the resolved value is empty, the variable will be omitted
         envPath: '.env' # [Optional] The path to the dotenv file (defaults to `.env`)
-    - name: REACT_APP_API_ID Environment variable to Dotenv
+    - name: REACT_APP_TENANT_ID Environment variable to Dotenv
       uses: TickX/var-to-dotenv@v1.1.1
       with:
         key: 'REACT_APP_TENANT_ID' # [Required]
@@ -68,7 +68,7 @@ jobs:
         default: 'REACT_APP_TENANT_ID must be provided' # [Optional] if `value` is empty, this is used instead
         nullable: 'false' # [Optional] if the resolved value is empty, the variable will be omitted
         envPath: '.env' # [Optional] The path to the dotenv file (defaults to `.env`)
-    - name: REACT_APP_TENANT_ID Environment variable to Dotenv
+    - name: REACT_APP_API_URL Environment variable to Dotenv
       uses: TickX/var-to-dotenv@v1.1.1
       with:
         key: 'REACT_APP_API_URL' # [Required]
@@ -76,7 +76,7 @@ jobs:
         default: 'REACT_APP_API_URL must be provided' # [Optional] if `value` is empty, this is used instead
         nullable: 'false' # [Optional] if the resolved value is empty, the variable will be omitted
         envPath: '.env' # [Optional] The path to the dotenv file (defaults to `.env`)
-    - name: REACT_APP_API_URL Environment variable to Dotenv
+    - name: REACT_APP_STANDINGS_GAMES Environment variable to Dotenv
       uses: TickX/var-to-dotenv@v1.1.1
       with:
         key: 'REACT_APP_STANDINGS_GAMES' # [Required]
