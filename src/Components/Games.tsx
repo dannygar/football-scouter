@@ -79,7 +79,7 @@ const Games: React.FC = () => {
 
 
   const handleSaveGames = async (games: IGame[]):  Promise<string>  => {
-    const result = await saveGames(games)
+    const result = await saveGames(games, authUserContext.authUser.token)
     return result
   }
 

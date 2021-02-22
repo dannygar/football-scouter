@@ -40,12 +40,19 @@ export const addGame = async (formData: IGame, games: IGame[]): Promise<AxiosRes
 }
 
 
-export const saveGames = async (games: IGame[]): Promise<string> => {
+export const saveGames = async (games: IGame[], token: string): Promise<string> => {
   try {
     const apiUrl = `${baseUrl}/save`
+    const config: AxiosRequestConfig = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+
     const response: AxiosResponse<boolean> = await axios.post(
       apiUrl,
-      games
+      games,
+      config
     )
     return response ? 'Saved' : 'Failed'
   } catch (error) {

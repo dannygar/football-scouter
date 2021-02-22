@@ -45,16 +45,38 @@ jobs:
     - name: add process.json
       run: |
        echo '{ script: "serve", env: { PM2_SERVE_SPA: "true", PM2_SERVE_HOMEPAGE: "/index.html" } }' >> build/process.json
-    - name: Create .env file
-      uses: SpicyPizza/create-envfile@v1
+    - name: Set Web App AD authentication
+      uses: Azure/appservice-settings@v1
       with:
-        envkey_REACT_APP_CLIENT_APP_ID: 'a6807271-358b-4616-9e63-530fb37155b6'
-        envkey_REACT_APP_API_ID: '32c5a006-8a99-479d-9d1b-c029f941bb2d'
-        envkey_REACT_REACT_APP_TENANT_ID: '6e164b62-93ce-4c99-9b4a-12b3123b4720'
-        envkey_REACT_APP_API_URL: 'http://footballscouterapp.scouterapi.51.132.152.18.nip.io'
-        envkey_REACT_APP_STANDINGS_GAMES: 4
-        directory: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-        file_name: .env
+        app-name: ${{ env.AZURE_WEBAPP_NAME }} 
+        app-settings-json: |
+          [
+              {
+                  "name": "REACT_APP_CLIENT_APP_ID",
+                  "value": "${{ secrets.REACT_APP_CLIENT_APP_ID }}",
+                  "slotSetting": false
+              },
+              {
+                  "name": "REACT_APP_API_ID",
+                  "value": "${{ secrets.REACT_APP_API_ID }}",
+                  "slotSetting": false
+              },
+              {
+                  "name": "REACT_REACT_APP_TENANT_ID",
+                  "value": "${{ secrets.REACT_REACT_APP_TENANT_ID  }}",
+                  "slotSetting": false
+              },
+              {
+                  "name": "REACT_APP_API_URL",
+                  "value": "${{ secrets.REACT_APP_API_URL  }}",
+                  "slotSetting": false
+              },
+              {
+                  "name": "REACT_APP_STANDINGS_GAMES",
+                  "value": "${{ secrets.REACT_APP_STANDINGS_GAMES  }}",
+                  "slotSetting": false
+              }
+          ]        
     - name: 'Deploy to Azure WebApp'
       uses: azure/webapps-deploy@v2
       with:
