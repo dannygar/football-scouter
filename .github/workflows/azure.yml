@@ -63,17 +63,17 @@ jobs:
               },
               {
                   "name": "REACT_REACT_APP_TENANT_ID",
-                  "value": "${{ secrets.REACT_REACT_APP_TENANT_ID  }}",
+                  "value": "${{ secrets.REACT_APP_TENANT_ID }}",
                   "slotSetting": false
               },
               {
                   "name": "REACT_APP_API_URL",
-                  "value": "${{ secrets.REACT_APP_API_URL  }}",
+                  "value": "${{ secrets.REACT_APP_API_URL }}",
                   "slotSetting": false
               },
               {
                   "name": "REACT_APP_STANDINGS_GAMES",
-                  "value": "${{ secrets.REACT_APP_STANDINGS_GAMES  }}",
+                  "value": "${{ secrets.REACT_APP_STANDINGS_GAMES }}",
                   "slotSetting": false
               }
           ]        
