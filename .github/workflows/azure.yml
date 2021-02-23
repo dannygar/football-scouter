@@ -18,7 +18,7 @@
 on: push
 
 env:
-  AZURE_WEBAPP_NAME: footscouterapp    # set this to your application's name
+  AZURE_WEBAPP_NAME: footballscoutingapp    # set this to your application's name
   AZURE_WEBAPP_PACKAGE_PATH: 'build'      # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '12.x'                # set this to the node version to use
   CI: false
@@ -31,6 +31,15 @@ jobs:
     environment: production
     steps:
     - uses: actions/checkout@v2
+    - name: Create .env file
+      uses: SpicyPizza/create-envfile@v1
+      with:
+        envkey_REACT_APP_CLIENT_APP_ID: ${{ secrets.REACT_APP_CLIENT_APP_ID }}
+        envkey_REACT_APP_API_ID: ${{ secrets.REACT_APP_API_ID }}
+        envkey_REACT_REACT_APP_TENANT_ID: ${{ secrets.REACT_APP_TENANT_ID }}
+        envkey_REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+        envkey_REACT_APP_STANDINGS_GAMES: 4
+        file_name: .env    
     - name: Use Node.js ${{ env.NODE_VERSION }}
       uses: actions/setup-node@v1
       with:
