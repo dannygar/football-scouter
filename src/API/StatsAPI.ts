@@ -1,7 +1,9 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import IGoldCircleModel from '../Models/GoldCircleModel'
 
-const baseUrl: string = `${process.env.REACT_APP_API_URL}/api/stats`
+const apiUrl = process.env.REACT_APP_API_URL as string
+const controllerUrl: string = apiUrl.charAt(apiUrl.length - 1) === '/' ? 'api/stats' : '/api/stats'
+const baseUrl = `${apiUrl}${controllerUrl}`
 
 export const getGoldCircle = async (gameId: string, token: string): Promise<IGoldCircleModel | null> => {
   try {

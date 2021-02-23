@@ -1,8 +1,12 @@
 import { v4 as uuid } from 'uuid'
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
-import { IEventModel, IEvent, EventDataType } from '../Models/EventModel'
+import { IEventModel, IEvent, EventDataType, IGoldCircle } from '../Models/EventModel'
+import IConsensusModel from '../Models/ConsensusModel'
 
-const baseUrl: string = `${process.env.REACT_APP_API_URL}/api/events`
+const apiUrl = process.env.REACT_APP_API_URL as string
+const controllerUrl: string = apiUrl.charAt(apiUrl.length - 1) === '/' ? 'api/events' : '/api/events'
+const baseUrl = `${apiUrl}${controllerUrl}`
+
 
 export const getEvents = async (gameId: string, userId: string | undefined, token: string): Promise<IEventModel | null> => {
   try {
@@ -120,5 +124,30 @@ export const deleteEvent = async (
     return deletedEvent
   } catch (error) {
     throw new Error(error)
+  }
+}
+
+export const getGameStats = async (gameId: string, agentKeys: string[], token: string): Promise<IConsensusModel[]> => {
+  try {
+    const payload: IGoldCircle = {
+      gameId: gameId,
+      agentIds: agentKeys
+    }
+    const apiUrl = `${baseUrl}/game/stats?id=${gameId}`
+    const config: AxiosRequestConfig = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+
+    const response: AxiosResponse<IConsensusModel[]> = await axios.post(
+      apiUrl,
+      payload,
+      config
+    )
+
+    return (response.status === 200)? response.data : []
+  } catch (error) {
+    throw error
   }
 }

@@ -8,7 +8,7 @@ import { Bar } from '@reactchartjs/react-chart.js'
 import { v4 as uuid } from 'uuid'
 import { Confirm } from 'react-st-modal'
 
-import { addEvent, saveEvents, getGameEvents, getEvents } from '../API/EventAPI'
+import { addEvent, saveEvents, getGameEvents, getEvents, getGameStats } from '../API/EventAPI'
 import { IEvent, IEventModel } from '../Models/EventModel'
 import AddEvent from './AddEvent'
 import Navigation from './Navigation'
@@ -19,7 +19,6 @@ import { IGame } from '../Models/GameModel'
 // import { useMenu } from '../NavBar/NavBar.Hook'
 // import { NIL } from 'uuid';
 import { getGames } from '../API/GameAPI';
-import { getGameStats } from '../API/ScoreAPI';
 import StatsTable from './StatsTable';
 import IConsensusModel from '../Models/ConsensusModel';
 import EventTable from './EventTable';
