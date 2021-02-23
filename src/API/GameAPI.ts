@@ -2,7 +2,9 @@ import { v4 as uuid } from 'uuid'
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import { IGame } from '../Models/GameModel'
 
-const baseUrl: string = `${process.env.REACT_APP_API_URL}/api/games`
+const apiUrl = process.env.REACT_APP_API_URL as string
+const controllerUrl: string = apiUrl.charAt(apiUrl.length - 1) === '/' ? 'api/games' : '/api/games'
+const baseUrl = `${apiUrl}${controllerUrl}`
 
 export const getGames = async (token: string): Promise<IGame[]> => {
   try {

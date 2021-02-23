@@ -1,7 +1,9 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import { IResultsModel, IStandingsModel } from '../Models/ResultsModel'
 
-const baseUrl: string = `${process.env.REACT_APP_API_URL}/api/results`
+const apiUrl = process.env.REACT_APP_API_URL as string
+const controllerUrl: string = apiUrl.charAt(apiUrl.length - 1) === '/' ? 'api/results' : '/api/results'
+const baseUrl = `${apiUrl}${controllerUrl}`
 
 export const getGameResults = async (gameId: string, token: string): Promise<IResultsModel[]> => {
   try {
