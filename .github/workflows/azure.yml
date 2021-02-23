@@ -45,38 +45,22 @@ jobs:
     - name: add process.json
       run: |
        echo '{ script: "serve", env: { PM2_SERVE_SPA: "true", PM2_SERVE_HOMEPAGE: "/index.html" } }' >> build/process.json
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
     - name: Set Web App AD authentication
-      uses: Azure/appservice-settings@v1
+      uses: azure/appservice-settings@v1
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }} 
-        app-settings-json: |
-          [
-              {
-                  "name": "REACT_APP_CLIENT_APP_ID",
-                  "value": "${{ secrets.REACT_APP_CLIENT_APP_ID }}",
-                  "slotSetting": false
-              },
-              {
-                  "name": "REACT_APP_API_ID",
-                  "value": "${{ secrets.REACT_APP_API_ID }}",
-                  "slotSetting": false
-              },
-              {
-                  "name": "REACT_REACT_APP_TENANT_ID",
-                  "value": "${{ secrets.REACT_APP_TENANT_ID }}",
-                  "slotSetting": false
-              },
-              {
-                  "name": "REACT_APP_API_URL",
-                  "value": "${{ secrets.REACT_APP_API_URL }}",
-                  "slotSetting": false
-              },
-              {
-                  "name": "REACT_APP_STANDINGS_GAMES",
-                  "value": "${{ secrets.REACT_APP_STANDINGS_GAMES }}",
-                  "slotSetting": false
-              }
-          ]        
+        app-settings-json: ${{ secrets.APP_SETTINGS }}
+        general-settings-json: '{"alwaysOn": "false", "webSocketsEnabled": "true"}' #'General configuration settings as Key Value pairs' 
+      id: settings
+    - name: Web App Url
+      run: echo "The webapp-url is ${{ steps.settings.outputs.webapp-url }}"
+    - name: Logout from Azure
+      run: |
+        az logout      
     - name: 'Deploy to Azure WebApp'
       uses: azure/webapps-deploy@v2
       with:

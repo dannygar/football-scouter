@@ -1,0 +1,10 @@
+PORT=3000
+HTTPS=false
+HOST=localhost
+SSL_CRT_FILE=./cert/.cert/footballscouter.crt
+SSL_KEY_FILE=./cert/.cert/footballscouter.key
+REACT_APP_CLIENT_APP_ID=a6807271-358b-4616-9e63-530fb37155b6
+REACT_APP_API_ID=32c5a006-8a99-479d-9d1b-c029f941bb2d
+REACT_APP_TENANT_ID=6e164b62-93ce-4c99-9b4a-12b3123b4720
+REACT_APP_API_URL=http://footballscouterapp.scouterapi.51.132.152.18.nip.io
+REACT_APP_STANDINGS_GAMES=4
