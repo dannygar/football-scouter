@@ -1,6 +1,8 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios'
 
-const baseUrl: string = `${process.env.REACT_APP_API_URL}/api/masters`
+const apiUrl = process.env.REACT_APP_API_URL as string
+const controllerUrl: string = apiUrl.charAt(apiUrl.length - 1) === '/' ? 'api/masters' : '/api/masters'
+const baseUrl = `${apiUrl}${controllerUrl}`
 
 export const isMaster = async (accountId: string, token: string): Promise<boolean> => {
   try {
